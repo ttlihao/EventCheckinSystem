@@ -4,6 +4,7 @@ using Microsoft.Identity.Web.Resource;
 
 namespace EventCheckinSystem.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     [RequiredScope(RequiredScopesConfigurationKey = "AzureAd:Scopes")]
