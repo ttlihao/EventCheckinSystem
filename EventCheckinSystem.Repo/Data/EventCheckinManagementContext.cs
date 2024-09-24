@@ -10,7 +10,7 @@ namespace EventCheckinSystem.Repo.Data
 {
     public class EventCheckinManagementContext : IdentityDbContext
     {
-        public EventCheckinManagementContext(DbContextOptions options) : base(options)
+        public EventCheckinManagementContext(DbContextOptions<EventCheckinManagementContext> options) : base(options)
         {
         }
     }
