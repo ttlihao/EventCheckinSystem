@@ -1,7 +1,11 @@
 using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Services.Interfaces;
+using EventCheckinSystem.Services.Services;
+using EventCheckinSystem.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +17,17 @@ var builder = WebApplication.CreateBuilder(args);
 //    .AddEntityFrameworkStores<EventCheckinManagementContext>()
 //    .AddDefaultTokenProviders()
 //    .AddDefaultUI();
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+});
+builder.Services.AddScoped<IEventServices, EventServices>();
+builder.Services.AddScoped<IGuestCheckinServices, GuestCheckinServices>();
+builder.Services.AddScoped<IGuestGroupServices, GuestGroupServices>();
+builder.Services.AddScoped<IGuestImageServices, GuestImageServices>();
+builder.Services.AddScoped<IGuestServices, GuestServices>();
+builder.Services.AddScoped<IOrganizationServices, OrganizationServices>();
+builder.Services.AddScoped<IWelcomeTemplateServices, WelcomeTemplateServices>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
