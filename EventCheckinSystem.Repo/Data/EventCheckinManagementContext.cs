@@ -22,6 +22,7 @@ namespace EventCheckinSystem.Repo.Data
         public DbSet<WelcomeTemplate> WelcomeTemplates { get; set; }
         public DbSet<GuestImage> GuestImages { get; set; }
         public DbSet<GuestCheckin> GuestCheckins { get; set; }
+        public DbSet<UserEvent> UserEvents { get; set; }    
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
