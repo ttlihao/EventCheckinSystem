@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace EventCheckinSystem.Repo.DTOs
 {
-    internal class DTO
+    public class GuestCheckinDTO
     {
+        public int GuestCheckinID { get; set; }
+        public int GuestID { get; set; }
+        public DateTime CheckinTime { get; set; }
+
     }
 }
