@@ -14,7 +14,7 @@ namespace EventCheckinSystem.Repo.Data
         public DateTimeOffset? VerificationTokenExpires { get; set; }
 
         // Navigation properties
-            public ICollection<Event> Events { get; set; }
+        public ICollection<Event> Events { get; set; }
         public ICollection<UserEvent> UserEvents { get; set; }
 
         // Base Entity
