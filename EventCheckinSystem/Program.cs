@@ -40,7 +40,7 @@ builder.Services.AddSwaggerGen(option =>
     });
     option.OperationFilter<SecurityRequirementsOperationFilter>();
 });
-
+//builder.Services.AddAutoMapper(typeof(MappingProfiles));
 builder.Services.AddDbContext<EventCheckinManagementContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddAuthorization();
