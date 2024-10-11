@@ -1,4 +1,6 @@
-﻿using EventCheckinSystem.Repo.Data;
+﻿using AutoMapper;
+using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,48 +14,51 @@ namespace EventCheckinSystem.Services.Services
     public class EventServices : IEventServices
     {
         private readonly EventCheckinManagementContext _context;
+        private readonly IMapper _mapper;
 
-        public EventServices(EventCheckinManagementContext context)
+        public EventServices(EventCheckinManagementContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Event>> GetAllEventsAsync()
+        public async Task<IEnumerable<EventDTO>> GetAllEventsAsync()
         {
-            return await _context.Events
-                                 .Include(e => e.Organization)
-                                 .Include(e => e.GuestGroups)
-                                 .Include(e => e.UserEvents)
-                                 .ToListAsync();
+            var events = await _context.Events
+                .Include(e => e.Organization)
+                .Include(e => e.GuestGroups)
+                .Include(e => e.UserEvents)
+                .ToListAsync();
+
+            return _mapper.Map<IEnumerable<EventDTO>>(events);
         }
 
-        public async Task<Event> GetEventByIdAsync(int id)
+        public async Task<EventDTO> GetEventByIdAsync(int id)
         {
-            return await _context.Events
-                                 .Include(e => e.Organization)
-                                 .Include(e => e.GuestGroups)
-                                 .Include(e => e.UserEvents)
-                                 .FirstOrDefaultAsync(e => e.EventID == id);
+            var eventEntity = await _context.Events
+                .Include(e => e.Organization)
+                .Include(e => e.GuestGroups)
+                .Include(e => e.UserEvents)
+                .FirstOrDefaultAsync(e => e.EventID == id);
+
+            return _mapper.Map<EventDTO>(eventEntity);
         }
 
-        public async Task<Event> CreateEventAsync(Event newEvent)
+        public async Task<EventDTO> CreateEventAsync(EventDTO newEventDto)
         {
+            var newEvent = _mapper.Map<Event>(newEventDto);
             await _context.Events.AddAsync(newEvent);
             await _context.SaveChangesAsync();
-            return newEvent;
+            return _mapper.Map<EventDTO>(newEvent);
         }
 
-        public async Task UpdateEventAsync(Event updatedEvent)
+        public async Task UpdateEventAsync(EventDTO updatedEventDto)
         {
-            var existingEvent = await _context.Events.FindAsync(updatedEvent.EventID);
+            var existingEvent = await _context.Events.FindAsync(updatedEventDto.EventID);
 
             if (existingEvent != null)
             {
-                existingEvent.Name = updatedEvent.Name;
-                existingEvent.OrganizationID = updatedEvent.OrganizationID;
-                existingEvent.GuestGroups = updatedEvent.GuestGroups;
-                existingEvent.UserEvents = updatedEvent.UserEvents;
-
+                _mapper.Map(updatedEventDto, existingEvent);
                 _context.Events.Update(existingEvent);
                 await _context.SaveChangesAsync();
             }

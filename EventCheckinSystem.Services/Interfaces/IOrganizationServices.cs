@@ -1,4 +1,4 @@
-﻿using EventCheckinSystem.Repo.Data;
+﻿using EventCheckinSystem.Repo.DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,10 +6,10 @@ namespace EventCheckinSystem.Services.Interfaces
 {
     public interface IOrganizationServices
     {
-        Task<IEnumerable<Organization>> GetAllOrganizationsAsync();
-        Task<Organization> GetOrganizationByIdAsync(int id);
-        Task<Organization> CreateOrganizationAsync(Organization organization);
-        Task UpdateOrganizationAsync(Organization organization);
+        Task<IEnumerable<OrganizationDTO>> GetAllOrganizationsAsync();
+        Task<OrganizationDTO> GetOrganizationByIdAsync(int id);
+        Task<OrganizationDTO> CreateOrganizationAsync(OrganizationDTO newOrganizationDto);
+        Task UpdateOrganizationAsync(OrganizationDTO updatedOrganizationDto);
         Task DeleteOrganizationAsync(int id);
     }
 }

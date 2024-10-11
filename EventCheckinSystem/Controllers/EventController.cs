@@ -1,78 +1,57 @@
 ﻿using EventCheckinSystem.Repo.Data;
 using Microsoft.AspNetCore.Mvc;
 using EventCheckinSystem.Services.Interfaces;
+using EventCheckinSystem.Repo.DTOs;
 
 namespace EventCheckinSystem.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class EventController : ControllerBase
     {
-        private readonly IEventServices _eventService;
+        private readonly IEventServices _eventServices;
 
-        public EventController(IEventServices eventService)
+        public EventController(IEventServices eventServices)
         {
-            _eventService = eventService;
+            _eventServices = eventServices;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Event>>> GetAllEvents()
+        public async Task<ActionResult<IEnumerable<EventDTO>>> GetAllEvents()
         {
-            var events = await _eventService.GetAllEventsAsync();
+            var events = await _eventServices.GetAllEventsAsync();
             return Ok(events);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Event>> GetEvent(int id)
+        public async Task<ActionResult<EventDTO>> GetEventById(int id)
         {
-            var eventItem = await _eventService.GetEventByIdAsync(id);
-            if (eventItem == null)
+            var eventDto = await _eventServices.GetEventByIdAsync(id);
+            if (eventDto == null)
             {
                 return NotFound();
             }
-            return Ok(eventItem);
+            return Ok(eventDto);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Event>> CreateEvent([FromBody] Event newEvent)
+        public async Task<ActionResult<EventDTO>> CreateEvent([FromBody] EventDTO eventDto)
         {
-            if (newEvent == null)
-            {
-                return BadRequest();
-            }
-
-            var createdEvent = await _eventService.CreateEventAsync(newEvent);
-            return CreatedAtAction(nameof(GetEvent), new { id = createdEvent.EventID }, createdEvent);
+            var createdEvent = await _eventServices.CreateEventAsync(eventDto);
+            return CreatedAtAction(nameof(GetEventById), new { id = createdEvent.EventID }, createdEvent);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateEvent(int id, [FromBody] Event updatedEvent)
+        [HttpPut]
+        public async Task<IActionResult> UpdateEvent([FromBody] EventDTO eventDto)
         {
-            if (updatedEvent == null || updatedEvent.EventID != id)
-            {
-                return BadRequest();
-            }
-
-            var existingEvent = await _eventService.GetEventByIdAsync(id);
-            if (existingEvent == null)
-            {
-                return NotFound();
-            }
-
-            await _eventService.UpdateEventAsync(updatedEvent);
+            await _eventServices.UpdateEventAsync(eventDto);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(int id)
         {
-            var eventToDelete = await _eventService.GetEventByIdAsync(id);
-            if (eventToDelete == null)
-            {
-                return NotFound();
-            }
-
-            await _eventService.DeleteEventAsync(id);
+            await _eventServices.DeleteEventAsync(id);
             return NoContent();
         }
     }

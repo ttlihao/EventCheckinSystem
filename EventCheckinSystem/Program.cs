@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text.Json.Serialization;
+using EventCheckinSystem.Repo.Configure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,7 @@ builder.Services.AddScoped<IGuestImageServices, GuestImageServices>();
 builder.Services.AddScoped<IGuestServices, GuestServices>();
 builder.Services.AddScoped<IOrganizationServices, OrganizationServices>();
 builder.Services.AddScoped<IWelcomeTemplateServices, WelcomeTemplateServices>();
+builder.Services.AddScoped<IUserEventServices, UserEventServices>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
@@ -72,7 +74,7 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddIdentityApiEndpoints<User>()
     .AddEntityFrameworkStores<EventCheckinManagementContext>();
-
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 
 

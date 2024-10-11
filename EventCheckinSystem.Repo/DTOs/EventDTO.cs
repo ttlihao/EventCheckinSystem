@@ -16,11 +16,6 @@ namespace EventCheckinSystem.Repo.DTOs
         public List<UserEventDTO> UserEvents { get; set; }
     }
 
-    public class GuestGroupDTO
-    {
-        public int GuestGroupID { get; set; }
-        public string GroupName { get; set; }
-    }
 
     
 }

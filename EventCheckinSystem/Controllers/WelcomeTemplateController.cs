@@ -1,13 +1,16 @@
-﻿using EventCheckinSystem.Services.Interfaces;
-using EventCheckinSystem.Repo.Data;
+﻿using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace EventCheckinSystem.API.Controllers
+namespace EventCheckinSystem.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Authorize] // Optional: Ensure the user is authenticated
     public class WelcomeTemplateController : ControllerBase
     {
         private readonly IWelcomeTemplateServices _welcomeTemplateServices;
@@ -17,74 +20,51 @@ namespace EventCheckinSystem.API.Controllers
             _welcomeTemplateServices = welcomeTemplateServices;
         }
 
-        // GET: api/WelcomeTemplate
         [HttpGet]
-        public async Task<IActionResult> GetAllWelcomeTemplates()
+        public async Task<ActionResult<IEnumerable<WelcomeTemplateDTO>>> GetAll()
         {
             var templates = await _welcomeTemplateServices.GetAllWelcomeTemplatesAsync();
             return Ok(templates);
         }
 
-        // GET: api/WelcomeTemplate/{id}
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetWelcomeTemplate(int id)
+        public async Task<ActionResult<WelcomeTemplateDTO>> GetById(int id)
         {
             var template = await _welcomeTemplateServices.GetWelcomeTemplateByIdAsync(id);
-            if (template == null)
-            {
-                return NotFound($"WelcomeTemplate with ID {id} not found.");
-            }
-
+            if (template == null) return NotFound();
             return Ok(template);
         }
 
-        // POST: api/WelcomeTemplate
         [HttpPost]
-        public async Task<IActionResult> CreateWelcomeTemplate([FromBody] WelcomeTemplate welcomeTemplate)
+        public async Task<ActionResult<WelcomeTemplate>> Create([FromBody] WelcomeTemplateDTO welcomeTemplateDto)
         {
-            if (welcomeTemplate == null)
-            {
-                return BadRequest("WelcomeTemplate data is null.");
-            }
-
-            var createdTemplate = await _welcomeTemplateServices.CreateWelcomeTemplateAsync(welcomeTemplate);
-            return CreatedAtAction(nameof(GetWelcomeTemplate), new { id = createdTemplate.WelcomeTemplateID }, createdTemplate);
+            var createdBy = User.Identity.Name; // Get the logged-in user's name
+            var welcomeTemplate = await _welcomeTemplateServices.CreateWelcomeTemplateAsync(welcomeTemplateDto, createdBy);
+            return CreatedAtAction(nameof(GetById), new { id = welcomeTemplate.WelcomeTemplateID }, welcomeTemplate);
         }
 
-        // PUT: api/WelcomeTemplate/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateWelcomeTemplate(int id, [FromBody] WelcomeTemplate welcomeTemplate)
+        public async Task<ActionResult> Update(int id, [FromBody] WelcomeTemplateDTO welcomeTemplateDto)
         {
-            if (id != welcomeTemplate.WelcomeTemplateID)
-            {
-                return BadRequest("ID mismatch.");
-            }
+            if (id != welcomeTemplateDto.WelcomeTemplateID) return BadRequest();
 
-            await _welcomeTemplateServices.UpdateWelcomeTemplateAsync(welcomeTemplate);
+            var updatedBy = User.Identity.Name; // Get the logged-in user's name
+            await _welcomeTemplateServices.UpdateWelcomeTemplateAsync(welcomeTemplateDto, updatedBy);
             return NoContent();
         }
 
-        // DELETE: api/WelcomeTemplate/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteWelcomeTemplate(int id)
+        public async Task<ActionResult> Delete(int id)
         {
             await _welcomeTemplateServices.DeleteWelcomeTemplateAsync(id);
             return NoContent();
         }
 
-        // GET: api/WelcomeTemplate/guestgroup/{guestGroupId}
-        [HttpGet("guestgroup/{guestGroupId}")]
-        public async Task<IActionResult> GetWelcomeTemplatesByGuestGroup(int guestGroupId)
+        [HttpGet("guestGroup/{guestGroupId}")]
+        public async Task<ActionResult<IEnumerable<WelcomeTemplateDTO>>> GetByGuestGroup(int guestGroupId)
         {
             var templates = await _welcomeTemplateServices.GetWelcomeTemplatesByGuestGroupAsync(guestGroupId);
-
-            if (templates == null || !templates.Any())
-            {
-                return NotFound($"No welcome templates found for Guest Group ID {guestGroupId}.");
-            }
-
             return Ok(templates);
         }
-
     }
 }

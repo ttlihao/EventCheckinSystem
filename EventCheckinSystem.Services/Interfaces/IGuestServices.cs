@@ -1,20 +1,17 @@
 ﻿using EventCheckinSystem.Repo.Data;
-using System;
+using EventCheckinSystem.Repo.DTOs;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace EventCheckinSystem.Services.Interfaces
 {
     public interface IGuestServices
     {
-        Task<List<Guest>> GetAllGuestsAsync();
-        Task<Guest> GetGuestByIdAsync(int guestId);
-        Task AddGuestAsync(Guest guest);
-        Task UpdateGuestAsync(Guest guest);
+        Task<List<GuestDTO>> GetAllGuestsAsync();
+        Task<GuestDTO> GetGuestByIdAsync(int guestId);
+        Task AddGuestAsync(Guest guest, string createdBy);
+        Task UpdateGuestAsync(Guest guest, string updatedBy);
         Task DeleteGuestAsync(int guestId);
-        Task<List<Guest>> GetGuestsByGroupIdAsync(int guestGroupId);
-
+        Task<List<GuestDTO>> GetGuestsByGroupIdAsync(int guestGroupId);
     }
 }

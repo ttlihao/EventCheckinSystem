@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EventCheckinSystem.Repo.DTOs;
 
-namespace EventCheckinSystem.Repo.DTOs
+public class OrganizationDTO
 {
-    internal class OrganizationDTO
-    {
-    }
+    public int OrganizationID { get; set; }
+    public string Name { get; set; }
+
+    public ICollection<EventDTO> Events { get; set; }
 }
+

@@ -1,4 +1,5 @@
 ﻿using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,10 @@ namespace EventCheckinSystem.Services.Interfaces
 {
     public interface IEventServices
     {
-        Task<IEnumerable<Event>> GetAllEventsAsync();
-        Task<Event> GetEventByIdAsync(int id);
-        Task<Event> CreateEventAsync(Event newEvent);
-        Task UpdateEventAsync(Event updatedEvent);
+        Task<IEnumerable<EventDTO>> GetAllEventsAsync();
+        Task<EventDTO> GetEventByIdAsync(int id);
+        Task<EventDTO> CreateEventAsync(EventDTO newEvent);
+        Task UpdateEventAsync(EventDTO updatedEvent);
         Task DeleteEventAsync(int id);
     }
 }

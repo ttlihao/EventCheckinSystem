@@ -1,16 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.DTOs;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using EventCheckinSystem.Repo.Data;
 
 namespace EventCheckinSystem.Services.Interfaces
 {
     public interface IWelcomeTemplateServices
     {
-        Task<IEnumerable<WelcomeTemplate>> GetAllWelcomeTemplatesAsync();
-        Task<WelcomeTemplate> GetWelcomeTemplateByIdAsync(int id);
-        Task<WelcomeTemplate> CreateWelcomeTemplateAsync(WelcomeTemplate welcomeTemplate);
-        Task UpdateWelcomeTemplateAsync(WelcomeTemplate updatedWelcomeTemplate);
+        Task<IEnumerable<WelcomeTemplateDTO>> GetAllWelcomeTemplatesAsync();
+        Task<WelcomeTemplateDTO> GetWelcomeTemplateByIdAsync(int id);
+        Task<WelcomeTemplate> CreateWelcomeTemplateAsync(WelcomeTemplateDTO welcomeTemplateDto, string createdBy);
+        Task UpdateWelcomeTemplateAsync(WelcomeTemplateDTO welcomeTemplateDto, string updatedBy);
         Task DeleteWelcomeTemplateAsync(int id);
-        Task<IEnumerable<WelcomeTemplate>> GetWelcomeTemplatesByGuestGroupAsync(int guestGroupId);
+        Task<IEnumerable<WelcomeTemplateDTO>> GetWelcomeTemplatesByGuestGroupAsync(int guestGroupId);
     }
 }

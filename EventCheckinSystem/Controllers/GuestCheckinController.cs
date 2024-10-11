@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EventCheckinSystem.Services.Interfaces;
+using EventCheckinSystem.Repo.DTOs;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using EventCheckinSystem.Repo.Data;
-using EventCheckinSystem.Services.Interfaces;
 
 namespace EventCheckinSystem.API.Controllers
 {
@@ -17,67 +17,47 @@ namespace EventCheckinSystem.API.Controllers
             _guestCheckinServices = guestCheckinServices;
         }
 
-        // GET: api/GuestCheckin
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GuestCheckin>>> GetAllCheckins()
+        public async Task<ActionResult<IEnumerable<GuestCheckinDTO>>> GetAllCheckins()
         {
             var checkins = await _guestCheckinServices.GetAllCheckinsAsync();
             return Ok(checkins);
         }
 
-        // GET: api/GuestCheckin/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<GuestCheckin>> GetCheckinById(int id)
+        public async Task<ActionResult<GuestCheckinDTO>> GetCheckinById(int id)
         {
             var checkin = await _guestCheckinServices.GetCheckinByIdAsync(id);
-
             if (checkin == null)
-            {
-                return NotFound($"Checkin with ID {id} not found.");
-            }
-
+                return NotFound();
             return Ok(checkin);
         }
 
-        // POST: api/GuestCheckin
         [HttpPost]
-        public async Task<IActionResult> CreateCheckin([FromBody] GuestCheckin guestCheckin)
+        public async Task<ActionResult<GuestCheckinDTO>> CreateCheckin(GuestCheckinDTO guestCheckinDto)
         {
-            if (guestCheckin == null)
+            var createdBy = User.Identity.Name;
+
+            if (string.IsNullOrEmpty(createdBy))
             {
-                return BadRequest("Guest check-in data is null.");
+                return BadRequest("The 'createdBy' information is missing.");
             }
 
-            try
-            {
-                var createdCheckin = await _guestCheckinServices.CreateCheckinAsync(guestCheckin);
-                return CreatedAtAction(nameof(GetCheckinById), new { id = createdCheckin.GuestCheckinID }, createdCheckin);
-            }
-            catch
-            {
-                return StatusCode(500, "Internal server error while creating check-in.");
-            }
+            var createdCheckin = await _guestCheckinServices.CreateCheckinAsync(guestCheckinDto, createdBy);
+            return CreatedAtAction(nameof(GetCheckinById), new { id = createdCheckin.GuestCheckinID }, createdCheckin);
         }
 
-        // PUT: api/GuestCheckin/{id}
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCheckin(int id, [FromBody] GuestCheckin guestCheckin)
+        public async Task<IActionResult> UpdateCheckin(int id, GuestCheckinDTO guestCheckinDto)
         {
-            if (id != guestCheckin.GuestCheckinID)
-            {
-                return BadRequest("Checkin ID mismatch.");
-            }
+            if (id != guestCheckinDto.GuestCheckinID)
+                return BadRequest();
 
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            await _guestCheckinServices.UpdateCheckinAsync(guestCheckin);
+            await _guestCheckinServices.UpdateCheckinAsync(guestCheckinDto);
             return NoContent();
         }
 
-        // DELETE: api/GuestCheckin/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCheckin(int id)
         {
@@ -85,24 +65,11 @@ namespace EventCheckinSystem.API.Controllers
             return NoContent();
         }
 
-        // POST: api/GuestCheckin/checkin/{guestId}
         [HttpPost("checkin/{guestId}")]
-        public async Task<IActionResult> CheckinGuestByGuestId(int guestId, [FromBody] string createdBy)
+        public async Task<ActionResult<GuestCheckinDTO>> CheckinGuestById(int guestId, [FromBody] string createdBy)
         {
-            if (string.IsNullOrEmpty(createdBy))
-            {
-                return BadRequest("CreatedBy cannot be null or empty.");
-            }
-
-            try
-            {
-                var checkin = await _guestCheckinServices.CheckinGuestByIdAsync(guestId, createdBy);
-                return CreatedAtAction(nameof(GetCheckinById), new { id = checkin.GuestCheckinID }, checkin);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            var checkin = await _guestCheckinServices.CheckinGuestByIdAsync(guestId, createdBy);
+            return Ok(checkin);
         }
     }
 }

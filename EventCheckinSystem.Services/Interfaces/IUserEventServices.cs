@@ -1,14 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using EventCheckinSystem.Repo.DTOs;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using EventCheckinSystem.Repo.Data;
 
 namespace EventCheckinSystem.Services.Interfaces
 {
     public interface IUserEventServices
     {
-        Task<IEnumerable<UserEvent>> GetAllUserEventsAsync();
-        Task<UserEvent> GetUserEventAsync(string userId, int eventId);
-        Task<UserEvent> CreateUserEventAsync(UserEvent userEvent);
-        Task DeleteUserEventAsync(string userId, int eventId);
+        Task<List<UserEventDTO>> GetAllUserEventsAsync();
+        Task<UserEventDTO> GetUserEventByIdAsync(int eventId);
+        Task AddUserEventAsync(UserEventDTO userEventDto);
+        Task UpdateUserEventAsync(UserEventDTO userEventDto);
+        Task DeleteUserEventAsync(int eventId);
     }
 }
