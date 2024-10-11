@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using EventCheckinSystem.Repo.Data;
-using EventCheckinSystem.Services.Interfaces;
 
-namespace EventCheckinSystem.API.Controllers
+namespace EventCheckinSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -18,50 +19,44 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GuestGroup>>> GetAllGuestGroups()
+        public async Task<ActionResult<IEnumerable<GuestGroupDTO>>> GetAllGuestGroups()
         {
-            var groups = await _guestGroupServices.GetAllGuestGroupsAsync();
-            return Ok(groups);
+            var guestGroups = await _guestGroupServices.GetAllGuestGroupsAsync();
+            return Ok(guestGroups);
         }
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<GuestGroup>> GetGuestGroupById(int id)
+        public async Task<ActionResult<GuestGroupDTO>> GetGuestGroupById(int id)
         {
-            var group = await _guestGroupServices.GetGuestGroupByIdAsync(id);
-
-            if (group == null)
+            var guestGroup = await _guestGroupServices.GetGuestGroupByIdAsync(id);
+            if (guestGroup == null)
             {
-                return NotFound($"Guest group with ID {id} not found.");
+                return NotFound();
             }
-
-            return Ok(group);
+            return Ok(guestGroup);
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddGuestGroup([FromBody] GuestGroup guestGroup)
+        public async Task<ActionResult<GuestGroupDTO>> CreateGuestGroup([FromBody] GuestGroupDTO guestGroupDto)
         {
-            if (!ModelState.IsValid)
+            if (guestGroupDto == null)
             {
-                return BadRequest(ModelState);
+                return BadRequest("GuestGroup data is required.");
             }
 
-            var createdGroup = await _guestGroupServices.CreateGuestGroupAsync(guestGroup);
-            return CreatedAtAction(nameof(GetGuestGroupById), new { id = createdGroup.GuestGroupID }, createdGroup);
+            var createdGuestGroup = await _guestGroupServices.CreateGuestGroupAsync(guestGroupDto, User.Identity.Name);
+            return CreatedAtAction(nameof(GetGuestGroupById), new { id = createdGuestGroup.GuestGroupID }, createdGuestGroup);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateGuestGroup(int id, [FromBody] GuestGroup guestGroup)
+        public async Task<IActionResult> UpdateGuestGroup(int id, [FromBody] GuestGroupDTO guestGroupDto)
         {
-            if (id != guestGroup.GuestGroupID)
+            if (id != guestGroupDto.GuestGroupID)
             {
-                return BadRequest("Guest group ID mismatch.");
+                return BadRequest("ID mismatch.");
             }
 
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            await _guestGroupServices.UpdateGuestGroupAsync(guestGroup);
+            await _guestGroupServices.UpdateGuestGroupAsync(guestGroupDto, User.Identity.Name);
             return NoContent();
         }
 
@@ -73,15 +68,13 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet("guest/{guestId}")]
-        public async Task<ActionResult<GuestGroup>> GetGuestGroupByGuestId(int guestId)
+        public async Task<ActionResult<GuestGroupDTO>> GetGuestGroupByGuestId(int guestId)
         {
             var guestGroup = await _guestGroupServices.GetGuestGroupByGuestIdAsync(guestId);
-
             if (guestGroup == null)
             {
-                return NotFound($"No guest group found for guest ID {guestId}.");
+                return NotFound();
             }
-
             return Ok(guestGroup);
         }
     }

@@ -1,40 +1,64 @@
-﻿using EventCheckinSystem.Repo.Data;
+﻿using AutoMapper;
+using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+
 namespace EventCheckinSystem.Services.Services
 {
     public class UserEventServices : IUserEventServices
     {
         private readonly EventCheckinManagementContext _context;
-        public UserEventServices(EventCheckinManagementContext context)
+        private readonly IMapper _mapper;
+
+        public UserEventServices(EventCheckinManagementContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
-        public async Task<IEnumerable<UserEvent>> GetAllUserEventsAsync()
+
+        public async Task<List<UserEventDTO>> GetAllUserEventsAsync()
         {
-            return await _context.UserEvents
-                                 .Include(ue => ue.User)
-                                 .Include(ue => ue.Event)
-                                 .ToListAsync();
+            var userEvents = await _context.UserEvents
+                .Include(ue => ue.Event)
+                .ToListAsync();
+
+            return _mapper.Map<List<UserEventDTO>>(userEvents);
         }
-        public async Task<UserEvent> GetUserEventAsync(string userId, int eventId)
+
+        public async Task<UserEventDTO> GetUserEventByIdAsync(int eventId)
         {
-            return await _context.UserEvents
-                                 .Include(ue => ue.User)
-                                 .Include(ue => ue.Event)
-                                 .FirstOrDefaultAsync(ue => ue.UserID == userId && ue.EventID == eventId);
+            var userEvent = await _context.UserEvents
+                .Include(ue => ue.Event)
+                .FirstOrDefaultAsync(ue => ue.EventID == eventId);
+
+            return _mapper.Map<UserEventDTO>(userEvent);
         }
-        public async Task<UserEvent> CreateUserEventAsync(UserEvent userEvent)
+
+        public async Task AddUserEventAsync(UserEventDTO userEventDto)
         {
+            var userEvent = _mapper.Map<UserEvent>(userEventDto);
             await _context.UserEvents.AddAsync(userEvent);
             await _context.SaveChangesAsync();
-            return userEvent;
         }
-        public async Task DeleteUserEventAsync(string userId, int eventId)
+
+        public async Task UpdateUserEventAsync(UserEventDTO userEventDto)
         {
-            var userEvent = await _context.UserEvents.FirstOrDefaultAsync(ue => ue.UserID == userId && ue.EventID == eventId);
+            var userEvent = await _context.UserEvents.FindAsync(userEventDto.EventID);
+            if (userEvent != null)
+            {
+                _mapper.Map(userEventDto, userEvent);
+                _context.UserEvents.Update(userEvent);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteUserEventAsync(int eventId)
+        {
+            var userEvent = await _context.UserEvents.FindAsync(eventId);
             if (userEvent != null)
             {
                 _context.UserEvents.Remove(userEvent);

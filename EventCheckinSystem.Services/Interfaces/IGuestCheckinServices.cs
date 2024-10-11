@@ -1,4 +1,5 @@
 ﻿using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,11 +7,12 @@ namespace EventCheckinSystem.Services.Interfaces
 {
     public interface IGuestCheckinServices
     {
-        Task<IEnumerable<GuestCheckin>> GetAllCheckinsAsync();
-        Task<GuestCheckin> GetCheckinByIdAsync(int id);
-        Task<GuestCheckin> CreateCheckinAsync(GuestCheckin guestCheckin);
-        Task UpdateCheckinAsync(GuestCheckin guestCheckin);
+        Task<IEnumerable<GuestCheckinDTO>> GetAllCheckinsAsync();
+        Task<GuestCheckinDTO> GetCheckinByIdAsync(int id);
+        Task<GuestCheckinDTO> CreateCheckinAsync(GuestCheckinDTO guestCheckinDto, string createdBy);
+        Task UpdateCheckinAsync(GuestCheckinDTO updatedCheckinDto);
         Task DeleteCheckinAsync(int id);
-        Task<GuestCheckin> CheckinGuestByIdAsync(int guestId, string created);
+        Task<GuestCheckinDTO> CheckinGuestByIdAsync(int guestId, string createdBy);
     }
 }
+

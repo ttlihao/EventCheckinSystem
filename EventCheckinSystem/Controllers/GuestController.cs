@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using EventCheckinSystem.Repo.Data;
-using EventCheckinSystem.Services;
-using EventCheckinSystem.Services.Interfaces;
 
-namespace EventCheckinSystem.API.Controllers
+namespace EventCheckinSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -20,42 +19,29 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Guest>>> GetAllGuests()
+        public async Task<ActionResult<IEnumerable<GuestDTO>>> GetAllGuests()
         {
             var guests = await _guestServices.GetAllGuestsAsync();
             return Ok(guests);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Guest>> GetGuestById(int id)
+        public async Task<ActionResult<GuestDTO>> GetGuestById(int id)
         {
             var guest = await _guestServices.GetGuestByIdAsync(id);
-
             if (guest == null)
             {
-                return NotFound($"Guest with ID {id} not found.");
+                return NotFound();
             }
-
             return Ok(guest);
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddGuest([FromBody] Guest guest)
+        public async Task<ActionResult<GuestDTO>> AddGuest([FromBody] Guest guest)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            try
-            {
-                await _guestServices.AddGuestAsync(guest);
-                return CreatedAtAction(nameof(GetGuestById), new { id = guest.GuestID }, guest);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            string createdBy = User.Identity.Name;
+            await _guestServices.AddGuestAsync(guest, createdBy);
+            return CreatedAtAction(nameof(GetGuestById), new { id = guest.GuestID }, guest);
         }
 
         [HttpPut("{id}")]
@@ -63,58 +49,25 @@ namespace EventCheckinSystem.API.Controllers
         {
             if (id != guest.GuestID)
             {
-                return BadRequest("Guest ID mismatch.");
+                return BadRequest();
             }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            try
-            {
-                await _guestServices.UpdateGuestAsync(guest);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            string updatedBy = User.Identity.Name;
+            await _guestServices.UpdateGuestAsync(guest, updatedBy);
+            return NoContent();
         }
 
-        // DELETE: api/Guest/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGuest(int id)
         {
-            try
-            {
-                await _guestServices.DeleteGuestAsync(id);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            await _guestServices.DeleteGuestAsync(id);
+            return NoContent();
         }
 
         [HttpGet("group/{guestGroupId}")]
-        public async Task<ActionResult<IEnumerable<Guest>>> GetGuestsByGroupId(int guestGroupId)
+        public async Task<ActionResult<IEnumerable<GuestDTO>>> GetGuestsByGroupId(int guestGroupId)
         {
-            try
-            {
-                var guests = await _guestServices.GetGuestsByGroupIdAsync(guestGroupId);
-
-                if (guests == null || !guests.Any())
-                {
-                    return NotFound($"No guests found for group ID {guestGroupId}.");
-                }
-
-                return Ok(guests);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            var guests = await _guestServices.GetGuestsByGroupIdAsync(guestGroupId);
+            return Ok(guests);
         }
     }
 }
