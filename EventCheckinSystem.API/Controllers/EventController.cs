@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EventCheckinSystem.Services.Interfaces;
 
-namespace EventCheckinSystem.Controllers
+namespace EventCheckinSystem.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

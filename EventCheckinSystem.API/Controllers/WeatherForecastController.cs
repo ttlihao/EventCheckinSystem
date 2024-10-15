@@ -1,8 +1,9 @@
+using EventCheckinSystem.API;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.Resource;
 
-namespace EventCheckinSystem.Controllers
+namespace EventCheckinSystem.API.Controllers
 {
     [Authorize]
     [ApiController]

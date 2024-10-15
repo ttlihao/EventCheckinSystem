@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EventCheckinSystem.Services
+namespace EventCheckinSystem.Services.Services
 {
     public class GuestServices : IGuestServices
     {
@@ -70,7 +70,7 @@ namespace EventCheckinSystem.Services
                                      .ToListAsync();
             }
             catch (Exception ex)
-            {              
+            {
                 throw new Exception($"An error occurred while retrieving guests for group ID {guestGroupId}.", ex);
             }
         }

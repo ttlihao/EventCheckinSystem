@@ -85,6 +85,7 @@ namespace EventCheckinSystem.Repo.Data
                 .WithMany(e => e.UserEvents)
                 .HasForeignKey(ue => ue.EventID)
                 .OnDelete(DeleteBehavior.Restrict);
+
         }
 
 

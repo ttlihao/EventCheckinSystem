@@ -1,4 +1,4 @@
-namespace EventCheckinSystem
+namespace EventCheckinSystem.API
 {
     public class WeatherForecast
     {
