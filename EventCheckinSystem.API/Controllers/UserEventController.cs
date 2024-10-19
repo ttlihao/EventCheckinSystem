@@ -1,53 +1,63 @@
-﻿using EventCheckinSystem.Services.Interfaces;
-using EventCheckinSystem.Repo.Data;
+﻿using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-namespace EventCheckinSystem.API.Controllers
+
+namespace EventCheckinSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class UserEventController : ControllerBase
     {
         private readonly IUserEventServices _userEventServices;
+
         public UserEventController(IUserEventServices userEventServices)
         {
             _userEventServices = userEventServices;
         }
-        // GET: api/UserEvent
+
         [HttpGet]
-        public async Task<IActionResult> GetAllUserEvents()
+        public async Task<ActionResult<IEnumerable<UserEventDTO>>> GetAllUserEvents()
         {
             var userEvents = await _userEventServices.GetAllUserEventsAsync();
             return Ok(userEvents);
         }
-        // GET: api/UserEvent/{userId}/{eventId}
-        [HttpGet("{userId}/{eventId}")]
-        public async Task<IActionResult> GetUserEvent(string userId, int eventId)
+
+        [HttpGet("{eventId}")]
+        public async Task<ActionResult<UserEventDTO>> GetUserEventById(int eventId)
         {
-            var userEvent = await _userEventServices.GetUserEventAsync(userId, eventId);
+            var userEvent = await _userEventServices.GetUserEventByIdAsync(eventId);
             if (userEvent == null)
             {
-                return NotFound($"No relationship found for User ID {userId} and Event ID {eventId}");
+                return NotFound();
             }
             return Ok(userEvent);
         }
-        // POST: api/UserEvent
+
         [HttpPost]
-        public async Task<IActionResult> CreateUserEvent([FromBody] UserEvent userEvent)
+        public async Task<ActionResult<UserEventDTO>> AddUserEvent([FromBody] UserEventDTO userEventDto)
         {
-            if (userEvent == null)
-            {
-                return BadRequest("UserEvent data is null.");
-            }
-            var createdUserEvent = await _userEventServices.CreateUserEventAsync(userEvent);
-            return CreatedAtAction(nameof(GetUserEvent), new { userId = createdUserEvent.UserID, eventId = createdUserEvent.EventID }, createdUserEvent);
+            await _userEventServices.AddUserEventAsync(userEventDto);
+            return CreatedAtAction(nameof(GetUserEventById), new { eventId = userEventDto.EventID }, userEventDto);
         }
-        // DELETE: api/UserEvent/{userId}/{eventId}
-        [HttpDelete("{userId}/{eventId}")]
-        public async Task<IActionResult> DeleteUserEvent(string userId, int eventId)
+
+        [HttpPut("{eventId}")]
+        public async Task<IActionResult> UpdateUserEvent(int eventId, [FromBody] UserEventDTO userEventDto)
         {
-            await _userEventServices.DeleteUserEventAsync(userId, eventId);
+            if (eventId != userEventDto.EventID)
+            {
+                return BadRequest();
+            }
+
+            await _userEventServices.UpdateUserEventAsync(userEventDto);
+            return NoContent();
+        }
+
+        [HttpDelete("{eventId}")]
+        public async Task<IActionResult> DeleteUserEvent(int eventId)
+        {
+            await _userEventServices.DeleteUserEventAsync(eventId);
             return NoContent();
         }
     }

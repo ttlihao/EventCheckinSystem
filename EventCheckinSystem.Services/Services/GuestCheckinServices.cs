@@ -1,4 +1,6 @@
-﻿using EventCheckinSystem.Repo.Data;
+﻿using AutoMapper;
+using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -9,42 +11,48 @@ namespace EventCheckinSystem.Services.Services
     public class GuestCheckinServices : IGuestCheckinServices
     {
         private readonly EventCheckinManagementContext _context;
+        private readonly IMapper _mapper;
 
-        public GuestCheckinServices(EventCheckinManagementContext context)
+        public GuestCheckinServices(EventCheckinManagementContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<GuestCheckin>> GetAllCheckinsAsync()
+        public async Task<IEnumerable<GuestCheckinDTO>> GetAllCheckinsAsync()
         {
-            return await _context.GuestCheckins
-                                 .Include(gc => gc.Guest)
-                                 .ToListAsync();
+            var checkins = await _context.GuestCheckins
+                                          .Include(gc => gc.Guest)
+                                          .ToListAsync();
+            return _mapper.Map<IEnumerable<GuestCheckinDTO>>(checkins);
         }
 
-        public async Task<GuestCheckin> GetCheckinByIdAsync(int id)
+        public async Task<GuestCheckinDTO> GetCheckinByIdAsync(int id)
         {
-            return await _context.GuestCheckins
-                                 .Include(gc => gc.Guest)
-                                 .FirstOrDefaultAsync(gc => gc.GuestCheckinID == id);
+            var guestCheckin = await _context.GuestCheckins
+                                              .Include(gc => gc.Guest)
+                                              .FirstOrDefaultAsync(gc => gc.GuestCheckinID == id);
+            return guestCheckin == null ? null : _mapper.Map<GuestCheckinDTO>(guestCheckin);
         }
 
-        public async Task<GuestCheckin> CreateCheckinAsync(GuestCheckin guestCheckin)
+        public async Task<GuestCheckinDTO> CreateCheckinAsync(GuestCheckinDTO guestCheckinDto, string createdBy)
         {
-            await _context.GuestCheckins.AddAsync(guestCheckin);
+            var newCheckin = _mapper.Map<GuestCheckin>(guestCheckinDto);
+            newCheckin.CreatedBy = createdBy;
+            newCheckin.LastUpdatedBy = createdBy;
+
+            await _context.GuestCheckins.AddAsync(newCheckin);
             await _context.SaveChangesAsync();
-            return guestCheckin;
+
+            return _mapper.Map<GuestCheckinDTO>(newCheckin);
         }
 
-        public async Task UpdateCheckinAsync(GuestCheckin updatedCheckin)
+        public async Task UpdateCheckinAsync(GuestCheckinDTO updatedCheckinDto)
         {
-            var existingCheckin = await _context.GuestCheckins.FindAsync(updatedCheckin.GuestCheckinID);
-
+            var existingCheckin = await _context.GuestCheckins.FindAsync(updatedCheckinDto.GuestCheckinID);
             if (existingCheckin != null)
             {
-                existingCheckin.CheckinTime = updatedCheckin.CheckinTime;
-                existingCheckin.GuestID = updatedCheckin.GuestID;
-
+                _mapper.Map(updatedCheckinDto, existingCheckin);
                 _context.GuestCheckins.Update(existingCheckin);
                 await _context.SaveChangesAsync();
             }
@@ -60,22 +68,20 @@ namespace EventCheckinSystem.Services.Services
             }
         }
 
-        public async Task<GuestCheckin> CheckinGuestByIdAsync(int guestId, string createdBy)
+        public async Task<GuestCheckinDTO> CheckinGuestByIdAsync(int guestId, string createdBy)
         {
             var checkin = new GuestCheckin
             {
                 GuestID = guestId,
                 CheckinTime = DateTime.UtcNow,
                 CreatedBy = createdBy,
-                LastUpdatedBy = createdBy   
+                LastUpdatedBy = createdBy
             };
 
             await _context.GuestCheckins.AddAsync(checkin);
             await _context.SaveChangesAsync();
 
-            return checkin;
+            return _mapper.Map<GuestCheckinDTO>(checkin);
         }
-
-
     }
 }

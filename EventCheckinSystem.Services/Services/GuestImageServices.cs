@@ -1,4 +1,6 @@
-﻿using EventCheckinSystem.Repo.Data;
+﻿using AutoMapper;
+using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -9,42 +11,47 @@ namespace EventCheckinSystem.Services.Services
     public class GuestImageServices : IGuestImageServices
     {
         private readonly EventCheckinManagementContext _context;
+        private readonly IMapper _mapper;
 
-        public GuestImageServices(EventCheckinManagementContext context)
+        public GuestImageServices(EventCheckinManagementContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<GuestImage>> GetAllGuestImagesAsync()
+        public async Task<IEnumerable<GuestImageDTO>> GetAllGuestImagesAsync()
         {
-            return await _context.GuestImages
-                                 .Include(g => g.Guest)
-                                 .ToListAsync();
+            var guestImages = await _context.GuestImages
+                .Include(g => g.Guest)
+                .ToListAsync();
+
+            return _mapper.Map<IEnumerable<GuestImageDTO>>(guestImages);
         }
 
-        public async Task<GuestImage> GetGuestImageByIdAsync(int id)
+        public async Task<GuestImageDTO> GetGuestImageByIdAsync(int id)
         {
-            return await _context.GuestImages
-                                 .Include(g => g.Guest)
-                                 .FirstOrDefaultAsync(g => g.GuestImageID == id);
+            var guestImage = await _context.GuestImages
+                .Include(g => g.Guest)
+                .FirstOrDefaultAsync(g => g.GuestImageID == id);
+
+            return _mapper.Map<GuestImageDTO>(guestImage);
         }
 
-        public async Task<GuestImage> CreateGuestImageAsync(GuestImage guestImage)
+        public async Task<GuestImageDTO> CreateGuestImageAsync(GuestImageDTO guestImageDto)
         {
+            var guestImage = _mapper.Map<GuestImage>(guestImageDto);
             await _context.GuestImages.AddAsync(guestImage);
             await _context.SaveChangesAsync();
-            return guestImage;
+            return _mapper.Map<GuestImageDTO>(guestImage);
         }
 
-        public async Task UpdateGuestImageAsync(GuestImage updatedImage)
+        public async Task UpdateGuestImageAsync(GuestImageDTO guestImageDto)
         {
-            var existingImage = await _context.GuestImages.FindAsync(updatedImage.GuestImageID);
+            var existingImage = await _context.GuestImages.FindAsync(guestImageDto.GuestImageID);
 
             if (existingImage != null)
             {
-                existingImage.GuestID = updatedImage.GuestID;
-                existingImage.ImageURL = updatedImage.ImageURL;
-
+                _mapper.Map(guestImageDto, existingImage); // Mapping DTO properties to existing entity
                 _context.GuestImages.Update(existingImage);
                 await _context.SaveChangesAsync();
             }

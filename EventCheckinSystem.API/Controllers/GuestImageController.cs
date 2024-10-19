@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using EventCheckinSystem.Repo.Data;
-using EventCheckinSystem.Services.Interfaces;
 
-namespace EventCheckinSystem.API.Controllers
+namespace EventCheckinSystem.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class GuestImageController : ControllerBase
     {
         private readonly IGuestImageServices _guestImageServices;
@@ -18,52 +19,39 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GuestImage>>> GetAllGuestImages()
+        public async Task<ActionResult<IEnumerable<GuestImageDTO>>> GetAllGuestImages()
         {
-            var images = await _guestImageServices.GetAllGuestImagesAsync();
-            return Ok(images);
+            var guestImages = await _guestImageServices.GetAllGuestImagesAsync();
+            return Ok(guestImages);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<GuestImage>> GetGuestImageById(int id)
+        public async Task<ActionResult<GuestImageDTO>> GetGuestImageById(int id)
         {
-            var image = await _guestImageServices.GetGuestImageByIdAsync(id);
-
-            if (image == null)
+            var guestImage = await _guestImageServices.GetGuestImageByIdAsync(id);
+            if (guestImage == null)
             {
-                return NotFound($"Guest image with ID {id} not found.");
+                return NotFound();
             }
-
-            return Ok(image);
+            return Ok(guestImage);
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddGuestImage([FromBody] GuestImage guestImage)
+        public async Task<ActionResult<GuestImageDTO>> CreateGuestImage(GuestImageDTO guestImageDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var createdImage = await _guestImageServices.CreateGuestImageAsync(guestImage);
-            return CreatedAtAction(nameof(GetGuestImageById), new { id = createdImage.GuestImageID }, createdImage);
+            var createdGuestImage = await _guestImageServices.CreateGuestImageAsync(guestImageDto);
+            return CreatedAtAction(nameof(GetGuestImageById), new { id = createdGuestImage.GuestImageID }, createdGuestImage);
         }
 
-
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateGuestImage(int id, [FromBody] GuestImage guestImage)
+        public async Task<IActionResult> UpdateGuestImage(int id, GuestImageDTO guestImageDto)
         {
-            if (id != guestImage.GuestImageID)
+            if (id != guestImageDto.GuestImageID)
             {
-                return BadRequest("Guest image ID mismatch.");
+                return BadRequest();
             }
 
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            await _guestImageServices.UpdateGuestImageAsync(guestImage);
+            await _guestImageServices.UpdateGuestImageAsync(guestImageDto);
             return NoContent();
         }
 

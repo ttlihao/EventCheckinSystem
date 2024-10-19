@@ -16,6 +16,7 @@ namespace EventCheckinSystem.Repo.DTOs
         public List<UserEventDTO> UserEvents { get; set; }
     }
 
+
     
 }
 
