@@ -18,6 +18,16 @@ var builder = WebApplication.CreateBuilder(args);
 //    .AddEntityFrameworkStores<EventCheckinManagementContext>()
 //    .AddDefaultTokenProviders()
 //    .AddDefaultUI();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin", policyBuilder =>
+    {
+        policyBuilder.WithOrigins("https://your-frontend-domain.com")
+                     .AllowAnyHeader()
+                     .AllowAnyMethod()
+                     .AllowCredentials();
+    });
+});
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
@@ -86,6 +96,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowSpecificOrigin");
 
 app.MapIdentityApi<User>();
 app.UseHttpsRedirection();
