@@ -1,4 +1,6 @@
-﻿using EventCheckinSystem.Repo.Data;
+﻿using AutoMapper;
+using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -9,47 +11,54 @@ namespace EventCheckinSystem.Services.Services
     public class GuestGroupServices : IGuestGroupServices
     {
         private readonly EventCheckinManagementContext _context;
+        private readonly IMapper _mapper;
 
-        public GuestGroupServices(EventCheckinManagementContext context)
+        public GuestGroupServices(EventCheckinManagementContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<GuestGroup>> GetAllGuestGroupsAsync()
+        public async Task<IEnumerable<GuestGroupDTO>> GetAllGuestGroupsAsync()
         {
-            return await _context.GuestGroups
-                                 .Include(g => g.Organization)
-                                 .Include(g => g.Event)
-                                 .Include(g => g.Guests)
-                                 .ToListAsync();
+            var guestGroups = await _context.GuestGroups
+                                             .Include(g => g.Organization)
+                                             .Include(g => g.Event)
+                                             .Include(g => g.Guests)
+                                             .ToListAsync();
+
+            return _mapper.Map<IEnumerable<GuestGroupDTO>>(guestGroups);
         }
 
-        public async Task<GuestGroup> GetGuestGroupByIdAsync(int id)
+        public async Task<GuestGroupDTO> GetGuestGroupByIdAsync(int id)
         {
-            return await _context.GuestGroups
-                                 .Include(g => g.Organization)
-                                 .Include(g => g.Event)
-                                 .Include(g => g.Guests)
-                                 .FirstOrDefaultAsync(g => g.GuestGroupID == id);
+            var guestGroup = await _context.GuestGroups
+                                            .Include(g => g.Organization)
+                                            .Include(g => g.Event)
+                                            .Include(g => g.Guests)
+                                            .FirstOrDefaultAsync(g => g.GuestGroupID == id);
+
+            return guestGroup == null ? null : _mapper.Map<GuestGroupDTO>(guestGroup);
         }
 
-        public async Task<GuestGroup> CreateGuestGroupAsync(GuestGroup guestGroup)
+        public async Task<GuestGroupDTO> CreateGuestGroupAsync(GuestGroupDTO guestGroupDto, string createdBy)
         {
+            var guestGroup = _mapper.Map<GuestGroup>(guestGroupDto);
+            guestGroup.CreatedBy = createdBy; // Set the createdBy
+            guestGroup.LastUpdatedBy = createdBy; // Set lastUpdatedBy
+
             await _context.GuestGroups.AddAsync(guestGroup);
             await _context.SaveChangesAsync();
-            return guestGroup;
+            return _mapper.Map<GuestGroupDTO>(guestGroup);
         }
 
-        public async Task UpdateGuestGroupAsync(GuestGroup updatedGroup)
+        public async Task UpdateGuestGroupAsync(GuestGroupDTO guestGroupDto, string updatedBy)
         {
-            var existingGroup = await _context.GuestGroups.FindAsync(updatedGroup.GuestGroupID);
-
+            var existingGroup = await _context.GuestGroups.FindAsync(guestGroupDto.GuestGroupID);
             if (existingGroup != null)
             {
-                existingGroup.Name = updatedGroup.Name;
-                existingGroup.OrganizationID = updatedGroup.OrganizationID;
-                existingGroup.EventID = updatedGroup.EventID;
-                existingGroup.Guests = updatedGroup.Guests;
+                _mapper.Map(guestGroupDto, existingGroup); // Map properties from DTO to existing entity
+                existingGroup.LastUpdatedBy = updatedBy; // Update lastUpdatedBy
 
                 _context.GuestGroups.Update(existingGroup);
                 await _context.SaveChangesAsync();
@@ -66,13 +75,15 @@ namespace EventCheckinSystem.Services.Services
             }
         }
 
-        public async Task<GuestGroup> GetGuestGroupByGuestIdAsync(int guestId)
+        public async Task<GuestGroupDTO> GetGuestGroupByGuestIdAsync(int guestId)
         {
-            return await _context.GuestGroups
-                                 .Include(g => g.Organization)
-                                 .Include(g => g.Event)
-                                 .Include(g => g.Guests)
-                                 .FirstOrDefaultAsync(g => g.Guests.Any(guest => guest.GuestID == guestId));
+            var guestGroup = await _context.GuestGroups
+                                            .Include(g => g.Organization)
+                                            .Include(g => g.Event)
+                                            .Include(g => g.Guests)
+                                            .FirstOrDefaultAsync(g => g.Guests.Any(guest => guest.GuestID == guestId));
+
+            return guestGroup == null ? null : _mapper.Map<GuestGroupDTO>(guestGroup);
         }
     }
 }

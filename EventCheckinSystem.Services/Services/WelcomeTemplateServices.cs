@@ -1,7 +1,9 @@
 ﻿using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace EventCheckinSystem.Services.Services
@@ -15,35 +17,57 @@ namespace EventCheckinSystem.Services.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<WelcomeTemplate>> GetAllWelcomeTemplatesAsync()
+        public async Task<IEnumerable<WelcomeTemplateDTO>> GetAllWelcomeTemplatesAsync()
         {
             return await _context.WelcomeTemplates
-                                 .Include(wt => wt.GuestGroup)
+                                 .Select(w => new WelcomeTemplateDTO
+                                 {
+                                     WelcomeTemplateID = w.WelcomeTemplateID,
+                                     GuestGroupID = w.GuestGroupID,
+                                     TemplateContent = w.TemplateContent,
+                                     GuestGroupName = w.GuestGroup.Name // Assuming you have a navigation property
+                                 })
                                  .ToListAsync();
         }
 
-        public async Task<WelcomeTemplate> GetWelcomeTemplateByIdAsync(int id)
+        public async Task<WelcomeTemplateDTO> GetWelcomeTemplateByIdAsync(int id)
         {
-            return await _context.WelcomeTemplates
-                                 .Include(wt => wt.GuestGroup)
-                                 .FirstOrDefaultAsync(wt => wt.WelcomeTemplateID == id);
+            var template = await _context.WelcomeTemplates.FindAsync(id);
+            if (template == null) return null;
+
+            return new WelcomeTemplateDTO
+            {
+                WelcomeTemplateID = template.WelcomeTemplateID,
+                GuestGroupID = template.GuestGroupID,
+                TemplateContent = template.TemplateContent,
+                GuestGroupName = template.GuestGroup.Name // Assuming you have a navigation property
+            };
         }
 
-        public async Task<WelcomeTemplate> CreateWelcomeTemplateAsync(WelcomeTemplate welcomeTemplate)
+        public async Task<WelcomeTemplate> CreateWelcomeTemplateAsync(WelcomeTemplateDTO welcomeTemplateDto, string createdBy)
         {
+            var welcomeTemplate = new WelcomeTemplate
+            {
+                GuestGroupID = welcomeTemplateDto.GuestGroupID,
+                TemplateContent = welcomeTemplateDto.TemplateContent,
+                CreatedBy = createdBy, // Set the createdBy
+                LastUpdatedBy = createdBy // Set lastUpdatedBy
+            };
+
             await _context.WelcomeTemplates.AddAsync(welcomeTemplate);
             await _context.SaveChangesAsync();
             return welcomeTemplate;
         }
 
-        public async Task UpdateWelcomeTemplateAsync(WelcomeTemplate updatedWelcomeTemplate)
+        public async Task UpdateWelcomeTemplateAsync(WelcomeTemplateDTO welcomeTemplateDto, string updatedBy)
         {
-            var existingTemplate = await _context.WelcomeTemplates.FindAsync(updatedWelcomeTemplate.WelcomeTemplateID);
+            var existingTemplate = await _context.WelcomeTemplates.FindAsync(welcomeTemplateDto.WelcomeTemplateID);
 
             if (existingTemplate != null)
             {
-                existingTemplate.GuestGroupID = updatedWelcomeTemplate.GuestGroupID;
-                existingTemplate.TemplateContent = updatedWelcomeTemplate.TemplateContent;
+                existingTemplate.GuestGroupID = welcomeTemplateDto.GuestGroupID;
+                existingTemplate.TemplateContent = welcomeTemplateDto.TemplateContent;
+                existingTemplate.LastUpdatedBy = updatedBy; // Update lastUpdatedBy
 
                 _context.WelcomeTemplates.Update(existingTemplate);
                 await _context.SaveChangesAsync();
@@ -60,13 +84,18 @@ namespace EventCheckinSystem.Services.Services
             }
         }
 
-        public async Task<IEnumerable<WelcomeTemplate>> GetWelcomeTemplatesByGuestGroupAsync(int guestGroupId)
+        public async Task<IEnumerable<WelcomeTemplateDTO>> GetWelcomeTemplatesByGuestGroupAsync(int guestGroupId)
         {
             return await _context.WelcomeTemplates
-                                 .Include(wt => wt.GuestGroup)
-                                 .Where(wt => wt.GuestGroupID == guestGroupId)
+                                 .Where(w => w.GuestGroupID == guestGroupId)
+                                 .Select(w => new WelcomeTemplateDTO
+                                 {
+                                     WelcomeTemplateID = w.WelcomeTemplateID,
+                                     GuestGroupID = w.GuestGroupID,
+                                     TemplateContent = w.TemplateContent,
+                                     GuestGroupName = w.GuestGroup.Name // Assuming you have a navigation property
+                                 })
                                  .ToListAsync();
         }
-
     }
 }

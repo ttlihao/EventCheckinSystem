@@ -10,6 +10,7 @@ namespace EventCheckinSystem.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize] // Optional: Ensure the user is authenticated
     public class WelcomeTemplateController : ControllerBase
     {
         private readonly IWelcomeTemplateServices _welcomeTemplateServices;

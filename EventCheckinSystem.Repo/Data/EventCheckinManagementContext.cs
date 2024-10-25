@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -86,88 +85,7 @@ namespace EventCheckinSystem.Repo.Data
                 .WithMany(e => e.UserEvents)
                 .HasForeignKey(ue => ue.EventID)
                 .OnDelete(DeleteBehavior.Restrict);
-<<<<<<< Updated upstream
-=======
-            builder.Entity<Organization>().HasData(
-    new Organization
-    {
-        OrganizationID = 1,
-        Name = "Org1",
-        CreatedBy = "Seeder",
-        LastUpdatedBy = "Seeder"
-    },
-    new Organization
-    {
-        OrganizationID = 2,
-        Name = "Org2",
-        CreatedBy = "Seeder",
-        LastUpdatedBy = "Seeder"
-    },
-    new Organization
-    {
-        OrganizationID = 3,
-        Name = "Org3",
-        CreatedBy = "Seeder",
-        LastUpdatedBy = "Seeder"
-    }
-);
-            builder.Entity<Event>().HasData(
-    new Event
-    {
-        EventID = 1,
-        Name = "Event1",
-        OrganizationID = 1,
-        CreatedBy = "Seeder",
-        LastUpdatedBy = "Seeder"
-    },
-    new Event
-    {
-        EventID = 2,
-        Name = "Event2",
-        OrganizationID = 2,
-        CreatedBy = "Seeder",
-        LastUpdatedBy = "Seeder"
-    },
-    new Event
-    {
-        EventID = 3,
-        Name = "Event3",
-        OrganizationID = 3,
-        CreatedBy = "Seeder",
-        LastUpdatedBy = "Seeder"
-    }
-);
-            builder.Entity<GuestGroup>().HasData(
-    new GuestGroup
-    {
-        GuestGroupID = 1,
-        Name = "Group1",
-        EventID = 1,
-        CreatedBy = "Seeder",
-        LastUpdatedBy = "Seeder"
-    },
-    new GuestGroup
-    {
-        GuestGroupID = 2,
-        Name = "Group2",
-        EventID = 2,
-        CreatedBy = "Seeder",
-        LastUpdatedBy = "Seeder"
-    },
-    new GuestGroup
-    {
-        GuestGroupID = 3,
-        Name = "Group3",
-        EventID = 3,
-        CreatedBy = "Seeder",
-        LastUpdatedBy = "Seeder"
-    }
-);
 
-
-
-
->>>>>>> Stashed changes
         }
 
 
