@@ -42,7 +42,7 @@ namespace EventCheckinSystem.Controllers
             if (newOrganizationDto == null) return BadRequest();
 
             var createdOrganization = await _organizationServices.CreateOrganizationAsync(newOrganizationDto);
-            return CreatedAtAction(nameof(GetOrganizationById), new { id = createdOrganization.OrganizationID }, createdOrganization);
+            return CreatedAtAction(nameof(GetOrganizationById), new { id = createdOrganization.Name }, createdOrganization);
         }
 
         // PUT: api/organization

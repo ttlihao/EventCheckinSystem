@@ -15,22 +15,20 @@ namespace EventCheckinSystem.Repo.Configure
         public MappingProfile()
         {
             CreateMap<Event, EventDTO>()
-                .ForMember(dest => dest.GuestGroups, opt => opt.MapFrom(src => src.GuestGroups)) 
-                .ForMember(dest => dest.UserEvents, opt => opt.MapFrom(src => src.UserEvents));
+                .ForMember(dest => dest.GuestGroups, opt => opt.MapFrom(src => src.GuestGroups)).ReverseMap();
 
-            CreateMap<Guest, GuestDTO>();
-            CreateMap<GuestCheckin, GuestCheckinDTO>();
-            CreateMap<GuestGroup, GuestGroupDTO>();
-            CreateMap<GuestImage, GuestImageDTO>();
+            CreateMap<Guest, GuestDTO>().ReverseMap();
+            CreateMap<GuestCheckin, GuestCheckinDTO>().ReverseMap();
+            CreateMap<GuestGroup, GuestGroupDTO>().ReverseMap();
+            CreateMap<GuestImage, GuestImageDTO>().ReverseMap();
 
-            CreateMap<Organization, OrganizationDTO>()
-                .ForMember(dest => dest.Events, opt => opt.MapFrom(src => src.Events));
+            CreateMap<Organization, OrganizationDTO>().ReverseMap();
 
             CreateMap<UserEvent, UserEventDTO>()
                 .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => src.User.FullName))
-                .ForMember(dest => dest.EventID, opt => opt.MapFrom(src => src.Event.Name));
+                .ForMember(dest => dest.EventID, opt => opt.MapFrom(src => src.Event.Name)).ReverseMap();
 
-            CreateMap<WelcomeTemplate, WelcomeTemplateDTO>();
+            CreateMap<WelcomeTemplate, WelcomeTemplateDTO>().ReverseMap();
         }
     }
 

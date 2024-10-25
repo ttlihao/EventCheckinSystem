@@ -6,7 +6,7 @@ services:
     container_name: sqlserver
     environment:
       - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=12345
+      - MSSQL_SA_PASSWORD=Event@123FPT
       - MSSQL_PID=Evaluation
     ports:
       - "1434:1433"
@@ -24,7 +24,7 @@ services:
     depends_on:
       - sqlserver
     environment:
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=EventCheckinManagement1;User Id=sa;Password=12345;TrustServerCertificate=True;
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=EventCheckinManagement1;User Id=sa;Password=Event@123FPT;TrustServerCertificate=True;
     ports:
       - "8688:8080"
     networks:

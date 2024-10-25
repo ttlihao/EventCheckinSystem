@@ -46,6 +46,8 @@ namespace EventCheckinSystem.Services.Services
         public async Task<OrganizationDTO> CreateOrganizationAsync(OrganizationDTO newOrganizationDto)
         {
             var newOrganization = _mapper.Map<Organization>(newOrganizationDto);
+            newOrganization.CreatedBy = "User";
+            newOrganization.LastUpdatedBy = "User";
             await _context.Organizations.AddAsync(newOrganization);
             await _context.SaveChangesAsync();
             return _mapper.Map<OrganizationDTO>(newOrganization);

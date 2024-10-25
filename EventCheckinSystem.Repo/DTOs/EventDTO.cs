@@ -13,7 +13,6 @@ namespace EventCheckinSystem.Repo.DTOs
         public int OrganizationID { get; set; }
         public string OrganizationName { get; set; }
         public List<GuestGroupDTO> GuestGroups { get; set; }
-        public List<UserEventDTO> UserEvents { get; set; }
     }
 
 
