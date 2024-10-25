@@ -6,17 +6,19 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text.Json.Serialization;
+<<<<<<< Updated upstream:EventCheckinSystem/Program.cs
+=======
+using EventCheckinSystem.Repo.Configure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Identity;
+>>>>>>> Stashed changes:EventCheckinSystem.API/Program.cs
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-
-
-//builder.Services.AddIdentity<User, IdentityRole>()
-//    .AddEntityFrameworkStores<EventCheckinManagementContext>()
-//    .AddDefaultTokenProviders()
-//    .AddDefaultUI();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
@@ -28,6 +30,11 @@ builder.Services.AddScoped<IGuestImageServices, GuestImageServices>();
 builder.Services.AddScoped<IGuestServices, GuestServices>();
 builder.Services.AddScoped<IOrganizationServices, OrganizationServices>();
 builder.Services.AddScoped<IWelcomeTemplateServices, WelcomeTemplateServices>();
+<<<<<<< Updated upstream:EventCheckinSystem/Program.cs
+=======
+builder.Services.AddScoped<IUserEventServices, UserEventServices>();
+
+>>>>>>> Stashed changes:EventCheckinSystem.API/Program.cs
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
@@ -40,7 +47,6 @@ builder.Services.AddSwaggerGen(option =>
     });
     option.OperationFilter<SecurityRequirementsOperationFilter>();
 });
-//builder.Services.AddAutoMapper(typeof(MappingProfiles));
 builder.Services.AddDbContext<EventCheckinManagementContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddAuthorization();
@@ -69,6 +75,31 @@ builder.Services.AddAuthorization();
 //     options.LoginPath = "/Account/Login";
 //     options.AccessDeniedPath = "/Account/AccessDenied";
 // });
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdministratorRole",
+        policy => policy.RequireRole("Administrator"));
+});
+
 
 builder.Services.AddIdentityApiEndpoints<User>()
     .AddEntityFrameworkStores<EventCheckinManagementContext>();
@@ -79,7 +110,7 @@ builder.Services.AddIdentityApiEndpoints<User>()
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
