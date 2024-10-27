@@ -132,7 +132,6 @@ if (app.Environment.IsDevelopment()|| app.Environment.IsProduction())
 
 app.UseCors("AllowSpecificOrigin");
 
-app.MapIdentityApi<User>();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();

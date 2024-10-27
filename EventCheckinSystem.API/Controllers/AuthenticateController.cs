@@ -1,4 +1,5 @@
-﻿using EventCheckinSystem.Services.Interfaces;
+﻿using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -16,9 +17,9 @@ namespace EventCheckinSystem.API.Controllers
             _authenticateService = authenticateService;
         }
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
+        public async Task<IActionResult> Login([FromBody] LoginDTO loginRequest)
         {
-            var response = await _authenticateService.LoginAsync(loginRequest.Email, loginRequest.Password);
+            var response = await _authenticateService.LoginAsync(loginRequest.UserName, loginRequest.Password);
             return Ok(response);
         }
     }
