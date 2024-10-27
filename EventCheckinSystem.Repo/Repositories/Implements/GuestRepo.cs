@@ -1,20 +1,20 @@
 ﻿using AutoMapper;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
-using EventCheckinSystem.Services.Interfaces;
+using EventCheckinSystem.Repo.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace EventCheckinSystem.Services.Services
+namespace EventCheckinSystem.Repo.Repositories.Implements
 {
-    public class GuestServices : IGuestServices
+    public class GuestRepo : IGuestRepo
     {
         private readonly EventCheckinManagementContext _context;
         private readonly IMapper _mapper; // Add a mapper instance
 
-        public GuestServices(EventCheckinManagementContext context, IMapper mapper)
+        public GuestRepo(EventCheckinManagementContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper; // Initialize the mapper

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EventCheckinSystem.Services.Interfaces;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.Repositories.Interfaces;
 
 namespace EventCheckinSystem.API.Controllers
 {

@@ -3,6 +3,7 @@ using EventCheckinSystem.Repo.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using EventCheckinSystem.Repo.Repositories.Interfaces;
 
 namespace EventCheckinSystem.API.Controllers
 {

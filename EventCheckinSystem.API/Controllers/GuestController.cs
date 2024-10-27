@@ -1,11 +1,12 @@
 ﻿using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace EventCheckinSystem.Controllers
+namespace EventCheckinSystem.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
