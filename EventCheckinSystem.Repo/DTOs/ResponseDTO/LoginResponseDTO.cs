@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EventCheckinSystem.Repo.DTOs
+namespace EventCheckinSystem.Repo.DTOs.ResponseDTO
 {
     public class LoginResponseDTO
     {

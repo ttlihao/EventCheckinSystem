@@ -1,5 +1,5 @@
 ﻿using EventCheckinSystem.Repo.Data;
-using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;

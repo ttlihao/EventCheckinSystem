@@ -60,6 +60,7 @@ builder.Services.AddScoped<IOrganizationServices, OrganizationServices>();
 builder.Services.AddScoped<IWelcomeTemplateServices, WelcomeTemplateServices>();
 builder.Services.AddScoped<IUserEventServices, UserEventServices>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
+builder.Services.AddScoped<IRoleService, RoleService>();    
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>

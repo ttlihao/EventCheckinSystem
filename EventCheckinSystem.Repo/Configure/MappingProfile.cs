@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.ResponseDTO;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +26,7 @@ namespace EventCheckinSystem.Repo.Configure
 
             CreateMap<Organization, OrganizationDTO>().ReverseMap();
 
+            CreateMap<IdentityRole, RoleResponseDTO>().ReverseMap();
             CreateMap<UserEvent, UserEventDTO>()
                 .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => src.User.FullName))
                 .ForMember(dest => dest.EventID, opt => opt.MapFrom(src => src.Event.Name)).ReverseMap();
