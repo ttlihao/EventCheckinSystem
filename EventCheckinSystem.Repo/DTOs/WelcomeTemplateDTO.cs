@@ -11,6 +11,7 @@ namespace EventCheckinSystem.Repo.DTOs
         public int WelcomeTemplateID { get; set; } 
         public int GuestGroupID { get; set; }
         public string TemplateContent { get; set; } 
-        public string GuestGroupName { get; set; } 
+        public string GuestGroupName { get; set; }
+        public string ImageURL { get; set; }
     }
 }

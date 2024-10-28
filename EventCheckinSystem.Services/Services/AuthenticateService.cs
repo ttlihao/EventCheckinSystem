@@ -127,16 +127,16 @@ namespace EventCheckinSystem.Services.Services
                 }
 
                 var roles = await _userManager.GetRolesAsync(user);
-                /* var userRole = roles.FirstOrDefault();
-                 if (userRole == null)
-                 {
-                     throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "Tên đăng nhập hoặc mật khẩu không đúng");
-                 }*/
+                var userRole = roles.FirstOrDefault();
+                if (userRole == null)
+                {
+                    throw new ArgumentException("Người dùng chưa được cấp quyền");
+                }
 
                 // Generate access token
-                var accessToken = GenerateToken(user.Id, "Admin", false);
+                var accessToken = GenerateToken(user.Id, userRole, false);
                 // Generate refresh token
-                var refreshToken = GenerateToken(user.Id, "Admin", true);
+                var refreshToken = GenerateToken(user.Id, userRole, true);
 
                 // Save Database
                 user.VerificationToken = accessToken;
@@ -171,9 +171,22 @@ namespace EventCheckinSystem.Services.Services
             throw new NotImplementedException();
         }
 
-        public Task<User> GetUserByIdAsync(string userId)
+        public async Task<User> GetUserByIdAsync(string userId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var user = await _authenticateRepo.GetUsesByIdAsync(userId);
+                if (user == null)
+                {
+                    throw new ArgumentException("Không tìm thấy người dùng");
+                }
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
         private string GenerateToken(string userId, string role, bool isRefreshToken)
         {

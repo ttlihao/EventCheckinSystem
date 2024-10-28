@@ -11,6 +11,8 @@ namespace EventCheckinSystem.Repo.Data
     {
         public int GuestGroupID { get; set; }
         public int OrganizationID { get; set; }
+        public string Type { get; set; }
+
         public int EventID { get; set; }
         public string Name { get; set; }
 

@@ -44,9 +44,11 @@ namespace EventCheckinSystem.Services.Services
             return _mapper.Map<EventDTO>(eventEntity);
         }
 
-        public async Task<EventDTO> CreateEventAsync(EventDTO newEventDto)
+        public async Task<EventDTO> CreateEventAsync(CreateEventDTO newEventDto)
         {
             var newEvent = _mapper.Map<Event>(newEventDto);
+            newEvent.CreatedBy = "SuperMario";
+            newEvent.LastUpdatedBy = "superMario";
             await _context.Events.AddAsync(newEvent);
             await _context.SaveChangesAsync();
             return _mapper.Map<EventDTO>(newEvent);

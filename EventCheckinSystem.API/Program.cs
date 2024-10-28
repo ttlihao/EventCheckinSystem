@@ -26,13 +26,13 @@ var builder = WebApplication.CreateBuilder(args);
 //    .AddDefaultUI();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigin", policyBuilder =>
-    {
-        policyBuilder.WithOrigins("https://your-frontend-domain.com")
-                     .AllowAnyHeader()
-                     .AllowAnyMethod()
-                     .AllowCredentials();
-    });
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder.WithOrigins("*")
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
 });
 builder.Services.AddControllers().AddJsonOptions(options =>
 {

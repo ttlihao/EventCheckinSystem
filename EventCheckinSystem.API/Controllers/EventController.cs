@@ -36,7 +36,7 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<EventDTO>> CreateEvent([FromBody] EventDTO eventDto)
+        public async Task<ActionResult<EventDTO>> CreateEvent([FromBody] CreateEventDTO eventDto)
         {
             var createdEvent = await _eventServices.CreateEventAsync(eventDto);
             return CreatedAtAction(nameof(GetEventById), new { id = createdEvent.EventID }, createdEvent);

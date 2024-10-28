@@ -11,8 +11,9 @@ namespace EventCheckinSystem.Repo.DTOs
     {
         public int GuestGroupID { get; set; }
         public int OrganizationID { get; set; }
+        public string Type { get; set; }
+
         public int EventID { get; set; }
         public string Name { get; set; }
-        public ICollection<GuestDTO> Guests { get; set; }
     }
 }

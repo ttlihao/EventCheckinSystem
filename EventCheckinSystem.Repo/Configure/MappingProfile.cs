@@ -16,8 +16,10 @@ namespace EventCheckinSystem.Repo.Configure
     {
         public MappingProfile()
         {
-            CreateMap<Event, EventDTO>()
-                .ForMember(dest => dest.GuestGroups, opt => opt.MapFrom(src => src.GuestGroups)).ReverseMap();
+            CreateMap<Event, CreateEventDTO>().ReverseMap();
+            CreateMap<CreateEventDTO, EventDTO>().ReverseMap();
+            CreateMap<Event, EventDTO>().ReverseMap();
+                //.ForMember(dest => dest.GuestGroups, opt => opt.MapFrom(src => src.GuestGroups)).ReverseMap();
 
             CreateMap<Guest, GuestDTO>().ReverseMap();
             CreateMap<GuestCheckin, GuestCheckinDTO>().ReverseMap();

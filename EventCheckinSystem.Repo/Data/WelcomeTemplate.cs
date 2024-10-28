@@ -12,6 +12,7 @@ namespace EventCheckinSystem.Repo.Data
         public int WelcomeTemplateID { get; set; }
         public int GuestGroupID { get; set; }
         public string TemplateContent { get; set; }
+        public string ImageURL { get; set; }    
 
         public GuestGroup GuestGroup { get; set; }
     }

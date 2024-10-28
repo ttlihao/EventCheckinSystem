@@ -1,20 +1,15 @@
-﻿using EventCheckinSystem.Repo.Bases.BaseEntitys;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EventCheckinSystem.Repo.Data
+namespace EventCheckinSystem.Repo.DTOs
 {
-    public class Event : BaseEntity
+    public class CreateEventDTO
     {
-        public int EventID { get; set; }
         public string Name { get; set; }
         public int OrganizationID { get; set; }
-        public Organization Organization { get; set; }
-        public ICollection<GuestGroup> GuestGroups { get; set; }
-        public ICollection<UserEvent> UserEvents { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string Location { get; set; }
@@ -22,6 +17,4 @@ namespace EventCheckinSystem.Repo.Data
         public int Capacity { get; set; }
         public string Status { get; set; }
     }
-
-
 }

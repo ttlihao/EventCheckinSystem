@@ -26,6 +26,12 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
                 .ToListAsync();
             return users;
         }
+        public async Task<IEnumerable<User>> GetAllUser()
+        {
+            var users = await _dbContext.Users
+                .ToListAsync();
+            return users;
+        }
 
         public async Task<string> GetUserEmailByIdAsync(string userId)
         {
@@ -76,6 +82,14 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
 
             // Convert the list of users to a dictionary
             return users.ToDictionary(u => u.Id, u => u.FullName);
+        }
+
+        public async Task<User> GetUsesByIdAsync(string userId)
+        {
+            var searchTerm = userId.Trim().ToLower();
+            var user = await _dbContext.Users
+                .FirstOrDefaultAsync(u => u.Id.ToLower().Contains(searchTerm) && u.IsDelete == false && u.IsActive == true);
+            return user;
         }
     }
 }

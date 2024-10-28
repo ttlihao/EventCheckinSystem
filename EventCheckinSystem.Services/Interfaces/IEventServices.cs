@@ -12,7 +12,7 @@ namespace EventCheckinSystem.Services.Interfaces
     {
         Task<IEnumerable<EventDTO>> GetAllEventsAsync();
         Task<EventDTO> GetEventByIdAsync(int id);
-        Task<EventDTO> CreateEventAsync(EventDTO newEvent);
+        Task<EventDTO> CreateEventAsync(CreateEventDTO newEvent);
         Task UpdateEventAsync(EventDTO updatedEvent);
         Task DeleteEventAsync(int id);
     }
