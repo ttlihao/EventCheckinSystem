@@ -22,5 +22,11 @@ namespace EventCheckinSystem.API.Controllers
             var response = await _authenticateService.LoginAsync(loginRequest.UserName, loginRequest.Password);
             return Ok(response);
         }
+        [HttpPost("register")]
+        public async Task<ActionResult<UserDTO>> CreateUser([FromBody] UserDTO userDTO)
+        {
+            var response = await _authenticateService.RegisterAsync(userDTO);
+            return Ok(response);
+        }
     }
 }

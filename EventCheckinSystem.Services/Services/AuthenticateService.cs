@@ -1,5 +1,7 @@
-﻿using Azure.Core;
+﻿using AutoMapper;
+using Azure.Core;
 using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
@@ -27,8 +29,10 @@ namespace EventCheckinSystem.Services.Services
         private readonly int _exAccessToken;
         private readonly int _exRefreshToken;
         private readonly ITimeService _timeService;
+        private readonly IMapper _mapper;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AuthenticateService(IAuthenticateRepo authenticateRepo, IConfiguration configuration, UserManager<User> userManager, ITimeService timeService)
+        public AuthenticateService(RoleManager<IdentityRole> roleManager, IMapper mapper, IAuthenticateRepo authenticateRepo, IConfiguration configuration, UserManager<User> userManager, ITimeService timeService)
         {
             _authenticateRepo = authenticateRepo;
             _configuration = configuration;
@@ -36,6 +40,8 @@ namespace EventCheckinSystem.Services.Services
             _exAccessToken = int.Parse(_configuration["Jwt:ExpirationAccessToken"]!);
             _exRefreshToken = int.Parse(_configuration["Jwt:ExpirationRefreshToken"]!);
             _timeService = timeService;
+            _mapper = mapper;
+            _roleManager = roleManager;
         }
 
         public async Task<IEnumerable<User>> GetUsersByFullNameAsync(string fullName)
@@ -73,9 +79,39 @@ namespace EventCheckinSystem.Services.Services
             return await _authenticateRepo.GetFullNamesByIdsAsync(userIds);
         }
 
-        public Task<LoginResponseDTO> RegisterAsync(string email, string password)
+        public async Task<UserDTO> RegisterAsync(UserDTO userDTO)
         {
-            throw new NotImplementedException();
+            if (await _userManager.Users.AnyAsync(x => x.UserName == userDTO.Username))
+                throw new ArgumentException("User đã tồn tại.");
+
+
+
+            //user
+            User newUser = _mapper.Map<User>(userDTO);
+            newUser.IsActive = true;
+            newUser.IsDelete = false;
+            IdentityResult resultCreateUser = await _userManager.CreateAsync(newUser, userDTO.Password);
+            if (!resultCreateUser.Succeeded)
+                throw new ArgumentException("Đã có lỗi xảy ra");
+
+            // Role by ID
+            var roleID = userDTO.RoleID;
+            IdentityRole? getRoleID = await _roleManager.FindByIdAsync(roleID);
+
+            if (getRoleID == null)
+            {
+                throw new ArgumentException("Vai trò không tồn tại.");
+            }
+
+            IdentityResult resultAddRoleID = await _userManager.AddToRoleAsync(newUser, getRoleID.Name!);
+
+            if (!resultAddRoleID.Succeeded)
+            {
+                throw new ArgumentException("Không thể thêm vai trò cho người dùng.");
+            }
+
+
+            return _mapper.Map<UserDTO>(newUser);
         }
 
         public async Task<LoginResponseDTO> LoginAsync(string username, string password)

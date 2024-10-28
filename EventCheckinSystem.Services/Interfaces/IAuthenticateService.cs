@@ -1,4 +1,5 @@
 ﻿using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using Microsoft.Identity.Client;
 using System;
@@ -11,7 +12,7 @@ namespace EventCheckinSystem.Services.Interfaces
 {
     public interface IAuthenticateService
     {
-        Task<LoginResponseDTO> RegisterAsync(string email, string password);
+        Task<UserDTO> RegisterAsync(UserDTO userDTO);
         Task<LoginResponseDTO> LoginAsync(string email, string password);
         Task<LoginResponseDTO> RefreshTokenAsync(string token, string refreshToken);
         Task<LoginResponseDTO> RevokeRefreshTokenAsync(string refreshToken);
