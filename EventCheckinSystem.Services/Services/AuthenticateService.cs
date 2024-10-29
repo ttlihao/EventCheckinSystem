@@ -145,7 +145,7 @@ namespace EventCheckinSystem.Services.Services
                     UserId = user.Id,
                     Username = user.UserName,
                     Email = user.Email,
-                    /*Role = userRole*/
+                    RoleName = userRole
                 };
             }
             catch (Exception ex)
