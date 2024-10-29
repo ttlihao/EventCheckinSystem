@@ -7,12 +7,12 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
 {
     public interface IGuestCheckinRepo
     {
-        Task<IEnumerable<GuestCheckinDTO>> GetAllCheckinsAsync();
-        Task<GuestCheckinDTO> GetCheckinByIdAsync(int id);
-        Task<GuestCheckinDTO> CreateCheckinAsync(GuestCheckinDTO guestCheckinDto, string createdBy);
-        Task UpdateCheckinAsync(GuestCheckinDTO updatedCheckinDto);
-        Task DeleteCheckinAsync(int id);
-        Task<GuestCheckinDTO> CheckinGuestByIdAsync(int guestId, string createdBy);
+        Task<IEnumerable<GuestCheckin>> GetAllCheckinsAsync();
+        Task<GuestCheckin> GetCheckinByIdAsync(int id);
+        Task<GuestCheckin> CreateCheckinAsync(GuestCheckin guestCheckin);
+        Task<bool> UpdateCheckinAsync(GuestCheckin updatedCheckinDto);
+        Task<bool> DeleteCheckinAsync(int id);
+        Task<GuestCheckin> CheckinGuestByIdAsync(int guestId, string createdBy);
     }
 }
 

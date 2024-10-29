@@ -8,8 +8,8 @@ namespace EventCheckinSystem.Services.Interfaces
     {
         Task<List<UserEventDTO>> GetAllUserEventsAsync();
         Task<UserEventDTO> GetUserEventByIdAsync(int eventId);
-        Task AddUserEventAsync(UserEventDTO userEventDto);
-        Task UpdateUserEventAsync(UserEventDTO userEventDto);
-        Task DeleteUserEventAsync(int eventId);
+        Task<UserEventDTO> AddUserEventAsync(UserEventDTO userEventDto);
+        Task<bool> UpdateUserEventAsync(UserEventDTO userEventDto);
+        Task<bool> DeleteUserEventAsync(int eventId);
     }
 }

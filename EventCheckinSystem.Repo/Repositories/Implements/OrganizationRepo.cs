@@ -11,15 +11,13 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
     public class OrganizationRepo : IOrganizationRepo
     {
         private readonly EventCheckinManagementContext _context;
-        private readonly IMapper _mapper;
 
-        public OrganizationRepo(EventCheckinManagementContext context, IMapper mapper)
+        public OrganizationRepo(EventCheckinManagementContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<OrganizationDTO>> GetAllOrganizationsAsync()
+        public async Task<IEnumerable<Organization>> GetAllOrganizationsAsync()
         {
             var organizations = await _context.Organizations
                 .Include(o => o.Events)
@@ -28,10 +26,10 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
                     .ThenInclude(e => e.UserEvents)
                 .ToListAsync();
 
-            return _mapper.Map<IEnumerable<OrganizationDTO>>(organizations);
+            return organizations;
         }
 
-        public async Task<OrganizationDTO> GetOrganizationByIdAsync(int id)
+        public async Task<Organization> GetOrganizationByIdAsync(int id)
         {
             var organizationEntity = await _context.Organizations
                 .Include(o => o.Events)
@@ -40,39 +38,50 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
                     .ThenInclude(e => e.UserEvents)
                 .FirstOrDefaultAsync(o => o.OrganizationID == id);
 
-            return _mapper.Map<OrganizationDTO>(organizationEntity);
+            return organizationEntity;
         }
 
-        public async Task<OrganizationDTO> CreateOrganizationAsync(OrganizationDTO newOrganizationDto)
+        public async Task<Organization> CreateOrganizationAsync(Organization newOrganization)
         {
-            var newOrganization = _mapper.Map<Organization>(newOrganizationDto);
-            newOrganization.CreatedBy = "User";
-            newOrganization.LastUpdatedBy = "User";
             await _context.Organizations.AddAsync(newOrganization);
             await _context.SaveChangesAsync();
-            return _mapper.Map<OrganizationDTO>(newOrganization);
+            return newOrganization;
         }
 
-        public async Task UpdateOrganizationAsync(OrganizationDTO updatedOrganizationDto)
+        public async Task<bool> UpdateOrganizationAsync(Organization updatedOrganizationDto)
         {
-            var existingOrganization = await _context.Organizations.FindAsync(updatedOrganizationDto.OrganizationID);
-
-            if (existingOrganization != null)
+            bool isSuccess = false;
+            try
             {
-                _mapper.Map(updatedOrganizationDto, existingOrganization);
-                _context.Organizations.Update(existingOrganization);
-                await _context.SaveChangesAsync();
+                var existingOrganiztion = await _context.Organizations.FirstOrDefaultAsync(e => e.OrganizationID == updatedOrganizationDto.OrganizationID);
+                if (existingOrganiztion != null)
+                {
+                    _context.Entry(existingOrganiztion).State = EntityState.Detached; // Detach the existing entity
+                    _context.Organizations.Attach(updatedOrganizationDto);
+                    _context.Entry(updatedOrganizationDto).State = EntityState.Modified; // Mark as modified
+                    var changes = await _context.SaveChangesAsync();
+                    isSuccess = changes > 0; // Return true if changes were made
+                }
             }
+            catch (Exception e)
+            {
+                throw new Exception($"Error updating guest check-in: {e.Message}");
+            }
+            return isSuccess;
         }
 
-        public async Task DeleteOrganizationAsync(int id)
+        public async Task<bool> DeleteOrganizationAsync(int id)
         {
             var organizationToDelete = await _context.Organizations.FindAsync(id);
             if (organizationToDelete != null)
             {
-                _context.Organizations.Remove(organizationToDelete);
-                await _context.SaveChangesAsync();
+                    organizationToDelete.IsActive = false;
+                    organizationToDelete.IsDelete = true;
+                    _context.Organizations.Update(organizationToDelete);
+                    await _context.SaveChangesAsync();
+                    return true;
             }
+                return false;
         }
     }
 }

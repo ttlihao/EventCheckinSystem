@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using EventCheckinSystem.Repo.Data;
-using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -12,58 +11,69 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
     public class UserEventRepo : IUserEventRepo
     {
         private readonly EventCheckinManagementContext _context;
-        private readonly IMapper _mapper;
 
-        public UserEventRepo(EventCheckinManagementContext context, IMapper mapper)
+        public UserEventRepo(EventCheckinManagementContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
-        public async Task<List<UserEventDTO>> GetAllUserEventsAsync()
+        public async Task<List<UserEvent>> GetAllUserEventsAsync()
         {
             var userEvents = await _context.UserEvents
                 .Include(ue => ue.Event)
                 .ToListAsync();
 
-            return _mapper.Map<List<UserEventDTO>>(userEvents);
+            return userEvents;
         }
 
-        public async Task<UserEventDTO> GetUserEventByIdAsync(int eventId)
+        public async Task<UserEvent> GetUserEventByIdAsync(int eventId)
         {
             var userEvent = await _context.UserEvents
                 .Include(ue => ue.Event)
                 .FirstOrDefaultAsync(ue => ue.EventID == eventId);
 
-            return _mapper.Map<UserEventDTO>(userEvent);
+            return userEvent;
         }
 
-        public async Task AddUserEventAsync(UserEventDTO userEventDto)
+        public async Task<UserEvent> AddUserEventAsync(UserEvent userEvent)
         {
-            var userEvent = _mapper.Map<UserEvent>(userEventDto);
             await _context.UserEvents.AddAsync(userEvent);
             await _context.SaveChangesAsync();
+            return userEvent;
         }
 
-        public async Task UpdateUserEventAsync(UserEventDTO userEventDto)
+        public async Task<bool> UpdateUserEventAsync(UserEvent userEvent)
         {
-            var userEvent = await _context.UserEvents.FindAsync(userEventDto.EventID);
-            if (userEvent != null)
+            bool isSuccess = false;
+            try
             {
-                _mapper.Map(userEventDto, userEvent);
-                _context.UserEvents.Update(userEvent);
-                await _context.SaveChangesAsync();
+                var existingUserEvent = await _context.UserEvents.FirstOrDefaultAsync(e => e.Id == userEvent.Id);
+                if (existingUserEvent != null)
+                {
+                    _context.Entry(existingUserEvent).State = EntityState.Detached; // Detach the existing entity
+                    _context.UserEvents.Attach(userEvent);
+                    _context.Entry(userEvent).State = EntityState.Modified; // Mark as modified
+                    var changes = await _context.SaveChangesAsync();
+                    isSuccess = changes > 0; // Return true if changes were made
+                }
             }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            return isSuccess;
         }
 
-        public async Task DeleteUserEventAsync(int eventId)
+        public async Task<bool> DeleteUserEventAsync(int eventId)
         {
             var userEvent = await _context.UserEvents.FindAsync(eventId);
             if (userEvent != null)
             {
                 _context.UserEvents.Remove(userEvent);
                 await _context.SaveChangesAsync();
+                return true;
             }
+            return false;
         }
     }
 }

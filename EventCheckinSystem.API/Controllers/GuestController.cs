@@ -1,5 +1,7 @@
 ﻿using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
+using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -12,19 +14,19 @@ namespace EventCheckinSystem.API.Controllers
     [Route("api/[controller]")]
     public class GuestController : ControllerBase
     {
-        private readonly IGuestRepo _guestRepo;
+        private readonly IGuestServices _guestService;
 
-        public GuestController(IGuestRepo guestRepo)
+        public GuestController(IGuestServices guestService)
         {
-            _guestRepo = guestRepo;
+            _guestService = guestService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Guest>>> GetAllGuests()
+        public async Task<ActionResult<List<GuestDTO>>> GetAllGuests()
         {
             try
             {
-                var guests = await _guestRepo.GetAllGuestsAsync();
+                var guests = await _guestService.GetAllGuestsAsync();
                 return Ok(guests);
             }
             catch (Exception ex)
@@ -38,7 +40,7 @@ namespace EventCheckinSystem.API.Controllers
         {
             try
             {
-                var guest = await _guestRepo.GetGuestByIdAsync(id);
+                var guest = await _guestService.GetGuestByIdAsync(id);
                 return Ok(guest);
             }
             catch (NullReferenceException ex)
@@ -52,11 +54,11 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddGuest([FromBody] Guest newGuest)
+        public async Task<ActionResult> AddGuest([FromBody] GuestDTO newGuest)
         {
             try
             {
-                await _guestRepo.AddGuestAsync(newGuest);
+                await _guestService.AddGuestAsync(newGuest);
                 return CreatedAtAction(nameof(GetGuestById), new { id = newGuest.GuestID }, newGuest);
             }
             catch (Exception ex)
@@ -66,11 +68,11 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateGuest([FromBody] Guest updatedGuest)
+        public async Task<IActionResult> UpdateGuest([FromBody] GuestDTO updatedGuest)
         {
             try
             {
-                await _guestRepo.UpdateGuestAsync(updatedGuest);
+                await _guestService.UpdateGuestAsync(updatedGuest);
                 return Ok();
             }
             catch (NullReferenceException ex)
@@ -88,7 +90,7 @@ namespace EventCheckinSystem.API.Controllers
         {
             try
             {
-                await _guestRepo.DeleteGuestAsync(id);
+                await _guestService.DeleteGuestAsync(id);
                 return Ok();
             }
             catch (NullReferenceException ex)
@@ -102,11 +104,11 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet("group/{groupId}")]
-        public async Task<ActionResult<List<Guest>>> GetGuestsByGroupId(int groupId)
+        public async Task<ActionResult<List<GuestDTO>>> GetGuestsByGroupId(int groupId)
         {
             try
             {
-                var guests = await _guestRepo.GetGuestsByGroupIdAsync(groupId);
+                var guests = await _guestService.GetGuestsByGroupIdAsync(groupId);
                 return Ok(guests);
             }
             catch (Exception ex)

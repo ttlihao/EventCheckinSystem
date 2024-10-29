@@ -73,40 +73,40 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
             }
         }
 
-        public async Task UpdateGuestImageAsync(GuestImage guestImage)
+        public async Task<bool> UpdateGuestImageAsync(GuestImage guestImage)
         {
+            bool isSuccess = false;
             try
             {
-                var existingImage = await _context.GuestImages.FindAsync(guestImage.GuestImageID);
-                if (existingImage != null)
+                var existingGuestImage = await _context.GuestImages.FirstOrDefaultAsync(e => e.GuestImageID == guestImage.GuestImageID);
+                if (existingGuestImage != null)
                 {
-                    existingImage.GuestID = guestImage.GuestID;
-                    existingImage.ImageURL = guestImage.ImageURL;
-                    existingImage.LastUpdatedTime = guestImage.LastUpdatedTime;
-
-                    _context.GuestImages.Update(existingImage);
-                    await _context.SaveChangesAsync();
-                }
-                else
-                {
-                    throw new NullReferenceException($"GuestImage with ID {guestImage.GuestImageID} not found.");
+                    _context.Entry(existingGuestImage).State = EntityState.Detached; // Detach the existing entity
+                    _context.GuestImages.Attach(guestImage);
+                    _context.Entry(guestImage).State = EntityState.Modified; // Mark as modified
+                    var changes = await _context.SaveChangesAsync();
+                    isSuccess = changes > 0; // Return true if changes were made
                 }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                throw new Exception($"Error updating GuestImage: {ex.Message}");
+                throw new Exception(e.Message);
             }
+            return isSuccess;
         }
 
-        public async Task DeleteGuestImageAsync(int id)
+        public async Task<bool> DeleteGuestImageAsync(int id)
         {
             try
             {
                 var imageToDelete = await _context.GuestImages.FindAsync(id);
                 if (imageToDelete != null)
                 {
-                    _context.GuestImages.Remove(imageToDelete);
+                    imageToDelete.IsActive = false;
+                    imageToDelete.IsDelete = true;
+                    _context.GuestImages.Update(imageToDelete);
                     await _context.SaveChangesAsync();
+                    return true;
                 }
                 else
                 {
@@ -117,6 +117,7 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
             {
                 throw new Exception($"Error deleting GuestImage with ID {id}: {ex.Message}");
             }
+            return false;
         }
     }
 }

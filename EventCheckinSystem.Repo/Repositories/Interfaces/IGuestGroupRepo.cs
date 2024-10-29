@@ -10,8 +10,8 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
         Task<IEnumerable<GuestGroup>> GetAllGuestGroupsAsync();
         Task<GuestGroup> GetGuestGroupByIdAsync(int id);
         Task<GuestGroup> CreateGuestGroupAsync(GuestGroup guestGroup);
-        Task UpdateGuestGroupAsync(GuestGroup guestGroupDto, string updatedBy);
-        Task DeleteGuestGroupAsync(int id);
+        Task<bool> UpdateGuestGroupAsync(GuestGroup guestGroup);
+        Task<bool> DeleteGuestGroupAsync(int id);
         Task<GuestGroup> GetGuestGroupByGuestIdAsync(int guestId);
     }
 }

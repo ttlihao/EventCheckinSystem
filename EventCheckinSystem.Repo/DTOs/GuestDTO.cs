@@ -16,6 +16,5 @@ namespace EventCheckinSystem.Repo.DTOs
         public string PhoneNumber { get; set; }
         public string Address { get; set; }
         public DateTime Birthday { get; set; }
-        public GuestImage GuestImage { get; set; }
     }
 }

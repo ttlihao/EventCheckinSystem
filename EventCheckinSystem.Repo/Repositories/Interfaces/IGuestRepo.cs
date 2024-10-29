@@ -9,9 +9,9 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
     {
         Task<List<Guest>> GetAllGuestsAsync();
         Task<Guest> GetGuestByIdAsync(int guestId);
-        Task AddGuestAsync(Guest guest);
-        Task UpdateGuestAsync(Guest guest);
-        Task DeleteGuestAsync(int guestId);
+        Task<Guest> AddGuestAsync(Guest guest);
+        Task<bool> UpdateGuestAsync(Guest guest);
+        Task<bool> DeleteGuestAsync(int guestId);
         Task<List<Guest>> GetGuestsByGroupIdAsync(int guestGroupId);
     }
 }

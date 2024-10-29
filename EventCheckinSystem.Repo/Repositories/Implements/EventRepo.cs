@@ -14,12 +14,10 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
     public class EventRepo : IEventRepo
     {
         private readonly EventCheckinManagementContext _context;
-        private readonly IMapper _mapper;
 
-        public EventRepo(EventCheckinManagementContext context, IMapper mapper)
+        public EventRepo(EventCheckinManagementContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         public async Task<IEnumerable<Event>> GetAllEventsAsync()
@@ -31,7 +29,7 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
                 .Include(e => e.UserEvents)
                 .ToListAsync();
 
-            return _mapper.Map<IEnumerable<Event>>(events);
+            return events;
         }
 
         public async Task<Event> GetEventByIdAsync(int id)
@@ -43,15 +41,15 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
                 .Include(e => e.UserEvents)
                 .FirstOrDefaultAsync(e => e.EventID == id);
 
-            return _mapper.Map<Event>(eventEntity);
+            return eventEntity;
         }
 
         public async Task<Event> CreateEventAsync(Event newEventDto)
         {
-            var newEvent = _mapper.Map<Event>(newEventDto);
+            var newEvent = newEventDto;
             await _context.Events.AddAsync(newEvent);
             await _context.SaveChangesAsync();
-            return _mapper.Map<Event>(newEvent);
+            return newEvent;
         }
         public async Task<bool> UpdateEventAsync(Event updatedEvent)
         {

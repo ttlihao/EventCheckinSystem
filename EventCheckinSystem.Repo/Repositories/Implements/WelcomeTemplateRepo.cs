@@ -17,84 +17,78 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
             _context = context;
         }
 
-        public async Task<IEnumerable<WelcomeTemplateDTO>> GetAllWelcomeTemplatesAsync()
+        public async Task<IEnumerable<WelcomeTemplate>> GetAllWelcomeTemplatesAsync()
         {
             return await _context.WelcomeTemplates
-                                 .Select(w => new WelcomeTemplateDTO
-                                 {
-                                     WelcomeTemplateID = w.WelcomeTemplateID,
-                                     GuestGroupID = w.GuestGroupID,
-                                     TemplateContent = w.TemplateContent,
-                                     GuestGroupName = w.GuestGroup.Name // Assuming you have a navigation property
-                                 })
+                .Where(x => x.IsActive && !x.IsDelete)
                                  .ToListAsync();
         }
 
-        public async Task<WelcomeTemplateDTO> GetWelcomeTemplateByIdAsync(int id)
+        public async Task<WelcomeTemplate> GetWelcomeTemplateByIdAsync(int id)
         {
-            var template = await _context.WelcomeTemplates.FindAsync(id);
-            if (template == null) return null;
-
-            return new WelcomeTemplateDTO
+            try
             {
-                WelcomeTemplateID = template.WelcomeTemplateID,
-                GuestGroupID = template.GuestGroupID,
-                TemplateContent = template.TemplateContent,
-                GuestGroupName = template.GuestGroup.Name // Assuming you have a navigation property
-            };
+                var template = await _context.WelcomeTemplates.FirstOrDefaultAsync(x => x.IsActive && !x.IsDelete && x.WelcomeTemplateID == id);
+                if (template == null)
+                {
+                    throw new NullReferenceException($"WelcomeTemplate with ID {id} not found.");
+                }
+                return template;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                // Logger.LogError(ex.Message);
+                throw new Exception($"Error retrieving WelcomeTemplate with ID {id}: {ex.Message}");
+            }
         }
 
-        public async Task<WelcomeTemplate> CreateWelcomeTemplateAsync(WelcomeTemplateDTO welcomeTemplateDto, string createdBy)
-        {
-            var welcomeTemplate = new WelcomeTemplate
-            {
-                GuestGroupID = welcomeTemplateDto.GuestGroupID,
-                TemplateContent = welcomeTemplateDto.TemplateContent,
-                CreatedBy = createdBy, // Set the createdBy
-                LastUpdatedBy = createdBy // Set lastUpdatedBy
-            };
 
+        public async Task<WelcomeTemplate> CreateWelcomeTemplateAsync(WelcomeTemplate welcomeTemplate)
+        {
             await _context.WelcomeTemplates.AddAsync(welcomeTemplate);
             await _context.SaveChangesAsync();
             return welcomeTemplate;
         }
 
-        public async Task UpdateWelcomeTemplateAsync(WelcomeTemplateDTO welcomeTemplateDto, string updatedBy)
+        public async Task<bool> UpdateWelcomeTemplateAsync(WelcomeTemplate welcomeTemplate)
         {
-            var existingTemplate = await _context.WelcomeTemplates.FindAsync(welcomeTemplateDto.WelcomeTemplateID);
-
-            if (existingTemplate != null)
+            bool isSuccess = false;
+            try
             {
-                existingTemplate.GuestGroupID = welcomeTemplateDto.GuestGroupID;
-                existingTemplate.TemplateContent = welcomeTemplateDto.TemplateContent;
-                existingTemplate.LastUpdatedBy = updatedBy; // Update lastUpdatedBy
-
-                _context.WelcomeTemplates.Update(existingTemplate);
-                await _context.SaveChangesAsync();
+                var existingWelcomeTemplate = await _context.WelcomeTemplates.FirstOrDefaultAsync(e => e.WelcomeTemplateID == welcomeTemplate.WelcomeTemplateID);
+                if (existingWelcomeTemplate != null)
+                {
+                    _context.Entry(existingWelcomeTemplate).State = EntityState.Detached; // Detach the existing entity
+                    _context.WelcomeTemplates.Attach(welcomeTemplate);
+                    _context.Entry(welcomeTemplate).State = EntityState.Modified; // Mark as modified
+                    var changes = await _context.SaveChangesAsync();
+                    isSuccess = changes > 0; // Return true if changes were made
+                }
             }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            return isSuccess;
         }
 
-        public async Task DeleteWelcomeTemplateAsync(int id)
+        public async Task<bool> DeleteWelcomeTemplateAsync(int id)
         {
             var templateToDelete = await _context.WelcomeTemplates.FindAsync(id);
             if (templateToDelete != null)
             {
                 _context.WelcomeTemplates.Remove(templateToDelete);
                 await _context.SaveChangesAsync();
+                return true;
             }
+            return false;
         }
 
-        public async Task<IEnumerable<WelcomeTemplateDTO>> GetWelcomeTemplatesByGuestGroupAsync(int guestGroupId)
+        public async Task<IEnumerable<WelcomeTemplate>> GetWelcomeTemplatesByGuestGroupAsync(int guestGroupId)
         {
             return await _context.WelcomeTemplates
-                                 .Where(w => w.GuestGroupID == guestGroupId)
-                                 .Select(w => new WelcomeTemplateDTO
-                                 {
-                                     WelcomeTemplateID = w.WelcomeTemplateID,
-                                     GuestGroupID = w.GuestGroupID,
-                                     TemplateContent = w.TemplateContent,
-                                     GuestGroupName = w.GuestGroup.Name // Assuming you have a navigation property
-                                 })
+                                 .Where(w => w.GuestGroupID == guestGroupId && !w.IsDelete && w.IsActive)
                                  .ToListAsync();
         }
     }

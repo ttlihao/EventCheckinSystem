@@ -8,9 +8,9 @@ namespace EventCheckinSystem.Services.Interfaces
     {
         Task<IEnumerable<GuestGroupDTO>> GetAllGuestGroupsAsync();
         Task<GuestGroupDTO> GetGuestGroupByIdAsync(int id);
-        Task<GuestGroupDTO> CreateGuestGroupAsync(GuestGroupDTO guestGroupDto, string createdBy);
-        Task UpdateGuestGroupAsync(GuestGroupDTO guestGroupDto, string updatedBy);
-        Task DeleteGuestGroupAsync(int id);
+        Task<GuestGroupDTO> CreateGuestGroupAsync(GuestGroupDTO guestGroupDto);
+        Task<bool> UpdateGuestGroupAsync(GuestGroupDTO guestGroupDto);
+        Task<bool> DeleteGuestGroupAsync(int id);
         Task<GuestGroupDTO> GetGuestGroupByGuestIdAsync(int guestId);
     }
 }

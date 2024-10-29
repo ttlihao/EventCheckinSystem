@@ -15,7 +15,6 @@ namespace EventCheckinSystem.Repo.DTOs
         public DateTime? CheckoutTime { get; set; }
         public string Status { get; set; }
         public string Notes { get; set; }
-        public Guest Guest { get; set; }
 
     }
 }

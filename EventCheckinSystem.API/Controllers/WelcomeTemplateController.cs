@@ -1,5 +1,6 @@
 ﻿using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
+using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -12,11 +13,11 @@ namespace EventCheckinSystem.API.Controllers
     [Route("api/[controller]")]
     public class WelcomeTemplateController : ControllerBase
     {
-        private readonly IWelcomeTemplateRepo _welcomeTemplateRepo;
+        private readonly IWelcomeTemplateServices _welcomeTemplateService;
 
-        public WelcomeTemplateController(IWelcomeTemplateRepo welcomeTemplateRepo)
+        public WelcomeTemplateController(IWelcomeTemplateServices welcomeTemplateRepo)
         {
-            _welcomeTemplateRepo = welcomeTemplateRepo;
+            _welcomeTemplateService = welcomeTemplateRepo;
         }
 
         [HttpGet]
@@ -24,7 +25,7 @@ namespace EventCheckinSystem.API.Controllers
         {
             try
             {
-                var templates = await _welcomeTemplateRepo.GetAllWelcomeTemplatesAsync();
+                var templates = await _welcomeTemplateService.GetAllWelcomeTemplatesAsync();
                 return Ok(templates);
             }
             catch (Exception ex)
@@ -38,7 +39,7 @@ namespace EventCheckinSystem.API.Controllers
         {
             try
             {
-                var template = await _welcomeTemplateRepo.GetWelcomeTemplateByIdAsync(id);
+                var template = await _welcomeTemplateService.GetWelcomeTemplateByIdAsync(id);
                 if (template == null)
                 {
                     return NotFound($"WelcomeTemplate with ID {id} not found.");
@@ -52,11 +53,11 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<WelcomeTemplateDTO>> CreateWelcomeTemplate([FromBody] WelcomeTemplateDTO newTemplate, [FromQuery] string createdBy)
+        public async Task<ActionResult<WelcomeTemplateDTO>> CreateWelcomeTemplate([FromBody] WelcomeTemplateDTO newTemplate)
         {
             try
             {
-                var createdTemplate = await _welcomeTemplateRepo.CreateWelcomeTemplateAsync(newTemplate, createdBy);
+                var createdTemplate = await _welcomeTemplateService.CreateWelcomeTemplateAsync(newTemplate);
                 return CreatedAtAction(nameof(GetWelcomeTemplateById), new { id = createdTemplate.WelcomeTemplateID }, createdTemplate);
             }
             catch (Exception ex)
@@ -66,11 +67,11 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateWelcomeTemplate([FromBody] WelcomeTemplateDTO updatedTemplate, [FromQuery] string updatedBy)
+        public async Task<IActionResult> UpdateWelcomeTemplate([FromBody] WelcomeTemplateDTO updatedTemplate)
         {
             try
             {
-                await _welcomeTemplateRepo.UpdateWelcomeTemplateAsync(updatedTemplate, updatedBy);
+                await _welcomeTemplateService.UpdateWelcomeTemplateAsync(updatedTemplate);
                 return Ok();
             }
             catch (Exception ex)
@@ -84,7 +85,7 @@ namespace EventCheckinSystem.API.Controllers
         {
             try
             {
-                await _welcomeTemplateRepo.DeleteWelcomeTemplateAsync(id);
+                await _welcomeTemplateService.DeleteWelcomeTemplateAsync(id);
                 return Ok();
             }
             catch (Exception ex)
@@ -98,7 +99,7 @@ namespace EventCheckinSystem.API.Controllers
         {
             try
             {
-                var templates = await _welcomeTemplateRepo.GetWelcomeTemplatesByGuestGroupAsync(guestGroupId);
+                var templates = await _welcomeTemplateService.GetWelcomeTemplatesByGuestGroupAsync(guestGroupId);
                 return Ok(templates);
             }
             catch (Exception ex)

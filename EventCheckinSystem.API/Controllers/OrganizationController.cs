@@ -1,5 +1,6 @@
 ﻿using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
+using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -12,11 +13,11 @@ namespace EventCheckinSystem.API.Controllers
     [Route("api/[controller]")]
     public class OrganizationController : ControllerBase
     {
-        private readonly IOrganizationRepo _organizationRepo;
+        private readonly IOrganizationServices _organizationService;
 
-        public OrganizationController(IOrganizationRepo organizationRepo)
+        public OrganizationController(IOrganizationServices organizationService)
         {
-            _organizationRepo = organizationRepo;
+            _organizationService = organizationService;
         }
 
         [HttpGet]
@@ -24,7 +25,7 @@ namespace EventCheckinSystem.API.Controllers
         {
             try
             {
-                var organizations = await _organizationRepo.GetAllOrganizationsAsync();
+                var organizations = await _organizationService.GetAllOrganizationsAsync();
                 return Ok(organizations);
             }
             catch (Exception ex)
@@ -38,7 +39,7 @@ namespace EventCheckinSystem.API.Controllers
         {
             try
             {
-                var organization = await _organizationRepo.GetOrganizationByIdAsync(id);
+                var organization = await _organizationService.GetOrganizationByIdAsync(id);
                 if (organization == null)
                 {
                     return NotFound($"Organization with ID {id} not found.");
@@ -56,7 +57,7 @@ namespace EventCheckinSystem.API.Controllers
         {
             try
             {
-                var createdOrganization = await _organizationRepo.CreateOrganizationAsync(newOrganization);
+                var createdOrganization = await _organizationService.CreateOrganizationAsync(newOrganization);
                 return CreatedAtAction(nameof(GetOrganizationById), new { id = createdOrganization.OrganizationID }, createdOrganization);
             }
             catch (Exception ex)
@@ -70,7 +71,7 @@ namespace EventCheckinSystem.API.Controllers
         {
             try
             {
-                await _organizationRepo.UpdateOrganizationAsync(updatedOrganization);
+                await _organizationService.UpdateOrganizationAsync(updatedOrganization);
                 return Ok();
             }
             catch (Exception ex)
@@ -84,7 +85,7 @@ namespace EventCheckinSystem.API.Controllers
         {
             try
             {
-                await _organizationRepo.DeleteOrganizationAsync(id);
+                await _organizationService.DeleteOrganizationAsync(id);
                 return Ok();
             }
             catch (Exception ex)

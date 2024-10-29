@@ -1,5 +1,6 @@
 ﻿using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
+using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -12,11 +13,11 @@ namespace EventCheckinSystem.API.Controllers
     [Route("api/[controller]")]
     public class UserEventController : ControllerBase
     {
-        private readonly IUserEventRepo _userEventRepo;
+        private readonly IUserEventServices _userEventService;
 
-        public UserEventController(IUserEventRepo userEventRepo)
+        public UserEventController(IUserEventServices userEventService)
         {
-            _userEventRepo = userEventRepo;
+            _userEventService = userEventService;
         }
 
         [HttpGet]
@@ -24,7 +25,7 @@ namespace EventCheckinSystem.API.Controllers
         {
             try
             {
-                var userEvents = await _userEventRepo.GetAllUserEventsAsync();
+                var userEvents = await _userEventService.GetAllUserEventsAsync();
                 return Ok(userEvents);
             }
             catch (Exception ex)
@@ -38,7 +39,7 @@ namespace EventCheckinSystem.API.Controllers
         {
             try
             {
-                var userEvent = await _userEventRepo.GetUserEventByIdAsync(id);
+                var userEvent = await _userEventService.GetUserEventByIdAsync(id);
                 if (userEvent == null)
                 {
                     return NotFound($"UserEvent with ID {id} not found.");
@@ -56,7 +57,7 @@ namespace EventCheckinSystem.API.Controllers
         {
             try
             {
-                await _userEventRepo.AddUserEventAsync(newUserEvent);
+                await _userEventService.AddUserEventAsync(newUserEvent);
                 return CreatedAtAction(nameof(GetUserEventById), new { id = newUserEvent.EventID }, newUserEvent);
             }
             catch (Exception ex)
@@ -70,7 +71,7 @@ namespace EventCheckinSystem.API.Controllers
         {
             try
             {
-                await _userEventRepo.UpdateUserEventAsync(updatedUserEvent);
+                await _userEventService.UpdateUserEventAsync(updatedUserEvent);
                 return Ok();
             }
             catch (Exception ex)
@@ -84,7 +85,7 @@ namespace EventCheckinSystem.API.Controllers
         {
             try
             {
-                await _userEventRepo.DeleteUserEventAsync(id);
+                await _userEventService.DeleteUserEventAsync(id);
                 return Ok();
             }
             catch (Exception ex)

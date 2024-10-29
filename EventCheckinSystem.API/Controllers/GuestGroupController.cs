@@ -1,5 +1,7 @@
 ﻿using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
+using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -11,26 +13,26 @@ namespace EventCheckinSystem.API.Controllers
     [Route("api/[controller]")]
     public class GuestGroupController : ControllerBase
     {
-        private readonly IGuestGroupRepo _guestGroupRepo;
+        private readonly IGuestGroupServices _guestGroupService;
 
-        public GuestGroupController(IGuestGroupRepo guestGroupRepo)
+        public GuestGroupController(IGuestGroupServices guestGroupService)
         {
-            _guestGroupRepo = guestGroupRepo;
+            _guestGroupService = guestGroupService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GuestGroup>>> GetAllGuestGroups()
+        public async Task<ActionResult<IEnumerable<GuestGroupDTO>>> GetAllGuestGroups()
         {
-            var groups = await _guestGroupRepo.GetAllGuestGroupsAsync();
+            var groups = await _guestGroupService.GetAllGuestGroupsAsync();
             return Ok(groups);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<GuestGroup>> GetGuestGroupById(int id)
+        public async Task<ActionResult<GuestGroupDTO>> GetGuestGroupById(int id)
         {
             try
             {
-                var group = await _guestGroupRepo.GetGuestGroupByIdAsync(id);
+                var group = await _guestGroupService.GetGuestGroupByIdAsync(id);
                 return Ok(group);
             }
             catch (NullReferenceException ex)
@@ -44,18 +46,18 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<GuestGroup>> CreateGuestGroup([FromBody] GuestGroup newGroup)
+        public async Task<ActionResult<GuestGroupDTO>> CreateGuestGroup([FromBody] GuestGroupDTO newGroup)
         {
-            var createdGroup = await _guestGroupRepo.CreateGuestGroupAsync(newGroup);
+            var createdGroup = await _guestGroupService.CreateGuestGroupAsync(newGroup);
             return CreatedAtAction(nameof(GetGuestGroupById), new { id = createdGroup.GuestGroupID }, createdGroup);
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateGuestGroup([FromBody] GuestGroup updatedGroup, [FromQuery] string updatedBy)
+        public async Task<IActionResult> UpdateGuestGroup([FromBody] GuestGroupDTO updatedGroup)
         {
             try
             {
-                await _guestGroupRepo.UpdateGuestGroupAsync(updatedGroup, updatedBy);
+                await _guestGroupService.UpdateGuestGroupAsync(updatedGroup);
                 return Ok();
             }
             catch (NullReferenceException ex)
@@ -73,7 +75,7 @@ namespace EventCheckinSystem.API.Controllers
         {
             try
             {
-                await _guestGroupRepo.DeleteGuestGroupAsync(id);
+                await _guestGroupService.DeleteGuestGroupAsync(id);
                 return Ok();
             }
             catch (NullReferenceException ex)
@@ -87,11 +89,11 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet("byguest/{guestId}")]
-        public async Task<ActionResult<GuestGroup>> GetGuestGroupByGuestId(int guestId)
+        public async Task<ActionResult<GuestGroupDTO>> GetGuestGroupByGuestId(int guestId)
         {
             try
             {
-                var group = await _guestGroupRepo.GetGuestGroupByGuestIdAsync(guestId);
+                var group = await _guestGroupService.GetGuestGroupByGuestIdAsync(guestId);
                 return Ok(group);
             }
             catch (NullReferenceException ex)

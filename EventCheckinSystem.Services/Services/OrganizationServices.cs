@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,68 +11,78 @@ namespace EventCheckinSystem.Services.Services
 {
     public class OrganizationServices : IOrganizationServices
     {
-        private readonly EventCheckinManagementContext _context;
+        private readonly IOrganizationRepo _organizationRepo;
         private readonly IMapper _mapper;
+        private readonly IUserContextService _userContextService;
+        private readonly ITimeService _timeService;
 
-        public OrganizationServices(EventCheckinManagementContext context, IMapper mapper)
+        public OrganizationServices(IOrganizationRepo organizationRepo, IMapper mapper, IUserContextService userContextService, ITimeService timeService)
         {
-            _context = context;
+            _organizationRepo = organizationRepo;
             _mapper = mapper;
+            _userContextService = userContextService;
+            _timeService = timeService;
         }
 
         public async Task<IEnumerable<OrganizationDTO>> GetAllOrganizationsAsync()
         {
-            var organizations = await _context.Organizations
-                .Include(o => o.Events)
-                    .ThenInclude(e => e.GuestGroups)
-                .Include(o => o.Events)
-                    .ThenInclude(e => e.UserEvents)
-                .ToListAsync();
-
+            var organizations = await _organizationRepo.GetAllOrganizationsAsync();
             return _mapper.Map<IEnumerable<OrganizationDTO>>(organizations);
         }
 
         public async Task<OrganizationDTO> GetOrganizationByIdAsync(int id)
         {
-            var organizationEntity = await _context.Organizations
-                .Include(o => o.Events)
-                    .ThenInclude(e => e.GuestGroups)
-                .Include(o => o.Events)
-                    .ThenInclude(e => e.UserEvents)
-                .FirstOrDefaultAsync(o => o.OrganizationID == id);
-
+            var organizationEntity = await _organizationRepo.GetOrganizationByIdAsync(id);
             return _mapper.Map<OrganizationDTO>(organizationEntity);
         }
 
         public async Task<OrganizationDTO> CreateOrganizationAsync(OrganizationDTO newOrganizationDto)
         {
-            var newOrganization = _mapper.Map<Organization>(newOrganizationDto);
-            newOrganization.CreatedBy = "User";
-            newOrganization.LastUpdatedBy = "User";
-            await _context.Organizations.AddAsync(newOrganization);
-            await _context.SaveChangesAsync();
-            return _mapper.Map<OrganizationDTO>(newOrganization);
-        }
-
-        public async Task UpdateOrganizationAsync(OrganizationDTO updatedOrganizationDto)
-        {
-            var existingOrganization = await _context.Organizations.FindAsync(updatedOrganizationDto.OrganizationID);
-
-            if (existingOrganization != null)
+            try
             {
-                _mapper.Map(updatedOrganizationDto, existingOrganization);
-                _context.Organizations.Update(existingOrganization);
-                await _context.SaveChangesAsync();
+                var newOrganization = _mapper.Map<Organization>(newOrganizationDto);
+                newOrganization.CreatedBy = _userContextService.GetCurrentUserId();
+                newOrganization.LastUpdatedBy = newOrganization.CreatedBy;
+                newOrganization.CreatedTime = _timeService.SystemTimeNow;
+                newOrganization.LastUpdatedTime = _timeService.SystemTimeNow;
+                var createdOrganization = await _organizationRepo.CreateOrganizationAsync(newOrganization);
+                return _mapper.Map<OrganizationDTO>(createdOrganization);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while creating the organization", ex);
             }
         }
 
-        public async Task DeleteOrganizationAsync(int id)
+        public async Task<bool> UpdateOrganizationAsync(OrganizationDTO updatedOrganizationDto)
         {
-            var organizationToDelete = await _context.Organizations.FindAsync(id);
-            if (organizationToDelete != null)
+            try
             {
-                _context.Organizations.Remove(organizationToDelete);
-                await _context.SaveChangesAsync();
+                var existingOrganization = await _organizationRepo.GetOrganizationByIdAsync(updatedOrganizationDto.OrganizationID);
+                if (existingOrganization == null)
+                {
+                    throw new Exception("Organization not found");
+                }
+                _mapper.Map(updatedOrganizationDto, existingOrganization); // Map updated fields to existing entity
+                existingOrganization.LastUpdatedBy = _userContextService.GetCurrentUserId();
+                existingOrganization.LastUpdatedTime = _timeService.SystemTimeNow;
+                return await _organizationRepo.UpdateOrganizationAsync(existingOrganization);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while updating the organization", ex);
+            }
+        }
+
+        public async Task<bool> DeleteOrganizationAsync(int id)
+        {
+            try
+            {
+                return await _organizationRepo.DeleteOrganizationAsync(id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while deleting the organization", ex);
             }
         }
     }

@@ -1,5 +1,7 @@
 ﻿using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
+using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -12,19 +14,19 @@ namespace EventCheckinSystem.API.Controllers
     [Route("api/[controller]")]
     public class GuestImageController : ControllerBase
     {
-        private readonly IGuestImageRepo _guestImageRepo;
+        private readonly IGuestImageServices _guestImageService;
 
-        public GuestImageController(IGuestImageRepo guestImageRepo)
+        public GuestImageController(IGuestImageServices guestImageService)
         {
-            _guestImageRepo = guestImageRepo;
+            _guestImageService = guestImageService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GuestImage>>> GetAllGuestImages()
+        public async Task<ActionResult<IEnumerable<GuestImageDTO>>> GetAllGuestImages()
         {
             try
             {
-                var guestImages = await _guestImageRepo.GetAllGuestImagesAsync();
+                var guestImages = await _guestImageService.GetAllGuestImagesAsync();
                 return Ok(guestImages);
             }
             catch (Exception ex)
@@ -34,11 +36,11 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<GuestImage>> GetGuestImageById(int id)
+        public async Task<ActionResult<GuestImageDTO>> GetGuestImageById(int id)
         {
             try
             {
-                var guestImage = await _guestImageRepo.GetGuestImageByIdAsync(id);
+                var guestImage = await _guestImageService.GetGuestImageByIdAsync(id);
                 return Ok(guestImage);
             }
             catch (NullReferenceException ex)
@@ -52,11 +54,11 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<GuestImage>> CreateGuestImage([FromBody] GuestImage newGuestImage)
+        public async Task<ActionResult<GuestImageDTO>> CreateGuestImage([FromBody] GuestImageDTO newGuestImage)
         {
             try
             {
-                var createdImage = await _guestImageRepo.CreateGuestImageAsync(newGuestImage);
+                var createdImage = await _guestImageService.CreateGuestImageAsync(newGuestImage);
                 return CreatedAtAction(nameof(GetGuestImageById), new { id = createdImage.GuestImageID }, createdImage);
             }
             catch (Exception ex)
@@ -66,11 +68,11 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateGuestImage([FromBody] GuestImage updatedGuestImage)
+        public async Task<IActionResult> UpdateGuestImage([FromBody] GuestImageDTO updatedGuestImage)
         {
             try
             {
-                await _guestImageRepo.UpdateGuestImageAsync(updatedGuestImage);
+                await _guestImageService.UpdateGuestImageAsync(updatedGuestImage);
                 return Ok();
             }
             catch (NullReferenceException ex)
@@ -88,7 +90,7 @@ namespace EventCheckinSystem.API.Controllers
         {
             try
             {
-                await _guestImageRepo.DeleteGuestImageAsync(id);
+                await _guestImageService.DeleteGuestImageAsync(id);
                 return Ok();
             }
             catch (NullReferenceException ex)

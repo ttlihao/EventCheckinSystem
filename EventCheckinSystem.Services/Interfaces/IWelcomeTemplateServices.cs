@@ -9,9 +9,9 @@ namespace EventCheckinSystem.Services.Interfaces
     {
         Task<IEnumerable<WelcomeTemplateDTO>> GetAllWelcomeTemplatesAsync();
         Task<WelcomeTemplateDTO> GetWelcomeTemplateByIdAsync(int id);
-        Task<WelcomeTemplate> CreateWelcomeTemplateAsync(WelcomeTemplateDTO welcomeTemplateDto, string createdBy);
-        Task UpdateWelcomeTemplateAsync(WelcomeTemplateDTO welcomeTemplateDto, string updatedBy);
-        Task DeleteWelcomeTemplateAsync(int id);
+        Task<WelcomeTemplateDTO> CreateWelcomeTemplateAsync(WelcomeTemplateDTO welcomeTemplateDto);
+        Task<bool> UpdateWelcomeTemplateAsync(WelcomeTemplateDTO welcomeTemplateDto);
+        Task<bool> DeleteWelcomeTemplateAsync(int id);
         Task<IEnumerable<WelcomeTemplateDTO>> GetWelcomeTemplatesByGuestGroupAsync(int guestGroupId);
     }
 }

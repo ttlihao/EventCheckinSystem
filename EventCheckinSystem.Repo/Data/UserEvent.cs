@@ -8,6 +8,7 @@ namespace EventCheckinSystem.Repo.Data
 {
     public class UserEvent
     {
+        public int Id { get; set; }
         public string UserID { get; set; }
         public User User { get; set; }
 

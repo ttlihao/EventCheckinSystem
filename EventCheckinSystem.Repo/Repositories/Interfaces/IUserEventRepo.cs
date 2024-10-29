@@ -1,4 +1,4 @@
-﻿using EventCheckinSystem.Repo.DTOs;
+﻿using EventCheckinSystem.Repo.Data;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,10 +6,10 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
 {
     public interface IUserEventRepo
     {
-        Task<List<UserEventDTO>> GetAllUserEventsAsync();
-        Task<UserEventDTO> GetUserEventByIdAsync(int eventId);
-        Task AddUserEventAsync(UserEventDTO userEventDto);
-        Task UpdateUserEventAsync(UserEventDTO userEventDto);
-        Task DeleteUserEventAsync(int eventId);
+        Task<List<UserEvent>> GetAllUserEventsAsync();
+        Task<UserEvent> GetUserEventByIdAsync(int eventId);
+        Task<UserEvent> AddUserEventAsync(UserEvent userEvent);
+        Task<bool> UpdateUserEventAsync(UserEvent userEvent);
+        Task<bool> DeleteUserEventAsync(int eventId);
     }
 }

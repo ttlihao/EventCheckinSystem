@@ -9,10 +9,10 @@ namespace EventCheckinSystem.Services.Interfaces
     {
         Task<IEnumerable<GuestCheckinDTO>> GetAllCheckinsAsync();
         Task<GuestCheckinDTO> GetCheckinByIdAsync(int id);
-        Task<GuestCheckinDTO> CreateCheckinAsync(GuestCheckinDTO guestCheckinDto, string createdBy);
-        Task UpdateCheckinAsync(GuestCheckinDTO updatedCheckinDto);
-        Task DeleteCheckinAsync(int id);
-        Task<GuestCheckinDTO> CheckinGuestByIdAsync(int guestId, string createdBy);
+        Task<GuestCheckinDTO> CreateCheckinAsync(GuestCheckinDTO guestCheckinDto);
+        Task<bool> UpdateCheckinAsync(GuestCheckinDTO updatedCheckinDto);
+        Task<bool> DeleteCheckinAsync(int id);
+        Task<GuestCheckinDTO> CheckinGuestByIdAsync(int guestId);
     }
 }
 

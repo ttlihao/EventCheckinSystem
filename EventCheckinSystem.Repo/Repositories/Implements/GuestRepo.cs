@@ -61,12 +61,13 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
             }
         }
 
-        public async Task AddGuestAsync(Guest guest)
+        public async Task<Guest> AddGuestAsync(Guest guest)
         {
             try
             {
                 await _context.Set<Guest>().AddAsync(guest);
                 await _context.SaveChangesAsync();
+                return guest;
             }
             catch (Exception ex)
             {
@@ -74,27 +75,29 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
             }
         }
 
-        public async Task UpdateGuestAsync(Guest guest)
+        public async Task<bool> UpdateGuestAsync(Guest guest)
         {
+            bool isSuccess = false;
             try
             {
-                var entry = _context.Entry(guest);
-
-                if (entry.State == EntityState.Detached)
+                var existingGuest = await _context.Guests.FirstOrDefaultAsync(e => e.GuestID == guest.GuestID);
+                if (existingGuest != null)
                 {
-                    _context.Set<Guest>().Attach(guest);
+                    _context.Entry(existingGuest).State = EntityState.Detached; // Detach the existing entity
+                    _context.Guests.Attach(guest);
+                    _context.Entry(guest).State = EntityState.Modified; // Mark as modified
+                    var changes = await _context.SaveChangesAsync();
+                    isSuccess = changes > 0; // Return true if changes were made
                 }
-
-                entry.State = EntityState.Modified;
-                await _context.SaveChangesAsync();
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                throw new Exception($"Error updating Guest: {ex.Message}");
+                throw new Exception(e.Message);
             }
+            return isSuccess;
         }
 
-        public async Task DeleteGuestAsync(int guestId)
+        public async Task<bool> DeleteGuestAsync(int guestId)
         {
             try
             {
@@ -103,6 +106,7 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
                 {
                     _context.Set<Guest>().Remove(guest);
                     await _context.SaveChangesAsync();
+                    return true;
                 }
                 else
                 {

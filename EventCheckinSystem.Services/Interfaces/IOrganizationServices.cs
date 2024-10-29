@@ -9,7 +9,7 @@ namespace EventCheckinSystem.Services.Interfaces
         Task<IEnumerable<OrganizationDTO>> GetAllOrganizationsAsync();
         Task<OrganizationDTO> GetOrganizationByIdAsync(int id);
         Task<OrganizationDTO> CreateOrganizationAsync(OrganizationDTO newOrganizationDto);
-        Task UpdateOrganizationAsync(OrganizationDTO updatedOrganizationDto);
-        Task DeleteOrganizationAsync(int id);
+        Task<bool> UpdateOrganizationAsync(OrganizationDTO updatedOrganizationDto);
+        Task<bool> DeleteOrganizationAsync(int id);
     }
 }

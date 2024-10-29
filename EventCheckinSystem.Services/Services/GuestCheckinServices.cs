@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.Repositories.Implements;
+using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -10,76 +12,83 @@ namespace EventCheckinSystem.Services.Services
 {
     public class GuestCheckinServices : IGuestCheckinServices
     {
-        private readonly EventCheckinManagementContext _context;
+        private readonly IGuestCheckinRepo _checkinRepo;
         private readonly IMapper _mapper;
+        private readonly IUserContextService _userContextService;
+        private readonly ITimeService _timeService;
 
-        public GuestCheckinServices(EventCheckinManagementContext context, IMapper mapper)
+        public GuestCheckinServices(IGuestCheckinRepo checkinRepo, IMapper mapper, IUserContextService userContextService, ITimeService timeService)
         {
-            _context = context;
+            _checkinRepo = checkinRepo;
             _mapper = mapper;
+            _userContextService = userContextService;
+            _timeService = timeService;
         }
 
         public async Task<IEnumerable<GuestCheckinDTO>> GetAllCheckinsAsync()
         {
-            var checkins = await _context.GuestCheckins
-                                          .Include(gc => gc.Guest)
-                                          .ToListAsync();
+            var checkins = await _checkinRepo.GetAllCheckinsAsync();
             return _mapper.Map<IEnumerable<GuestCheckinDTO>>(checkins);
         }
 
         public async Task<GuestCheckinDTO> GetCheckinByIdAsync(int id)
         {
-            var guestCheckin = await _context.GuestCheckins
-                                              .Include(gc => gc.Guest)
-                                              .FirstOrDefaultAsync(gc => gc.GuestCheckinID == id);
+            var guestCheckin = await _checkinRepo.GetCheckinByIdAsync(id);
             return guestCheckin == null ? null : _mapper.Map<GuestCheckinDTO>(guestCheckin);
         }
 
-        public async Task<GuestCheckinDTO> CreateCheckinAsync(GuestCheckinDTO guestCheckinDto, string createdBy)
+        public async Task<GuestCheckinDTO> CreateCheckinAsync(GuestCheckinDTO guestCheckinDto)
         {
-            var newCheckin = _mapper.Map<GuestCheckin>(guestCheckinDto);
-            newCheckin.CreatedBy = createdBy;
-            newCheckin.LastUpdatedBy = createdBy;
-
-            await _context.GuestCheckins.AddAsync(newCheckin);
-            await _context.SaveChangesAsync();
-
-            return _mapper.Map<GuestCheckinDTO>(newCheckin);
-        }
-
-        public async Task UpdateCheckinAsync(GuestCheckinDTO updatedCheckinDto)
-        {
-            var existingCheckin = await _context.GuestCheckins.FindAsync(updatedCheckinDto.GuestCheckinID);
-            if (existingCheckin != null)
+            try
             {
-                _mapper.Map(updatedCheckinDto, existingCheckin);
-                _context.GuestCheckins.Update(existingCheckin);
-                await _context.SaveChangesAsync();
+                var newCheckin = _mapper.Map<GuestCheckin>(guestCheckinDto);
+                newCheckin.CreatedBy = _userContextService.GetCurrentUserId();
+                newCheckin.LastUpdatedBy = newCheckin.CreatedBy;
+                newCheckin.CreatedTime = _timeService.SystemTimeNow;
+                newCheckin.LastUpdatedTime = _timeService.SystemTimeNow;
+                var createdCheckin = await _checkinRepo.CreateCheckinAsync(newCheckin);
+                return _mapper.Map<GuestCheckinDTO>(createdCheckin);
+            }
+            catch (Exception ex)
+            {
+                throw;
             }
         }
 
-        public async Task DeleteCheckinAsync(int id)
+        public async Task<bool> UpdateCheckinAsync(GuestCheckinDTO updatedCheckinDto)
         {
-            var checkinToDelete = await _context.GuestCheckins.FindAsync(id);
-            if (checkinToDelete != null)
+            try
             {
-                _context.GuestCheckins.Remove(checkinToDelete);
-                await _context.SaveChangesAsync();
+                var existingEvent = await _checkinRepo.GetCheckinByIdAsync(updatedCheckinDto.GuestCheckinID);
+                if (existingEvent == null)
+                {
+                    throw new Exception("Checkin not found");
+                }
+
+                _mapper.Map(updatedCheckinDto, existingEvent); // Map updated fields to existing entity
+                existingEvent.LastUpdatedBy = _userContextService.GetCurrentUserId();
+                existingEvent.LastUpdatedTime = _timeService.SystemTimeNow;
+
+                return await _checkinRepo.UpdateCheckinAsync(existingEvent);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while updating the event", ex);
             }
         }
 
-        public async Task<GuestCheckinDTO> CheckinGuestByIdAsync(int guestId, string createdBy)
+        public async Task<bool> DeleteCheckinAsync(int id)
         {
-            var checkin = new GuestCheckin
+            if (await _checkinRepo.GetCheckinByIdAsync(id) == null)
             {
-                GuestID = guestId,
-                CheckinTime = DateTime.UtcNow,
-                CreatedBy = createdBy,
-                LastUpdatedBy = createdBy
-            };
+                throw new ArgumentException("Checkin Not Found!!");
+            }
+            return await _checkinRepo.DeleteCheckinAsync(id);
+        }
 
-            await _context.GuestCheckins.AddAsync(checkin);
-            await _context.SaveChangesAsync();
+        public async Task<GuestCheckinDTO> CheckinGuestByIdAsync(int guestId)
+        {
+            var checkin = await _checkinRepo.CheckinGuestByIdAsync(guestId, _userContextService.GetCurrentUserId());
 
             return _mapper.Map<GuestCheckinDTO>(checkin);
         }

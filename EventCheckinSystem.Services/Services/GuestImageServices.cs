@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,60 +12,78 @@ namespace EventCheckinSystem.Services.Services
 {
     public class GuestImageServices : IGuestImageServices
     {
-        private readonly EventCheckinManagementContext _context;
+        private readonly IGuestImageRepo _guestImageRepo;
         private readonly IMapper _mapper;
+        private readonly IUserContextService _userContextService;
+        private readonly ITimeService _timeService;
 
-        public GuestImageServices(EventCheckinManagementContext context, IMapper mapper)
+        public GuestImageServices(IGuestImageRepo guestImageRepo, IMapper mapper, IUserContextService userContextService, ITimeService timeService)
         {
-            _context = context;
+            _guestImageRepo = guestImageRepo;
             _mapper = mapper;
+            _userContextService = userContextService;
+            _timeService = timeService;
         }
 
         public async Task<IEnumerable<GuestImageDTO>> GetAllGuestImagesAsync()
         {
-            var guestImages = await _context.GuestImages
-                .Include(g => g.Guest)
-                .ToListAsync();
-
+            var guestImages = await _guestImageRepo.GetAllGuestImagesAsync();
             return _mapper.Map<IEnumerable<GuestImageDTO>>(guestImages);
         }
 
         public async Task<GuestImageDTO> GetGuestImageByIdAsync(int id)
         {
-            var guestImage = await _context.GuestImages
-                .Include(g => g.Guest)
-                .FirstOrDefaultAsync(g => g.GuestImageID == id);
-
+            var guestImage = await _guestImageRepo.GetGuestImageByIdAsync(id);
             return _mapper.Map<GuestImageDTO>(guestImage);
         }
 
         public async Task<GuestImageDTO> CreateGuestImageAsync(GuestImageDTO guestImageDto)
         {
-            var guestImage = _mapper.Map<GuestImage>(guestImageDto);
-            await _context.GuestImages.AddAsync(guestImage);
-            await _context.SaveChangesAsync();
-            return _mapper.Map<GuestImageDTO>(guestImage);
-        }
-
-        public async Task UpdateGuestImageAsync(GuestImageDTO guestImageDto)
-        {
-            var existingImage = await _context.GuestImages.FindAsync(guestImageDto.GuestImageID);
-
-            if (existingImage != null)
+            try
             {
-                _mapper.Map(guestImageDto, existingImage); // Mapping DTO properties to existing entity
-                _context.GuestImages.Update(existingImage);
-                await _context.SaveChangesAsync();
+                var newGuestImage = _mapper.Map<GuestImage>(guestImageDto);
+                newGuestImage.CreatedBy = _userContextService.GetCurrentUserId();
+                newGuestImage.LastUpdatedBy = newGuestImage.CreatedBy;
+                newGuestImage.CreatedTime = _timeService.SystemTimeNow;
+                newGuestImage.LastUpdatedTime = _timeService.SystemTimeNow;
+                var createdGuestImage = await _guestImageRepo.CreateGuestImageAsync(newGuestImage);
+                return _mapper.Map<GuestImageDTO>(createdGuestImage);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while creating the guest image", ex);
             }
         }
 
-        public async Task DeleteGuestImageAsync(int id)
+        public async Task<bool> UpdateGuestImageAsync(GuestImageDTO guestImageDto)
         {
-            var imageToDelete = await _context.GuestImages.FindAsync(id);
-            if (imageToDelete != null)
+            try
             {
-                _context.GuestImages.Remove(imageToDelete);
-                await _context.SaveChangesAsync();
+                var existingGuestImage = await _guestImageRepo.GetGuestImageByIdAsync(guestImageDto.GuestImageID);
+                if (existingGuestImage == null)
+                {
+                    throw new Exception("GuestImage not found");
+                }
+                _mapper.Map(guestImageDto, existingGuestImage); // Map updated fields to existing entity
+                existingGuestImage.LastUpdatedBy = _userContextService.GetCurrentUserId();
+                existingGuestImage.LastUpdatedTime = _timeService.SystemTimeNow;
+                return await _guestImageRepo.UpdateGuestImageAsync(existingGuestImage);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while updating the guest image", ex);
+            }
+        }
+
+        public async Task<bool> DeleteGuestImageAsync(int id)
+        {
+            try
+            {
+                return await _guestImageRepo.DeleteGuestImageAsync(id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while deleting the guest image", ex);
             }
         }
     }

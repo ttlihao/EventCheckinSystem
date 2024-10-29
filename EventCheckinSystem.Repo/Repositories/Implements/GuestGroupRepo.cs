@@ -29,8 +29,6 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
             }
             catch (Exception ex)
             {
-                // Log the exception
-                // Logger.LogError(ex.Message);
                 throw new Exception($"Error retrieving all GuestGroups: {ex.Message}");
             }
         }
@@ -70,43 +68,41 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
             return guestGroup;
         }
 
-        public async Task UpdateGuestGroupAsync(GuestGroup guestGroup, string updatedBy)
+        public async Task<bool> UpdateGuestGroupAsync(GuestGroup guestGroup)
         {
+            bool isSuccess = false;
             try
             {
-                var existingGroup = await _context.GuestGroups.FindAsync(guestGroup.GuestGroupID);
-                if (existingGroup != null)
+                var existingGuestGroup = await _context.GuestGroups.FirstOrDefaultAsync(e => e.GuestGroupID == guestGroup.GuestGroupID);
+                if (existingGuestGroup != null)
                 {
-                    existingGroup.Name = guestGroup.Name;
-                    existingGroup.OrganizationID = guestGroup.OrganizationID;
-                    existingGroup.EventID = guestGroup.EventID;
-                    existingGroup.IsActive = guestGroup.IsActive;
-                    existingGroup.IsDelete = guestGroup.IsDelete;
-                    existingGroup.LastUpdatedBy = updatedBy; // Update lastUpdatedBy
-                    _context.GuestGroups.Update(existingGroup);
-                    await _context.SaveChangesAsync();
-                }
-                else
-                {
-                    throw new NullReferenceException($"GuestGroup with ID {guestGroup.GuestGroupID} not found.");
+                    _context.Entry(existingGuestGroup).State = EntityState.Detached; // Detach the existing entity
+                    _context.GuestGroups.Attach(guestGroup);
+                    _context.Entry(guestGroup).State = EntityState.Modified; // Mark as modified
+                    var changes = await _context.SaveChangesAsync();
+                    isSuccess = changes > 0; // Return true if changes were made
                 }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                throw new Exception($"Error updating GuestGroup: {ex.Message}");
+                throw new Exception(e.Message);
             }
+            return isSuccess;
         }
 
 
-        public async Task DeleteGuestGroupAsync(int id)
+        public async Task<bool> DeleteGuestGroupAsync(int id)
         {
             try
             {
                 var groupToDelete = await _context.GuestGroups.FindAsync(id);
                 if (groupToDelete != null)
                 {
-                    _context.GuestGroups.Remove(groupToDelete);
+                    groupToDelete.IsActive = false;
+                    groupToDelete.IsDelete = true;
+                    _context.GuestGroups.Update(groupToDelete);
                     await _context.SaveChangesAsync();
+                    return true;
                 }
                 else
                 {

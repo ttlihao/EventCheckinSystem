@@ -1,5 +1,5 @@
 ﻿using EventCheckinSystem.Repo.DTOs;
-using EventCheckinSystem.Repo.Repositories.Interfaces;
+using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -11,24 +11,24 @@ namespace EventCheckinSystem.API.Controllers
     [Route("api/[controller]")]
     public class GuestCheckinController : ControllerBase
     {
-        private readonly IGuestCheckinRepo _guestCheckinRepo;
+        private readonly IGuestCheckinServices _guestCheckinService;
 
-        public GuestCheckinController(IGuestCheckinRepo guestCheckinRepo)
+        public GuestCheckinController(IGuestCheckinServices guestCheckinService)
         {
-            _guestCheckinRepo = guestCheckinRepo;
+            _guestCheckinService = guestCheckinService;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GuestCheckinDTO>>> GetAllCheckins()
         {
-            var checkins = await _guestCheckinRepo.GetAllCheckinsAsync();
+            var checkins = await _guestCheckinService.GetAllCheckinsAsync();
             return Ok(checkins);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<GuestCheckinDTO>> GetCheckinById(int id)
         {
-            var checkin = await _guestCheckinRepo.GetCheckinByIdAsync(id);
+            var checkin = await _guestCheckinService.GetCheckinByIdAsync(id);
             if (checkin == null)
             {
                 return NotFound();
@@ -37,30 +37,28 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<GuestCheckinDTO>> CreateCheckin([FromBody] GuestCheckinDTO checkinDto, [FromQuery] string createdBy)
+        public async Task<ActionResult<GuestCheckinDTO>> CreateCheckin([FromBody] GuestCheckinDTO checkinDto)
         {
-            var createdCheckin = await _guestCheckinRepo.CreateCheckinAsync(checkinDto, createdBy);
+            var createdCheckin = await _guestCheckinService.CreateCheckinAsync(checkinDto);
             return CreatedAtAction(nameof(GetCheckinById), new { id = createdCheckin.GuestCheckinID }, createdCheckin);
         }
 
         [HttpPut]
         public async Task<IActionResult> UpdateCheckin([FromBody] GuestCheckinDTO checkinDto)
         {
-            await _guestCheckinRepo.UpdateCheckinAsync(checkinDto);
-            return Ok();
+            return Ok(await _guestCheckinService.UpdateCheckinAsync(checkinDto));
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCheckin(int id)
         {
-            await _guestCheckinRepo.DeleteCheckinAsync(id);
-            return Ok();
+            return Ok(await _guestCheckinService.DeleteCheckinAsync(id));
         }
 
         [HttpPost("checkin")]
-        public async Task<ActionResult<GuestCheckinDTO>> CheckinGuest([FromQuery] int guestId, [FromQuery] string createdBy)
+        public async Task<ActionResult<GuestCheckinDTO>> CheckinGuest([FromQuery] int guestId)
         {
-            var checkin = await _guestCheckinRepo.CheckinGuestByIdAsync(guestId, createdBy);
+            var checkin = await _guestCheckinService.CheckinGuestByIdAsync(guestId);
             return Ok(checkin);
         }
     }
