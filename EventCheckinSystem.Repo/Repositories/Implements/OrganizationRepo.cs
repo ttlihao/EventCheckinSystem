@@ -19,7 +19,7 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
 
         public async Task<IEnumerable<Organization>> GetAllOrganizationsAsync()
         {
-            var organizations = await _context.Organizations
+            var organizations = await _context.Organizations.Where(e => e.IsActive && !e.IsDelete)
                 .Include(o => o.Events)
                     .ThenInclude(e => e.GuestGroups)
                 .Include(o => o.Events)
@@ -31,7 +31,7 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
 
         public async Task<Organization> GetOrganizationByIdAsync(int id)
         {
-            var organizationEntity = await _context.Organizations
+            var organizationEntity = await _context.Organizations.Where(e => e.IsActive && !e.IsDelete)
                 .Include(o => o.Events)
                     .ThenInclude(e => e.GuestGroups)
                 .Include(o => o.Events)
