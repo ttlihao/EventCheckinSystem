@@ -13,5 +13,6 @@ namespace EventCheckinSystem.Services.Interfaces
         Task<bool> UpdateGuestAsync(GuestDTO guest);
         Task<bool> DeleteGuestAsync(int guestId);
         Task<List<GuestDTO>> GetGuestsByGroupIdAsync(int guestGroupId);
+        Task<List<GuestDTO>> GetGuestByNameAsync(string guestName);
     }
 }

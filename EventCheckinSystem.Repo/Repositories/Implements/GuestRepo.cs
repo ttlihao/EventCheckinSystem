@@ -60,6 +60,29 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
                 throw new Exception($"Error retrieving Guest with ID {guestId}: {ex.Message}");
             }
         }
+        public async Task<List<Guest>> GetGuestsByNameAsync(string guestName)
+        {
+            try
+            {
+                var guest = await _context.Set<Guest>()
+                    .Where(e => e.IsActive && !e.IsDelete && e.Name.Contains(guestName.ToLower().Trim()))
+                    .Include(g => g.GuestGroup)
+                    .Include(g => g.GuestImage)
+                    .Include(g => g.GuestCheckin)
+                    .ToListAsync();
+
+                if (guest == null)
+                {
+                    throw new NullReferenceException($"Guest with Name {guestName} not found.");
+                }
+
+                return guest;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving Guest with Name {guestName}: {ex.Message}");
+            }
+        }
 
         public async Task<Guest> AddGuestAsync(Guest guest)
         {

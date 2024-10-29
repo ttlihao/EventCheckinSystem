@@ -35,6 +35,11 @@ namespace EventCheckinSystem.Services.Services
             var guest = await _guestRepo.GetGuestByIdAsync(guestId);
             return guest != null ? _mapper.Map<GuestDTO>(guest) : null;
         }
+        public async Task<List<GuestDTO>> GetGuestByNameAsync(string guestName)
+        {
+            var guest = await _guestRepo.GetGuestsByNameAsync(guestName);
+            return guest != null ? _mapper.Map<List<GuestDTO>>(guest) : null;
+        }
 
         public async Task<GuestDTO> AddGuestAsync(GuestDTO guestDto)
         {

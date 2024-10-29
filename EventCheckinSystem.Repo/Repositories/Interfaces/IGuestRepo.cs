@@ -13,5 +13,6 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
         Task<bool> UpdateGuestAsync(Guest guest);
         Task<bool> DeleteGuestAsync(int guestId);
         Task<List<Guest>> GetGuestsByGroupIdAsync(int guestGroupId);
+        Task<List<Guest>> GetGuestsByNameAsync(string guestName);
     }
 }

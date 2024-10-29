@@ -20,6 +20,7 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
         public async Task<IEnumerable<WelcomeTemplate>> GetAllWelcomeTemplatesAsync()
         {
             return await _context.WelcomeTemplates
+                .Include(x => x.GuestGroup)
                 .Where(x => x.IsActive && !x.IsDelete)
                                  .ToListAsync();
         }
@@ -28,7 +29,9 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
         {
             try
             {
-                var template = await _context.WelcomeTemplates.FirstOrDefaultAsync(x => x.IsActive && !x.IsDelete && x.WelcomeTemplateID == id);
+                var template = await _context.WelcomeTemplates
+                    .Include(x => x.GuestGroup)
+                    .FirstOrDefaultAsync(x => x.IsActive && !x.IsDelete && x.WelcomeTemplateID == id);
                 if (template == null)
                 {
                     throw new NullReferenceException($"WelcomeTemplate with ID {id} not found.");
@@ -46,10 +49,23 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
 
         public async Task<WelcomeTemplate> CreateWelcomeTemplateAsync(WelcomeTemplate welcomeTemplate)
         {
-            await _context.WelcomeTemplates.AddAsync(welcomeTemplate);
-            await _context.SaveChangesAsync();
-            return welcomeTemplate;
+            try
+            {
+                var newWelcomeTemplate = welcomeTemplate;
+
+                // Convert GuestGroupID from BigInteger to int
+                newWelcomeTemplate.GuestGroupID = (int)newWelcomeTemplate.GuestGroupID;
+
+                await _context.WelcomeTemplates.AddAsync(newWelcomeTemplate);
+                await _context.SaveChangesAsync();
+                return newWelcomeTemplate;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
+
 
         public async Task<bool> UpdateWelcomeTemplateAsync(WelcomeTemplate welcomeTemplate)
         {
@@ -88,6 +104,7 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
         public async Task<IEnumerable<WelcomeTemplate>> GetWelcomeTemplatesByGuestGroupAsync(int guestGroupId)
         {
             return await _context.WelcomeTemplates
+                .Include(x => x.GuestGroup)
                                  .Where(w => w.GuestGroupID == guestGroupId && !w.IsDelete && w.IsActive)
                                  .ToListAsync();
         }
