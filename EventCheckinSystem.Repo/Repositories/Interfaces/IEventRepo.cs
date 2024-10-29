@@ -10,10 +10,10 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
 {
     public interface IEventRepo
     {
-        Task<IEnumerable<EventDTO>> GetAllEventsAsync();
-        Task<EventDTO> GetEventByIdAsync(int id);
-        Task<EventDTO> CreateEventAsync(EventDTO newEvent);
-        Task UpdateEventAsync(EventDTO updatedEvent);
+        Task<IEnumerable<Event>> GetAllEventsAsync();
+        Task<Event> GetEventByIdAsync(int id);
+        Task<Event> CreateEventAsync(Event newEvent);
+        Task UpdateEventAsync(Event updatedEvent);
         Task DeleteEventAsync(int id);
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using EventCheckinSystem.Services.Interfaces;
 using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EventCheckinSystem.API.Controllers
 {
@@ -18,6 +19,7 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet]
+
         public async Task<ActionResult<IEnumerable<EventDTO>>> GetAllEvents()
         {
             var events = await _eventServices.GetAllEventsAsync();

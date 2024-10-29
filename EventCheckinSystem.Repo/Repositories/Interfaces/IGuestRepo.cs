@@ -7,11 +7,11 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
 {
     public interface IGuestRepo
     {
-        Task<List<GuestDTO>> GetAllGuestsAsync();
-        Task<GuestDTO> GetGuestByIdAsync(int guestId);
-        Task AddGuestAsync(Guest guest, string createdBy);
-        Task UpdateGuestAsync(Guest guest, string updatedBy);
+        Task<List<Guest>> GetAllGuestsAsync();
+        Task<Guest> GetGuestByIdAsync(int guestId);
+        Task AddGuestAsync(Guest guest);
+        Task UpdateGuestAsync(Guest guest);
         Task DeleteGuestAsync(int guestId);
-        Task<List<GuestDTO>> GetGuestsByGroupIdAsync(int guestGroupId);
+        Task<List<Guest>> GetGuestsByGroupIdAsync(int guestGroupId);
     }
 }

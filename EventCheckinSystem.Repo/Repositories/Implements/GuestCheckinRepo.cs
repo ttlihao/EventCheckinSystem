@@ -23,6 +23,7 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
         {
             var checkins = await _context.GuestCheckins
                                           .Include(gc => gc.Guest)
+                                          .Where(e => e.IsActive && !e.IsDelete)
                                           .ToListAsync();
             return _mapper.Map<IEnumerable<GuestCheckinDTO>>(checkins);
         }

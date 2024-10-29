@@ -1,4 +1,5 @@
-﻿using EventCheckinSystem.Repo.DTOs;
+﻿using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,10 +7,10 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
 {
     public interface IGuestImageRepo
     {
-        Task<IEnumerable<GuestImageDTO>> GetAllGuestImagesAsync();
-        Task<GuestImageDTO> GetGuestImageByIdAsync(int id);
-        Task<GuestImageDTO> CreateGuestImageAsync(GuestImageDTO guestImageDto);
-        Task UpdateGuestImageAsync(GuestImageDTO guestImageDto);
+        Task<IEnumerable<GuestImage>> GetAllGuestImagesAsync();
+        Task<GuestImage> GetGuestImageByIdAsync(int id);
+        Task<GuestImage> CreateGuestImageAsync(GuestImage guestImage);
+        Task UpdateGuestImageAsync(GuestImage guestImage);
         Task DeleteGuestImageAsync(int id);
     }
 }

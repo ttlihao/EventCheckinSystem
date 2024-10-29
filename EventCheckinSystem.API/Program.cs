@@ -1,4 +1,4 @@
-using EventCheckinSystem.Repo.Data;
+﻿using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Services.Interfaces;
 using EventCheckinSystem.Services.Services;
 using Microsoft.EntityFrameworkCore;
@@ -13,17 +13,13 @@ using Microsoft.IdentityModel.Tokens;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Repo.Repositories.Implements;
 using Microsoft.AspNetCore.Identity;
+using AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddHttpContextAccessor();
 
-
-
-//builder.Services.AddIdentity<User, IdentityRole>()
-//    .AddEntityFrameworkStores<EventCheckinManagementContext>()
-//    .AddDefaultTokenProviders()
-//    .AddDefaultUI();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -34,10 +30,79 @@ builder.Services.AddCors(options =>
                    .AllowAnyMethod();
         });
 });
-builder.Services.AddControllers().AddJsonOptions(options =>
+builder.Services.AddSwaggerGen(c =>
 {
-    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Version = "v1",
+        Title = "API"
+
+    });
+
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "JWT Authorization header sử dụng scheme Bearer.",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Name = "Authorization",
+        Scheme = "bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+            {
+            {
+                new OpenApiSecurityScheme
+                {
+                Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    },
+                    Scheme = "oauth2",
+                    Name = "Bearer",
+                    In = ParameterLocation.Header,
+                },
+                new List<string>()
+                }
+            });
 });
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+var mappingConfig = new MapperConfiguration(mc =>
+{
+    mc.AddProfile(new MappingProfile());
+});
+IMapper mapper = mappingConfig.CreateMapper();
+builder.Services.AddSingleton(mapper);
+
+builder.Services.AddSingleton<TokenValidationParameters>(provider =>
+{
+    return new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidAudience = builder.Configuration["Jwt:Issuer"],
+        ValidIssuer = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
+        ClockSkew = TimeSpan.FromMinutes(60)
+    };
+});
+builder.Services.AddIdentityCore<User>()
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<EventCheckinManagementContext>();
+
+builder.Services.AddIdentityCore<User>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequiredUniqueChars = 1;
+})
+.AddEntityFrameworkStores<EventCheckinManagementContext>();
+
 builder.Services.AddScoped<IEventRepo, EventRepo>();
 builder.Services.AddScoped<IGuestCheckinRepo, GuestCheckinRepo>();
 builder.Services.AddScoped<IGuestGroupRepo, GuestGroupRepo>();
@@ -49,6 +114,7 @@ builder.Services.AddScoped<IUserEventRepo, UserEventRepo>();
 builder.Services.AddScoped<IAuthenticateRepo, AuthenticateRepo>();
 
 
+builder.Services.AddScoped<IUserContextService, UserContextService>();
 builder.Services.AddSingleton<IEmailService, EmailService>();   
 builder.Services.AddScoped<ITimeService, TimeService>();
 builder.Services.AddScoped<IEventServices, EventServices>();
@@ -60,30 +126,29 @@ builder.Services.AddScoped<IOrganizationServices, OrganizationServices>();
 builder.Services.AddScoped<IWelcomeTemplateServices, WelcomeTemplateServices>();
 builder.Services.AddScoped<IUserEventServices, UserEventServices>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
-builder.Services.AddScoped<IRoleService, RoleService>();    
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(option =>
+builder.Services.AddSwaggerGen();
+builder.Services.Configure<RouteOptions>(options =>
 {
-    option.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-    {
-        In = ParameterLocation.Header,
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey
-    });
-    option.OperationFilter<SecurityRequirementsOperationFilter>();
+    options.LowercaseUrls = true;
 });
-//builder.Services.AddAutoMapper(typeof(MappingProfiles));
 builder.Services.AddDbContext<EventCheckinManagementContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddAuthorization();
+
+
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddEntityFrameworkStores<EventCheckinManagementContext>()
+    .AddDefaultTokenProviders();
+
 
 
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 }).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
@@ -100,25 +165,7 @@ builder.Services.AddAuthentication(options =>
 
 //builder.Services.AddIdentityApiEndpoints<User>()
 //    .AddEntityFrameworkStores<EventCheckinManagementContext>();
-builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-builder.Services.AddIdentityCore<User>(options =>
-{
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = true;
-    options.Password.RequiredLength = 6;
-    options.Password.RequiredUniqueChars = 1;
-})
-.AddRoles<IdentityRole>()
-.AddEntityFrameworkStores<EventCheckinManagementContext>()
-.AddDefaultTokenProviders()
-.AddTokenProvider<DataProtectorTokenProvider<User>>(TokenOptions.DefaultProvider);
-
-builder.Services.AddIdentity<User, IdentityRole>()
-    .AddEntityFrameworkStores<EventCheckinManagementContext>()
-    .AddDefaultTokenProviders();
 
 
 
@@ -130,15 +177,14 @@ if (app.Environment.IsDevelopment()|| app.Environment.IsProduction())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseCors("AllowSpecificOrigin");
-
 app.UseHttpsRedirection();
-app.UseStaticFiles();
-app.UseRouting();
+
+app.UseCors("AllowAll");
+
+app.UseAuthentication();
 app.UseAuthorization();
 
-
 app.MapControllers();
+
 
 app.Run();

@@ -1,23 +1,16 @@
 ﻿using AutoMapper;
-using Azure.Core;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace EventCheckinSystem.Services.Services
 {
@@ -192,7 +185,8 @@ namespace EventCheckinSystem.Services.Services
         {
             try
             {
-                var keyString = _configuration["Jwt:Key"];
+                var keyString = _configuration["Jwt:Key"]
+                     ?? throw new ArgumentException("JWT key is not configured.");
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 

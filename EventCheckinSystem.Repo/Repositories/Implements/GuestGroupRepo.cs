@@ -1,9 +1,8 @@
-﻿using AutoMapper;
-using EventCheckinSystem.Repo.Data;
-using EventCheckinSystem.Repo.DTOs;
+﻿using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace EventCheckinSystem.Repo.Repositories.Implements
@@ -11,79 +10,137 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
     public class GuestGroupRepo : IGuestGroupRepo
     {
         private readonly EventCheckinManagementContext _context;
-        private readonly IMapper _mapper;
 
-        public GuestGroupRepo(EventCheckinManagementContext context, IMapper mapper)
+        public GuestGroupRepo(EventCheckinManagementContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<GuestGroupDTO>> GetAllGuestGroupsAsync()
+        public async Task<IEnumerable<GuestGroup>> GetAllGuestGroupsAsync()
         {
-            var guestGroups = await _context.GuestGroups
-                                             .Include(g => g.Organization)
-                                             .Include(g => g.Event)
-                                             .Include(g => g.Guests)
-                                             .ToListAsync();
-
-            return _mapper.Map<IEnumerable<GuestGroupDTO>>(guestGroups);
-        }
-
-        public async Task<GuestGroupDTO> GetGuestGroupByIdAsync(int id)
-        {
-            var guestGroup = await _context.GuestGroups
-                                            .Include(g => g.Organization)
-                                            .Include(g => g.Event)
-                                            .Include(g => g.Guests)
-                                            .FirstOrDefaultAsync(g => g.GuestGroupID == id);
-
-            return guestGroup == null ? null : _mapper.Map<GuestGroupDTO>(guestGroup);
-        }
-
-        public async Task<GuestGroupDTO> CreateGuestGroupAsync(GuestGroupDTO guestGroupDto, string createdBy)
-        {
-            var guestGroup = _mapper.Map<GuestGroup>(guestGroupDto);
-            guestGroup.CreatedBy = createdBy; // Set the createdBy
-            guestGroup.LastUpdatedBy = createdBy; // Set lastUpdatedBy
-
-            await _context.GuestGroups.AddAsync(guestGroup);
-            await _context.SaveChangesAsync();
-            return _mapper.Map<GuestGroupDTO>(guestGroup);
-        }
-
-        public async Task UpdateGuestGroupAsync(GuestGroupDTO guestGroupDto, string updatedBy)
-        {
-            var existingGroup = await _context.GuestGroups.FindAsync(guestGroupDto.GuestGroupID);
-            if (existingGroup != null)
+            try
             {
-                _mapper.Map(guestGroupDto, existingGroup); // Map properties from DTO to existing entity
-                existingGroup.LastUpdatedBy = updatedBy; // Update lastUpdatedBy
-
-                _context.GuestGroups.Update(existingGroup);
-                await _context.SaveChangesAsync();
+                return await _context.GuestGroups
+                    .Where(g => g.IsActive && !g.IsDelete)
+                    .Include(g => g.Organization)
+                    .Include(g => g.Event)
+                    .Include(g => g.Guests)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                // Logger.LogError(ex.Message);
+                throw new Exception($"Error retrieving all GuestGroups: {ex.Message}");
             }
         }
+
+
+        public async Task<GuestGroup> GetGuestGroupByIdAsync(int id)
+        {
+            try
+            {
+                var guestGroup = await _context.GuestGroups
+                    .Where(g => g.IsActive && !g.IsDelete)
+                    .Include(g => g.Organization)
+                    .Include(g => g.Event)
+                    .Include(g => g.Guests)
+                    .FirstOrDefaultAsync(g => g.GuestGroupID == id);
+
+                if (guestGroup == null)
+                {
+                    throw new NullReferenceException($"GuestGroup with ID {id} not found.");
+                }
+
+                return guestGroup;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                // Logger.LogError(ex.Message);
+                throw new Exception($"Error retrieving GuestGroup with ID {id}: {ex.Message}");
+            }
+        }
+
+
+        public async Task<GuestGroup> CreateGuestGroupAsync(GuestGroup guestGroup)
+        {
+            await _context.GuestGroups.AddAsync(guestGroup);
+            await _context.SaveChangesAsync();
+            return guestGroup;
+        }
+
+        public async Task UpdateGuestGroupAsync(GuestGroup guestGroup, string updatedBy)
+        {
+            try
+            {
+                var existingGroup = await _context.GuestGroups.FindAsync(guestGroup.GuestGroupID);
+                if (existingGroup != null)
+                {
+                    existingGroup.Name = guestGroup.Name;
+                    existingGroup.OrganizationID = guestGroup.OrganizationID;
+                    existingGroup.EventID = guestGroup.EventID;
+                    existingGroup.IsActive = guestGroup.IsActive;
+                    existingGroup.IsDelete = guestGroup.IsDelete;
+                    existingGroup.LastUpdatedBy = updatedBy; // Update lastUpdatedBy
+                    _context.GuestGroups.Update(existingGroup);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new NullReferenceException($"GuestGroup with ID {guestGroup.GuestGroupID} not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error updating GuestGroup: {ex.Message}");
+            }
+        }
+
 
         public async Task DeleteGuestGroupAsync(int id)
         {
-            var groupToDelete = await _context.GuestGroups.FindAsync(id);
-            if (groupToDelete != null)
+            try
             {
-                _context.GuestGroups.Remove(groupToDelete);
-                await _context.SaveChangesAsync();
+                var groupToDelete = await _context.GuestGroups.FindAsync(id);
+                if (groupToDelete != null)
+                {
+                    _context.GuestGroups.Remove(groupToDelete);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new NullReferenceException($"GuestGroup with ID {id} not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                // Logger.LogError(ex.Message);
+                throw new Exception($"Error deleting GuestGroup with ID {id}: {ex.Message}");
             }
         }
 
-        public async Task<GuestGroupDTO> GetGuestGroupByGuestIdAsync(int guestId)
+        public async Task<GuestGroup> GetGuestGroupByGuestIdAsync(int guestId)
         {
-            var guestGroup = await _context.GuestGroups
-                                            .Include(g => g.Organization)
-                                            .Include(g => g.Event)
-                                            .Include(g => g.Guests)
-                                            .FirstOrDefaultAsync(g => g.Guests.Any(guest => guest.GuestID == guestId));
-
-            return guestGroup == null ? null : _mapper.Map<GuestGroupDTO>(guestGroup);
+            try
+            {
+                var guestGroup = await _context.GuestGroups
+                    .Where(g => g.IsActive && !g.IsDelete)
+                    .Include(g => g.Organization)
+                    .Include(g => g.Event)
+                    .Include(g => g.Guests)
+                    .FirstOrDefaultAsync(g => g.Guests.Any(guest => guest.GuestID == guestId));
+                if (guestGroup == null)
+                {
+                    throw new NullReferenceException($"GuestGroup with Guest ID {guestId} not found.");
+                }
+                return guestGroup;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving GuestGroup with guestID {guestId}: {ex.Message}");
+            }
         }
     }
 }
