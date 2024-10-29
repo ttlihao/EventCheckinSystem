@@ -1,7 +1,8 @@
 ﻿using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
-using EventCheckinSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,57 +12,85 @@ namespace EventCheckinSystem.API.Controllers
     [Route("api/[controller]")]
     public class OrganizationController : ControllerBase
     {
-        private readonly IOrganizationServices _organizationServices;
+        private readonly IOrganizationRepo _organizationRepo;
 
-        public OrganizationController(IOrganizationServices organizationServices)
+        public OrganizationController(IOrganizationRepo organizationRepo)
         {
-            _organizationServices = organizationServices;
+            _organizationRepo = organizationRepo;
         }
 
-        // GET: api/organization
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrganizationDTO>>> GetAllOrganizations()
         {
-            var organizations = await _organizationServices.GetAllOrganizationsAsync();
-            return Ok(organizations);
+            try
+            {
+                var organizations = await _organizationRepo.GetAllOrganizationsAsync();
+                return Ok(organizations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
-        // GET: api/organization/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<OrganizationDTO>> GetOrganizationById(int id)
         {
-            var organization = await _organizationServices.GetOrganizationByIdAsync(id);
-            if (organization == null) return NotFound();
-
-            return Ok(organization);
+            try
+            {
+                var organization = await _organizationRepo.GetOrganizationByIdAsync(id);
+                if (organization == null)
+                {
+                    return NotFound($"Organization with ID {id} not found.");
+                }
+                return Ok(organization);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
-        // POST: api/organization
         [HttpPost]
-        public async Task<ActionResult<OrganizationDTO>> CreateOrganization([FromBody] OrganizationDTO newOrganizationDto)
+        public async Task<ActionResult<OrganizationDTO>> CreateOrganization([FromBody] OrganizationDTO newOrganization)
         {
-            if (newOrganizationDto == null) return BadRequest();
-
-            var createdOrganization = await _organizationServices.CreateOrganizationAsync(newOrganizationDto);
-            return CreatedAtAction(nameof(GetOrganizationById), new { id = createdOrganization.Name }, createdOrganization);
+            try
+            {
+                var createdOrganization = await _organizationRepo.CreateOrganizationAsync(newOrganization);
+                return CreatedAtAction(nameof(GetOrganizationById), new { id = createdOrganization.OrganizationID }, createdOrganization);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
-        // PUT: api/organization
         [HttpPut]
-        public async Task<IActionResult> UpdateOrganization([FromBody] OrganizationDTO updatedOrganizationDto)
+        public async Task<IActionResult> UpdateOrganization([FromBody] OrganizationDTO updatedOrganization)
         {
-            if (updatedOrganizationDto == null) return BadRequest();
-
-            await _organizationServices.UpdateOrganizationAsync(updatedOrganizationDto);
-            return NoContent();
+            try
+            {
+                await _organizationRepo.UpdateOrganizationAsync(updatedOrganization);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
-        // DELETE: api/organization/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrganization(int id)
         {
-            await _organizationServices.DeleteOrganizationAsync(id);
-            return NoContent();
+            try
+            {
+                await _organizationRepo.DeleteOrganizationAsync(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }

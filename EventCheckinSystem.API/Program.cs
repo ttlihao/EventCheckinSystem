@@ -143,6 +143,12 @@ builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<EventCheckinManagementContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });
 
 
 builder.Services.AddAuthentication(options =>

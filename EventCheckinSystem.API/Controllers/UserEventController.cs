@@ -1,65 +1,96 @@
 ﻿using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
-using EventCheckinSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace EventCheckinSystem.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class UserEventController : ControllerBase
     {
-        private readonly IUserEventServices _userEventServices;
+        private readonly IUserEventRepo _userEventRepo;
 
-        public UserEventController(IUserEventServices userEventServices)
+        public UserEventController(IUserEventRepo userEventRepo)
         {
-            _userEventServices = userEventServices;
+            _userEventRepo = userEventRepo;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserEventDTO>>> GetAllUserEvents()
         {
-            var userEvents = await _userEventServices.GetAllUserEventsAsync();
-            return Ok(userEvents);
+            try
+            {
+                var userEvents = await _userEventRepo.GetAllUserEventsAsync();
+                return Ok(userEvents);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
-        [HttpGet("{eventId}")]
-        public async Task<ActionResult<UserEventDTO>> GetUserEventById(int eventId)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UserEventDTO>> GetUserEventById(int id)
         {
-            var userEvent = await _userEventServices.GetUserEventByIdAsync(eventId);
-            if (userEvent == null)
+            try
             {
-                return NotFound();
+                var userEvent = await _userEventRepo.GetUserEventByIdAsync(id);
+                if (userEvent == null)
+                {
+                    return NotFound($"UserEvent with ID {id} not found.");
+                }
+                return Ok(userEvent);
             }
-            return Ok(userEvent);
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpPost]
-        public async Task<ActionResult<UserEventDTO>> AddUserEvent([FromBody] UserEventDTO userEventDto)
+        public async Task<ActionResult> AddUserEvent([FromBody] UserEventDTO newUserEvent)
         {
-            await _userEventServices.AddUserEventAsync(userEventDto);
-            return CreatedAtAction(nameof(GetUserEventById), new { eventId = userEventDto.EventID }, userEventDto);
-        }
-
-        [HttpPut("{eventId}")]
-        public async Task<IActionResult> UpdateUserEvent(int eventId, [FromBody] UserEventDTO userEventDto)
-        {
-            if (eventId != userEventDto.EventID)
+            try
             {
-                return BadRequest();
+                await _userEventRepo.AddUserEventAsync(newUserEvent);
+                return CreatedAtAction(nameof(GetUserEventById), new { id = newUserEvent.EventID }, newUserEvent);
             }
-
-            await _userEventServices.UpdateUserEventAsync(userEventDto);
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
-        [HttpDelete("{eventId}")]
-        public async Task<IActionResult> DeleteUserEvent(int eventId)
+        [HttpPut]
+        public async Task<IActionResult> UpdateUserEvent([FromBody] UserEventDTO updatedUserEvent)
         {
-            await _userEventServices.DeleteUserEventAsync(eventId);
-            return NoContent();
+            try
+            {
+                await _userEventRepo.UpdateUserEventAsync(updatedUserEvent);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUserEvent(int id)
+        {
+            try
+            {
+                await _userEventRepo.DeleteUserEventAsync(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }

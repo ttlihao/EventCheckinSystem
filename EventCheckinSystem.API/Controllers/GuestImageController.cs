@@ -1,8 +1,8 @@
-﻿using EventCheckinSystem.Repo.DTOs;
+﻿using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
-using EventCheckinSystem.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -12,55 +12,93 @@ namespace EventCheckinSystem.API.Controllers
     [Route("api/[controller]")]
     public class GuestImageController : ControllerBase
     {
-        private readonly IGuestImageServices _guestImageServices;
+        private readonly IGuestImageRepo _guestImageRepo;
 
-        public GuestImageController(IGuestImageServices guestImageServices)
+        public GuestImageController(IGuestImageRepo guestImageRepo)
         {
-            _guestImageServices = guestImageServices;
+            _guestImageRepo = guestImageRepo;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GuestImageDTO>>> GetAllGuestImages()
+        public async Task<ActionResult<IEnumerable<GuestImage>>> GetAllGuestImages()
         {
-            var guestImages = await _guestImageServices.GetAllGuestImagesAsync();
-            return Ok(guestImages);
+            try
+            {
+                var guestImages = await _guestImageRepo.GetAllGuestImagesAsync();
+                return Ok(guestImages);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<GuestImageDTO>> GetGuestImageById(int id)
+        public async Task<ActionResult<GuestImage>> GetGuestImageById(int id)
         {
-            var guestImage = await _guestImageServices.GetGuestImageByIdAsync(id);
-            if (guestImage == null)
+            try
             {
-                return NotFound();
+                var guestImage = await _guestImageRepo.GetGuestImageByIdAsync(id);
+                return Ok(guestImage);
             }
-            return Ok(guestImage);
+            catch (NullReferenceException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpPost]
-        public async Task<ActionResult<GuestImageDTO>> CreateGuestImage(GuestImageDTO guestImageDto)
+        public async Task<ActionResult<GuestImage>> CreateGuestImage([FromBody] GuestImage newGuestImage)
         {
-            var createdGuestImage = await _guestImageServices.CreateGuestImageAsync(guestImageDto);
-            return CreatedAtAction(nameof(GetGuestImageById), new { id = createdGuestImage.GuestImageID }, createdGuestImage);
+            try
+            {
+                var createdImage = await _guestImageRepo.CreateGuestImageAsync(newGuestImage);
+                return CreatedAtAction(nameof(GetGuestImageById), new { id = createdImage.GuestImageID }, createdImage);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateGuestImage(int id, GuestImageDTO guestImageDto)
+        [HttpPut]
+        public async Task<IActionResult> UpdateGuestImage([FromBody] GuestImage updatedGuestImage)
         {
-            if (id != guestImageDto.GuestImageID)
+            try
             {
-                return BadRequest();
+                await _guestImageRepo.UpdateGuestImageAsync(updatedGuestImage);
+                return Ok();
             }
-
-            await _guestImageServices.UpdateGuestImageAsync(guestImageDto);
-            return NoContent();
+            catch (NullReferenceException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGuestImage(int id)
         {
-            await _guestImageServices.DeleteGuestImageAsync(id);
-            return NoContent();
+            try
+            {
+                await _guestImageRepo.DeleteGuestImageAsync(id);
+                return Ok();
+            }
+            catch (NullReferenceException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }

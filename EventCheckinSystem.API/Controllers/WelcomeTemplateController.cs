@@ -1,9 +1,8 @@
-﻿using EventCheckinSystem.Repo.Data;
-using EventCheckinSystem.Repo.DTOs;
+﻿using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
-using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,61 +10,101 @@ namespace EventCheckinSystem.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize] // Optional: Ensure the user is authenticated
     public class WelcomeTemplateController : ControllerBase
     {
-        private readonly IWelcomeTemplateServices _welcomeTemplateServices;
+        private readonly IWelcomeTemplateRepo _welcomeTemplateRepo;
 
-        public WelcomeTemplateController(IWelcomeTemplateServices welcomeTemplateServices)
+        public WelcomeTemplateController(IWelcomeTemplateRepo welcomeTemplateRepo)
         {
-            _welcomeTemplateServices = welcomeTemplateServices;
+            _welcomeTemplateRepo = welcomeTemplateRepo;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<WelcomeTemplateDTO>>> GetAll()
+        public async Task<ActionResult<IEnumerable<WelcomeTemplateDTO>>> GetAllWelcomeTemplates()
         {
-            var templates = await _welcomeTemplateServices.GetAllWelcomeTemplatesAsync();
-            return Ok(templates);
+            try
+            {
+                var templates = await _welcomeTemplateRepo.GetAllWelcomeTemplatesAsync();
+                return Ok(templates);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<WelcomeTemplateDTO>> GetById(int id)
+        public async Task<ActionResult<WelcomeTemplateDTO>> GetWelcomeTemplateById(int id)
         {
-            var template = await _welcomeTemplateServices.GetWelcomeTemplateByIdAsync(id);
-            if (template == null) return NotFound();
-            return Ok(template);
+            try
+            {
+                var template = await _welcomeTemplateRepo.GetWelcomeTemplateByIdAsync(id);
+                if (template == null)
+                {
+                    return NotFound($"WelcomeTemplate with ID {id} not found.");
+                }
+                return Ok(template);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpPost]
-        public async Task<ActionResult<WelcomeTemplate>> Create([FromBody] WelcomeTemplateDTO welcomeTemplateDto)
+        public async Task<ActionResult<WelcomeTemplateDTO>> CreateWelcomeTemplate([FromBody] WelcomeTemplateDTO newTemplate, [FromQuery] string createdBy)
         {
-            var createdBy = User.Identity.Name; // Get the logged-in user's name
-            var welcomeTemplate = await _welcomeTemplateServices.CreateWelcomeTemplateAsync(welcomeTemplateDto, createdBy);
-            return CreatedAtAction(nameof(GetById), new { id = welcomeTemplate.WelcomeTemplateID }, welcomeTemplate);
+            try
+            {
+                var createdTemplate = await _welcomeTemplateRepo.CreateWelcomeTemplateAsync(newTemplate, createdBy);
+                return CreatedAtAction(nameof(GetWelcomeTemplateById), new { id = createdTemplate.WelcomeTemplateID }, createdTemplate);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult> Update(int id, [FromBody] WelcomeTemplateDTO welcomeTemplateDto)
+        [HttpPut]
+        public async Task<IActionResult> UpdateWelcomeTemplate([FromBody] WelcomeTemplateDTO updatedTemplate, [FromQuery] string updatedBy)
         {
-            if (id != welcomeTemplateDto.WelcomeTemplateID) return BadRequest();
-
-            var updatedBy = User.Identity.Name; // Get the logged-in user's name
-            await _welcomeTemplateServices.UpdateWelcomeTemplateAsync(welcomeTemplateDto, updatedBy);
-            return NoContent();
+            try
+            {
+                await _welcomeTemplateRepo.UpdateWelcomeTemplateAsync(updatedTemplate, updatedBy);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<IActionResult> DeleteWelcomeTemplate(int id)
         {
-            await _welcomeTemplateServices.DeleteWelcomeTemplateAsync(id);
-            return NoContent();
+            try
+            {
+                await _welcomeTemplateRepo.DeleteWelcomeTemplateAsync(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
-        [HttpGet("guestGroup/{guestGroupId}")]
-        public async Task<ActionResult<IEnumerable<WelcomeTemplateDTO>>> GetByGuestGroup(int guestGroupId)
+        [HttpGet("guestgroup/{guestGroupId}")]
+        public async Task<ActionResult<IEnumerable<WelcomeTemplateDTO>>> GetWelcomeTemplatesByGuestGroup(int guestGroupId)
         {
-            var templates = await _welcomeTemplateServices.GetWelcomeTemplatesByGuestGroupAsync(guestGroupId);
-            return Ok(templates);
+            try
+            {
+                var templates = await _welcomeTemplateRepo.GetWelcomeTemplatesByGuestGroupAsync(guestGroupId);
+                return Ok(templates);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }

@@ -1,74 +1,118 @@
 ﻿using EventCheckinSystem.Repo.Data;
-using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
-using EventCheckinSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace EventCheckinSystem.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class GuestController : ControllerBase
     {
-        private readonly IGuestServices _guestServices;
+        private readonly IGuestRepo _guestRepo;
 
-        public GuestController(IGuestServices guestServices)
+        public GuestController(IGuestRepo guestRepo)
         {
-            _guestServices = guestServices;
+            _guestRepo = guestRepo;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GuestDTO>>> GetAllGuests()
+        public async Task<ActionResult<List<Guest>>> GetAllGuests()
         {
-            var guests = await _guestServices.GetAllGuestsAsync();
-            return Ok(guests);
+            try
+            {
+                var guests = await _guestRepo.GetAllGuestsAsync();
+                return Ok(guests);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<GuestDTO>> GetGuestById(int id)
+        public async Task<ActionResult<Guest>> GetGuestById(int id)
         {
-            var guest = await _guestServices.GetGuestByIdAsync(id);
-            if (guest == null)
+            try
             {
-                return NotFound();
+                var guest = await _guestRepo.GetGuestByIdAsync(id);
+                return Ok(guest);
             }
-            return Ok(guest);
+            catch (NullReferenceException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpPost]
-        public async Task<ActionResult<GuestDTO>> AddGuest([FromBody] Guest guest)
+        public async Task<ActionResult> AddGuest([FromBody] Guest newGuest)
         {
-            string createdBy = User.Identity.Name;
-            await _guestServices.AddGuestAsync(guest, createdBy);
-            return CreatedAtAction(nameof(GetGuestById), new { id = guest.GuestID }, guest);
+            try
+            {
+                await _guestRepo.AddGuestAsync(newGuest);
+                return CreatedAtAction(nameof(GetGuestById), new { id = newGuest.GuestID }, newGuest);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateGuest(int id, [FromBody] Guest guest)
+        [HttpPut]
+        public async Task<IActionResult> UpdateGuest([FromBody] Guest updatedGuest)
         {
-            if (id != guest.GuestID)
+            try
             {
-                return BadRequest();
+                await _guestRepo.UpdateGuestAsync(updatedGuest);
+                return Ok();
             }
-            string updatedBy = User.Identity.Name;
-            await _guestServices.UpdateGuestAsync(guest, updatedBy);
-            return NoContent();
+            catch (NullReferenceException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGuest(int id)
         {
-            await _guestServices.DeleteGuestAsync(id);
-            return NoContent();
+            try
+            {
+                await _guestRepo.DeleteGuestAsync(id);
+                return Ok();
+            }
+            catch (NullReferenceException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
-        [HttpGet("group/{guestGroupId}")]
-        public async Task<ActionResult<IEnumerable<GuestDTO>>> GetGuestsByGroupId(int guestGroupId)
+        [HttpGet("group/{groupId}")]
+        public async Task<ActionResult<List<Guest>>> GetGuestsByGroupId(int groupId)
         {
-            var guests = await _guestServices.GetGuestsByGroupIdAsync(guestGroupId);
-            return Ok(guests);
+            try
+            {
+                var guests = await _guestRepo.GetGuestsByGroupIdAsync(groupId);
+                return Ok(guests);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }
