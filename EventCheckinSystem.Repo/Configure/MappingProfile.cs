@@ -26,6 +26,7 @@ namespace EventCheckinSystem.Repo.Configure
             CreateMap<GuestGroup, GuestGroupDTO>().ReverseMap();
             CreateMap<GuestImage, GuestImageDTO>().ReverseMap();
 
+            CreateMap<Organization, CreateOrganizationDTO>().ReverseMap();
             CreateMap<Organization, OrganizationDTO>().ReverseMap();
 
             CreateMap<IdentityUser, UserDTO>().ReverseMap();

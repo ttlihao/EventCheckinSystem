@@ -278,12 +278,14 @@ namespace EventCheckinSystem.Repo.Migrations
                 name: "UserEvents",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     UserID = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     EventID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserEvents", x => new { x.UserID, x.EventID });
+                    table.PrimaryKey("PK_UserEvents", x => x.Id);
                     table.ForeignKey(
                         name: "FK_UserEvents_AspNetUsers_UserID",
                         column: x => x.UserID,
@@ -498,6 +500,12 @@ namespace EventCheckinSystem.Repo.Migrations
                 name: "IX_UserEvents_EventID",
                 table: "UserEvents",
                 column: "EventID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserEvents_UserID_EventID",
+                table: "UserEvents",
+                columns: new[] { "UserID", "EventID" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_WelcomeTemplates_GuestGroupID",

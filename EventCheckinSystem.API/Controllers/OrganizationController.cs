@@ -53,12 +53,12 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<OrganizationDTO>> CreateOrganization([FromBody] OrganizationDTO newOrganization)
+        public async Task<ActionResult<CreateOrganizationDTO>> CreateOrganization([FromBody] CreateOrganizationDTO newOrganization)
         {
             try
             {
                 var createdOrganization = await _organizationService.CreateOrganizationAsync(newOrganization);
-                return CreatedAtAction(nameof(GetOrganizationById), new { id = createdOrganization.OrganizationID }, createdOrganization);
+                return Ok(createdOrganization);
             }
             catch (Exception ex)
             {

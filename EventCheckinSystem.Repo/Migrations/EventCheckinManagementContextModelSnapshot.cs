@@ -388,18 +388,25 @@ namespace EventCheckinSystem.Repo.Migrations
 
             modelBuilder.Entity("EventCheckinSystem.Repo.Data.UserEvent", b =>
                 {
-                    b.Property<string>("UserID")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("EventID")
                         .HasColumnType("int");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("UserID", "EventID");
+                    b.HasKey("Id");
 
                     b.HasIndex("EventID");
+
+                    b.HasIndex("UserID", "EventID")
+                        .IsUnique();
 
                     b.ToTable("UserEvents");
                 });

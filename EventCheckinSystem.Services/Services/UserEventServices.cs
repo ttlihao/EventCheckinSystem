@@ -12,13 +12,17 @@ namespace EventCheckinSystem.Services.Services
     public class UserEventServices : IUserEventServices
     {
         private readonly IUserEventRepo _userEventRepo;
+        private readonly IAuthenticateRepo _authenticateRepo;
+        private readonly IEventRepo _eventRepo;
         private readonly IMapper _mapper;
         private readonly IUserContextService _userContextService;
         private readonly ITimeService _timeService;
 
-        public UserEventServices(IUserEventRepo userEventRepo, IMapper mapper, IUserContextService userContextService, ITimeService timeService)
+        public UserEventServices(IUserEventRepo userEventRepo, IAuthenticateRepo authenticateRepo, IEventRepo eventRepo, IMapper mapper, IUserContextService userContextService, ITimeService timeService)
         {
             _userEventRepo = userEventRepo;
+            _authenticateRepo = authenticateRepo;
+            _eventRepo = eventRepo; 
             _mapper = mapper;
             _userContextService = userContextService;
             _timeService = timeService;
@@ -41,6 +45,8 @@ namespace EventCheckinSystem.Services.Services
             try
             {
                 var newUserEvent = _mapper.Map<UserEvent>(userEventDto);
+                newUserEvent.User = await _authenticateRepo.GetUsesByIdAsync(newUserEvent.UserID);
+                newUserEvent.Event = await _eventRepo.GetEventByIdAsync(newUserEvent.EventID);
                 var createdUserEvent = await _userEventRepo.AddUserEventAsync(newUserEvent);
                 return _mapper.Map<UserEventDTO>(createdUserEvent);
             }

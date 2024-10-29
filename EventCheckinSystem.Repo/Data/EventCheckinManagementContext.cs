@@ -72,7 +72,15 @@ namespace EventCheckinSystem.Repo.Data
 
             // Configure many-to-many relationship between User and Event
             builder.Entity<UserEvent>()
-                .HasKey(ue => new { ue.UserID, ue.EventID });
+                 .HasKey(ue => ue.Id);
+
+            builder.Entity<UserEvent>()
+                .Property(ue => ue.Id)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<UserEvent>()
+                .HasIndex(ue => new { ue.UserID, ue.EventID })
+                .IsUnique();
 
             builder.Entity<UserEvent>()
                 .HasOne(ue => ue.User)
