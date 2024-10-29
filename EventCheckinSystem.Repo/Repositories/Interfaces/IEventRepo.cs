@@ -13,7 +13,7 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
         Task<IEnumerable<Event>> GetAllEventsAsync();
         Task<Event> GetEventByIdAsync(int id);
         Task<Event> CreateEventAsync(Event newEvent);
-        Task UpdateEventAsync(Event updatedEvent);
-        Task DeleteEventAsync(int id);
+        Task<bool> UpdateEventAsync(Event updatedEvent);
+        Task<bool> DeleteEventAsync(int id);
     }
 }

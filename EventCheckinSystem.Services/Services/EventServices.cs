@@ -57,24 +57,32 @@ namespace EventCheckinSystem.Services.Services
             }
         }
 
-        public async Task UpdateEventAsync(EventDTO updatedEventDto)
+        public async Task<bool> UpdateEventAsync(EventDTO updatedEventDto)
         {
             try
             {
-                var existingEvent = _mapper.Map<Event>(updatedEventDto);
+                var existingEvent = await _eventRepo.GetEventByIdAsync(updatedEventDto.EventID);
+                if (existingEvent == null)
+                {
+                    throw new Exception("Event not found");
+                }
+
+                _mapper.Map(updatedEventDto, existingEvent); // Map updated fields to existing entity
                 existingEvent.LastUpdatedBy = _userContextService.GetCurrentUserId();
                 existingEvent.LastUpdatedTime = _timeService.SystemTimeNow;
-                await _eventRepo.UpdateEventAsync(existingEvent);
+
+                return await _eventRepo.UpdateEventAsync(existingEvent);
             }
             catch (Exception ex)
             {
-                throw;
+                throw new Exception("An error occurred while updating the event", ex);
             }
         }
 
-        public async Task DeleteEventAsync(int id)
+
+        public async Task<bool> DeleteEventAsync(int id)
         {
-            await _eventRepo.DeleteEventAsync(id);
+            return await _eventRepo.DeleteEventAsync(id);
         }
     }
 

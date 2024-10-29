@@ -53,27 +53,42 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
             await _context.SaveChangesAsync();
             return _mapper.Map<Event>(newEvent);
         }
-
-        public async Task UpdateEventAsync(Event updatedEvent)
+        public async Task<bool> UpdateEventAsync(Event updatedEvent)
         {
-            var existingEvent = await _context.Events.FindAsync(updatedEvent.EventID);
-
-            if (existingEvent != null)
+            bool isSuccess = false;
+            try
             {
-                _mapper.Map(updatedEvent, existingEvent);
-                _context.Events.Update(existingEvent);
-                await _context.SaveChangesAsync();
+                var existingEvent = await _context.Events.FirstOrDefaultAsync(e => e.EventID == updatedEvent.EventID);
+                if (existingEvent != null)
+                {
+                    _context.Entry(existingEvent).State = EntityState.Detached; // Detach the existing entity
+                    _context.Events.Attach(updatedEvent);
+                    _context.Entry(updatedEvent).State = EntityState.Modified; // Mark as modified
+                    var changes = await _context.SaveChangesAsync();
+                    isSuccess = changes > 0; // Return true if changes were made
+                }
             }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            return isSuccess;
         }
 
-        public async Task DeleteEventAsync(int id)
+
+
+        public async Task<bool> DeleteEventAsync(int id)
         {
             var eventToDelete = await _context.Events.FindAsync(id);
             if (eventToDelete != null)
             {
-                _context.Events.Remove(eventToDelete);
+                eventToDelete.IsActive = false;
+                eventToDelete.IsDelete = true;
+                _context.Events.Update(eventToDelete);
                 await _context.SaveChangesAsync();
+                return true;
             }
+            return false;
         }
     }
 }

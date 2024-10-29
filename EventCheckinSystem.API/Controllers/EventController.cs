@@ -47,15 +47,15 @@ namespace EventCheckinSystem.API.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateEvent([FromBody] EventDTO eventDto)
         {
-            await _eventServices.UpdateEventAsync(eventDto);
-            return NoContent();
+           var result = await _eventServices.UpdateEventAsync(eventDto);
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(int id)
         {
-            await _eventServices.DeleteEventAsync(id);
-            return NoContent();
+            var result = await _eventServices.DeleteEventAsync(id);
+            return Ok(result);
         }
     }
 }
