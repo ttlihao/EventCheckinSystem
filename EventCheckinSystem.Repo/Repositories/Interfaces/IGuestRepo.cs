@@ -14,5 +14,6 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
         Task<bool> DeleteGuestAsync(int guestId);
         Task<List<Guest>> GetGuestsByGroupIdAsync(int guestGroupId);
         Task<List<Guest>> GetGuestsByNameAsync(string guestName);
+        Task<List<Guest>> GetGuestsByEventIdAsync(int eventId);
     }
 }

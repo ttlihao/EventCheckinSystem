@@ -161,5 +161,24 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
                 throw new Exception($"Error retrieving Guests by Group ID {guestGroupId}: {ex.Message}");
             }
         }
+        public async Task<List<Guest>> GetGuestsByEventIdAsync(int eventId)
+        {
+            try
+            {
+                var guests = await _context.Guests
+                    .Where(g => g.IsActive && !g.IsDelete)
+                    .Include(g => g.GuestGroup)
+                    .Include(g => g.GuestImage)
+                    .Include(g => g.GuestCheckin)
+                    .Where(g => g.GuestGroup.EventID == eventId)
+                    .ToListAsync();
+
+                return guests;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving Guests by Event ID {eventId}: {ex.Message}");
+            }
+        }
     }
 }

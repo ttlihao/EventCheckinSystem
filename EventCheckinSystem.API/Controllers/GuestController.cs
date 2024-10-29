@@ -69,6 +69,23 @@ namespace EventCheckinSystem.API.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+        [HttpGet("get-by-eventid/{id}")]
+        public async Task<ActionResult<Guest>> GetGuestByName(int id)
+        {
+            try
+            {
+                var guest = await _guestService.GetGuestsByEventIdAsync(id);
+                return Ok(guest);
+            }
+            catch (NullReferenceException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
 
         [HttpPost]
         public async Task<ActionResult> AddGuest([FromBody] GuestDTO newGuest)

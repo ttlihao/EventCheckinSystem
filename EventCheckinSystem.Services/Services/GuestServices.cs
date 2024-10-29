@@ -96,5 +96,10 @@ namespace EventCheckinSystem.Services.Services
             var guests = await _guestRepo.GetGuestsByGroupIdAsync(guestGroupId);
             return _mapper.Map<List<GuestDTO>>(guests);
         }
+        public async Task<List<GuestDTO>> GetGuestsByEventIdAsync(int eventId)
+        {
+            var guests = await _guestRepo.GetGuestsByEventIdAsync(eventId);
+            return _mapper.Map<List<GuestDTO>>(guests);
+        }
     }
 }
