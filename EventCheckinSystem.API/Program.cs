@@ -14,6 +14,9 @@ using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Repo.Repositories.Implements;
 using Microsoft.AspNetCore.Identity;
 using AutoMapper;
+using EventCheckinSystem.Repo.DTOs;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +40,12 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1",
         Title = "API"
 
+    });
+
+    c.MapType<IFormFile>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Format = "binary"
     });
 
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
@@ -102,6 +111,8 @@ builder.Services.AddIdentityCore<User>(options =>
     options.Password.RequiredUniqueChars = 1;
 })
 .AddEntityFrameworkStores<EventCheckinManagementContext>();
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<GuestDTOValidator>();
 
 builder.Services.AddScoped<IEventRepo, EventRepo>();
 builder.Services.AddScoped<IGuestCheckinRepo, GuestCheckinRepo>();
@@ -149,7 +160,6 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
-
 
 builder.Services.AddAuthentication(options =>
 {

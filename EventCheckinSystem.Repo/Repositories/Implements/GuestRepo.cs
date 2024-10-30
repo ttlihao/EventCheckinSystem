@@ -180,5 +180,17 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
                 throw new Exception($"Error retrieving Guests by Event ID {eventId}: {ex.Message}");
             }
         }
+
+        public async Task AddGuestsAsync(List<Guest> guests)
+        {
+            await _context.Guests.AddRangeAsync(guests);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> GuestGroupExistsAsync(int guestGroupId)
+        {
+            return await _context.GuestGroups.AnyAsync(g => g.GuestGroupID == guestGroupId);
+        }
+
     }
 }
