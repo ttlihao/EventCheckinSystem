@@ -136,7 +136,7 @@ namespace EventCheckinSystem.Services.Services
                 user.ResetToken = refreshToken;
                 user.VerificationTokenExpires = _timeService.SystemTimeNow.AddHours(_exRefreshToken);
                 user.VerificationTokenExpires = _timeService.SystemTimeNow.AddHours(_exRefreshToken);
-                user.ResetTokenExpires = _timeService.SystemTimeNow.AddMinutes(_exAccessToken);
+                user.ResetTokenExpires = _timeService.SystemTimeNow.AddHours(_exAccessToken);
                 await _userManager.UpdateAsync(user);
                 return new LoginResponseDTO
                 {
