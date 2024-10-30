@@ -1,4 +1,5 @@
 ﻿using EventCheckinSystem.Repo.DTOs;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,18 @@ using System.Threading.Tasks;
 
 namespace EventCheckinSystem.Repo.DTOs
 {
+
+    public class UserEventDTOValidator : AbstractValidator<UserEventDTO>
+    {
+        public UserEventDTOValidator()
+        {
+            RuleFor(model => model.UserID)
+                .NotEmpty().WithMessage("UserID không được bỏ trống!");
+
+            RuleFor(model => model.EventID)
+                .NotEmpty().WithMessage("RoleID không được bỏ trống!");
+        }
+    }
     public class UserEventDTO
     {
         public string UserID { get; set; }
