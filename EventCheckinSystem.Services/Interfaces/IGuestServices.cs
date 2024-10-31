@@ -1,5 +1,6 @@
 ﻿using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -15,5 +16,6 @@ namespace EventCheckinSystem.Services.Interfaces
         Task<List<GuestDTO>> GetGuestsByGroupIdAsync(int guestGroupId);
         Task<List<GuestDTO>> GetGuestByNameAsync(string guestName);
         Task<List<GuestDTO>> GetGuestsByEventIdAsync(int eventId);
+        Task<int> ImportGuestsFromExcelAsync(IFormFile file);
     }
 }

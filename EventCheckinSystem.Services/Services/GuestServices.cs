@@ -3,9 +3,14 @@ using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
+using ExcelDataReader;
+using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
+using ExcelDataReader;
 
 namespace EventCheckinSystem.Services.Services
 {
@@ -15,13 +20,15 @@ namespace EventCheckinSystem.Services.Services
         private readonly IMapper _mapper;
         private readonly IUserContextService _userContextService;
         private readonly ITimeService _timeService;
+        private readonly IValidator<GuestDTO> _guestValidator;
 
-        public GuestServices(IGuestRepo guestRepo, IMapper mapper, IUserContextService userContextService, ITimeService timeService)
+        public GuestServices(IGuestRepo guestRepo, IMapper mapper, IUserContextService userContextService, ITimeService timeService, IValidator<GuestDTO> guestValidator)
         {
             _guestRepo = guestRepo;
             _mapper = mapper;
             _userContextService = userContextService;
             _timeService = timeService;
+            _guestValidator = guestValidator;
         }
 
         public async Task<List<GuestDTO>> GetAllGuestsAsync()
@@ -101,5 +108,95 @@ namespace EventCheckinSystem.Services.Services
             var guests = await _guestRepo.GetGuestsByEventIdAsync(eventId);
             return _mapper.Map<List<GuestDTO>>(guests);
         }
+
+        public async Task<int> ImportGuestsFromExcelAsync(IFormFile file)
+        {
+            var guests = new List<Guest>();
+            var dataTable = ReadExcelFile(file);
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                var guestDto = ValidateAndMapRow(row);
+
+                if (guestDto != null)
+                {
+                    var guestGroupExists = await _guestRepo.GuestGroupExistsAsync(guestDto.GuestGroupID);
+                    if (!guestGroupExists)
+                    {
+                        throw new Exception($"Invalid GuestGroupID: {guestDto.GuestGroupID}. This group does not exist.");
+                    }
+                    var newGuest = _mapper.Map<Guest>(guestDto);
+                    newGuest.IsActive = true;
+                    newGuest.IsDelete = false;
+                    newGuest.CreatedBy = _userContextService.GetCurrentUserId();
+                    newGuest.LastUpdatedBy = newGuest.CreatedBy;
+                    newGuest.CreatedTime = _timeService.SystemTimeNow;
+                    newGuest.LastUpdatedTime = _timeService.SystemTimeNow;
+                    guests.Add(newGuest);
+                }
+            }
+            if (guests.Count == 0)
+                return 0;
+            try
+            {
+                await _guestRepo.AddGuestsAsync(guests);
+                return guests.Count;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.InnerException?.Message}");
+                throw new Exception("An error occurred while saving the guests. Please check the inner exception for details.", ex);
+            }
+        }
+
+
+        private GuestDTO ValidateAndMapRow(DataRow row)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(row["Name"].ToString()) ||
+                    string.IsNullOrWhiteSpace(row["Email"].ToString()) ||
+                    string.IsNullOrWhiteSpace(row["PhoneNumber"].ToString()))
+                {
+                    return null;
+                }
+
+                return new GuestDTO
+                {
+                    Name = row["Name"].ToString(),
+                    Email = row["Email"].ToString(),
+                    PhoneNumber = row["PhoneNumber"].ToString(),
+                    Address = row["Address"].ToString(),
+                    Birthday = DateTime.Parse(row["Birthday"].ToString() ?? DateTime.Now.ToString()),
+                    GuestGroupID = int.Parse(row["GuestGroupID"].ToString() ?? "0")
+                };
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private DataTable ReadExcelFile(IFormFile file)
+        {
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
+            using var stream = new MemoryStream();
+            file.CopyTo(stream);
+            stream.Position = 0;
+
+            using var reader = ExcelReaderFactory.CreateReader(stream);
+            var dataSet = reader.AsDataSet(new ExcelDataSetConfiguration
+            {
+                ConfigureDataTable = _ => new ExcelDataTableConfiguration
+                {
+                    UseHeaderRow = true
+                }
+            });
+
+            return dataSet.Tables[0];
+        }
+
     }
 }
+

@@ -15,5 +15,7 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
         Task<List<Guest>> GetGuestsByGroupIdAsync(int guestGroupId);
         Task<List<Guest>> GetGuestsByNameAsync(string guestName);
         Task<List<Guest>> GetGuestsByEventIdAsync(int eventId);
+        Task AddGuestsAsync(List<Guest> guests);
+        Task<bool> GuestGroupExistsAsync(int guestGroupId);
     }
 }
