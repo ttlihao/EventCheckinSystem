@@ -13,8 +13,8 @@ namespace EventCheckinSystem.Services.Interfaces
 {
     public interface IRoleService
     {
-            Task<IEnumerable<RoleResponseDTO>> GetAllRolesAsync();
-            Task<RoleResponseDTO> GetRoleByNameAsync(string roleName);
+            Task<IEnumerable<RoleResponse>> GetAllRolesAsync();
+            Task<RoleResponse> GetRoleByNameAsync(string roleName);
             Task<bool> CreateRoleAsync(string roleName);
             Task<bool> UpdateRoleAsync(UpdateRoleDTO role);
             Task<bool> DeleteRoleAsync(string roleId);

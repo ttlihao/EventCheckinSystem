@@ -28,7 +28,8 @@ namespace EventCheckinSystem.Repo.DTOs
                 .NotEmpty().WithMessage("Địa chỉ không được bỏ trống!")
                 .MinimumLength(8).WithMessage("Đia chỉ phải có ít nhất 8 ký tự.");
             RuleFor(model => model.Birthday)
-                .NotEmpty().WithMessage("Ngày subg jh không được bỏ trống!");
+                .NotEmpty().WithMessage("Ngày sinh không được bỏ trống!")
+                .Must(date => date >= DateTime.Today).WithMessage("Ngày sinh không được trước ngày hôm nay!");
         }
     }
     public class GuestDTO

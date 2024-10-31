@@ -16,14 +16,26 @@ namespace EventCheckinSystem.Repo.Configure
     {
         public MappingProfile()
         {
-            CreateMap<Event, CreateEventDTO>().ReverseMap();
-            CreateMap<CreateEventDTO, EventDTO>().ReverseMap();
             CreateMap<Event, EventDTO>().ReverseMap();
-                //.ForMember(dest => dest.GuestGroups, opt => opt.MapFrom(src => src.GuestGroups)).ReverseMap();
+            CreateMap<Event, CreateEventDTO>().ReverseMap();
+            CreateMap<CreateEventDTO, EventResponse>()
+                .ReverseMap();
+            CreateMap<Event, EventResponse>()
+                .ForMember(dest => dest.OrganizationName, opt => opt.MapFrom(src => src.Organization.Name))
+                .ReverseMap();
 
             CreateMap<Guest, GuestDTO>().ReverseMap();
             CreateMap<GuestCheckin, GuestCheckinDTO>().ReverseMap();
+
             CreateMap<GuestGroup, GuestGroupDTO>().ReverseMap();
+            CreateMap<GuestGroup, GuestGroupResponse>()
+                .ForMember(dest => dest.OrganizationName, opt => opt.MapFrom(src => src.Organization.Name))
+                .ForMember(dest => dest.EventName, opt => opt.MapFrom(src => src.Event.Name))
+                .ReverseMap();
+
+
+
+
             CreateMap<GuestImage, GuestImageDTO>().ReverseMap();
 
             CreateMap<Organization, CreateOrganizationDTO>().ReverseMap();
@@ -31,7 +43,7 @@ namespace EventCheckinSystem.Repo.Configure
 
             CreateMap<IdentityUser, UserDTO>().ReverseMap();
             CreateMap<User, UserDTO>().ReverseMap();
-            CreateMap<IdentityRole, RoleResponseDTO>().ReverseMap();
+            CreateMap<IdentityRole, RoleResponse>().ReverseMap();
             CreateMap<UserEvent, UserEventDTO>()
                 .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => src.User.FullName))
                 .ForMember(dest => dest.EventID, opt => opt.MapFrom(src => src.Event.Name)).ReverseMap();
