@@ -1,5 +1,6 @@
 ﻿using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using System;
 using System.Collections.Generic;

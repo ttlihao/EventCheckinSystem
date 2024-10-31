@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -18,28 +19,32 @@ namespace EventCheckinSystem.Repo.Configure
         {
             CreateMap<Event, EventDTO>().ReverseMap();
             CreateMap<Event, CreateEventDTO>().ReverseMap();
-            CreateMap<CreateEventDTO, EventResponse>()
-                .ReverseMap();
             CreateMap<Event, EventResponse>()
                 .ForMember(dest => dest.OrganizationName, opt => opt.MapFrom(src => src.Organization.Name))
                 .ReverseMap();
+            CreateMap<CreateEventDTO, EventResponse>().ReverseMap();
 
             CreateMap<Guest, GuestDTO>().ReverseMap();
+            CreateMap<Guest, CreateGuestDTO>().ReverseMap();
+
             CreateMap<GuestCheckin, GuestCheckinDTO>().ReverseMap();
+            CreateMap<GuestCheckin, CreateGuestCheckinDTO>().ReverseMap();
 
             CreateMap<GuestGroup, GuestGroupDTO>().ReverseMap();
+            CreateMap<GuestGroup, CreateGuestGroupDTO>().ReverseMap();
             CreateMap<GuestGroup, GuestGroupResponse>()
                 .ForMember(dest => dest.OrganizationName, opt => opt.MapFrom(src => src.Organization.Name))
                 .ForMember(dest => dest.EventName, opt => opt.MapFrom(src => src.Event.Name))
                 .ReverseMap();
 
-
-
-
             CreateMap<GuestImage, GuestImageDTO>().ReverseMap();
+            CreateMap<GuestImage, CreateGuestImageDTO>().ReverseMap();
 
-            CreateMap<Organization, CreateOrganizationDTO>().ReverseMap();
             CreateMap<Organization, OrganizationDTO>().ReverseMap();
+            CreateMap<Organization, CreateOrganizationDTO>().ReverseMap();
+
+
+            CreateMap<WelcomeTemplate, CreateWelcomeTemplateDTO>().ReverseMap();
 
             CreateMap<IdentityUser, UserDTO>().ReverseMap();
             CreateMap<User, UserDTO>().ReverseMap();
@@ -48,7 +53,7 @@ namespace EventCheckinSystem.Repo.Configure
                 .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => src.User.FullName))
                 .ForMember(dest => dest.EventID, opt => opt.MapFrom(src => src.Event.Name)).ReverseMap();
 
-            CreateMap<WelcomeTemplate, WelcomeTemplateDTO>().ReverseMap();
+            
         }
     }
 

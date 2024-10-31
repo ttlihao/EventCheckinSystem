@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;

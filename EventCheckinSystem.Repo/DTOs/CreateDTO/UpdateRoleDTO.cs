@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EventCheckinSystem.Repo.DTOs.UpdateDTO
+namespace EventCheckinSystem.Repo.DTOs.CreateDTO
 {
-        public class UpdateRoleDTO
+    public class UpdateRoleDTO
     {
         public string RoleId { get; set; }
         public string NewRoleName { get; set; }

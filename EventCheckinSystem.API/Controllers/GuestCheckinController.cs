@@ -1,4 +1,5 @@
 ﻿using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +38,7 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<GuestCheckinDTO>> CreateCheckin([FromBody] GuestCheckinDTO checkinDto)
+        public async Task<ActionResult<GuestCheckinDTO>> CreateCheckin([FromBody] CreateGuestCheckinDTO checkinDto)
         {
             var createdCheckin = await _guestCheckinService.CreateCheckinAsync(checkinDto);
             return CreatedAtAction(nameof(GetCheckinById), new { id = createdCheckin.GuestCheckinID }, createdCheckin);

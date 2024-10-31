@@ -1,5 +1,5 @@
 ﻿using EventCheckinSystem.Repo.DTOs;
-using EventCheckinSystem.Repo.DTOs.UpdateDTO;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 

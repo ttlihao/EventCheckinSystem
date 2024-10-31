@@ -20,6 +20,18 @@ namespace EventCheckinSystem.API.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDTO loginRequest)
         {
             var response = await _authenticateService.LoginAsync(loginRequest.UserName, loginRequest.Password);
+            if (response == null) return Unauthorized();
+
+            var token = response.VerificationToken;
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict
+            };
+
+            Response.Cookies.Append("jwt", token, cookieOptions);
+
             return Ok(response);
         }
         [HttpPost("register")]

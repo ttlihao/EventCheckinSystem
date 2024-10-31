@@ -1,5 +1,6 @@
 ﻿using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,7 +10,7 @@ namespace EventCheckinSystem.Services.Interfaces
     {
         Task<List<GuestDTO>> GetAllGuestsAsync();
         Task<GuestDTO> GetGuestByIdAsync(int guestId);
-        Task<GuestDTO> AddGuestAsync(GuestDTO guest);
+        Task<GuestDTO> AddGuestAsync(CreateGuestDTO guest);
         Task<bool> UpdateGuestAsync(GuestDTO guest);
         Task<bool> DeleteGuestAsync(int guestId);
         Task<List<GuestDTO>> GetGuestsByGroupIdAsync(int guestGroupId);

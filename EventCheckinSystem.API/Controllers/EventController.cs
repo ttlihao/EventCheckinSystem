@@ -5,6 +5,7 @@ using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using EventCheckinSystem.Repo.DTOs.ResponseDTO;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 
 namespace EventCheckinSystem.API.Controllers
 {

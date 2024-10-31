@@ -1,7 +1,7 @@
 ﻿using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 using EventCheckinSystem.Repo.DTOs.ResponseDTO;
-using EventCheckinSystem.Repo.DTOs.UpdateDTO;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;

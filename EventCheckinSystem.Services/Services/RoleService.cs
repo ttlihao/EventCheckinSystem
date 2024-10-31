@@ -2,8 +2,8 @@
 using Azure.Core;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 using EventCheckinSystem.Repo.DTOs.ResponseDTO;
-using EventCheckinSystem.Repo.DTOs.UpdateDTO;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;

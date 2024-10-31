@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using EventCheckinSystem.Repo.Repositories.Implements;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
@@ -45,7 +46,7 @@ namespace EventCheckinSystem.Services.Services
         }
 
 
-        public async Task<GuestGroupResponse> CreateGuestGroupAsync(GuestGroupDTO guestGroupDto)
+        public async Task<GuestGroupResponse> CreateGuestGroupAsync(CreateGuestGroupDTO guestGroupDto)
         {
             try
             {

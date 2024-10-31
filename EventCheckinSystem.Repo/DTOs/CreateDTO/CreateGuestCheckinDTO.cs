@@ -1,13 +1,11 @@
 ﻿using FluentValidation;
 
-namespace EventCheckinSystem.Repo.DTOs
+namespace EventCheckinSystem.Repo.DTOs.CreateDTO
 {
-    public class GuestCheckinDTOValidator : AbstractValidator<GuestCheckinDTO>
+    public class CreateGuestCheckinDTOValidator : AbstractValidator<CreateGuestCheckinDTO>
     {
-        public GuestCheckinDTOValidator()
+        public CreateGuestCheckinDTOValidator()
         {
-            RuleFor(model => model.GuestCheckinID)
-                .NotEmpty().WithMessage("GuestCheckinID không được bỏ trống!");
 
             RuleFor(model => model.GuestID)
                 .NotEmpty().WithMessage("GuestID không được bỏ trống!");
@@ -25,9 +23,8 @@ namespace EventCheckinSystem.Repo.DTOs
         }
     }
 
-    public class GuestCheckinDTO
+    public class CreateGuestCheckinDTO
     {
-        public int GuestCheckinID { get; set; }
         public int GuestID { get; set; }
         public DateTime CheckinTime { get; set; }
         public string Status { get; set; }
