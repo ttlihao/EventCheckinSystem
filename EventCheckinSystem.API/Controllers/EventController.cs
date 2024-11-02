@@ -21,7 +21,6 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles ="admin")]
         public async Task<ActionResult<IEnumerable<EventResponse>>> GetAllEvents()
         {
             var events = await _eventServices.GetAllEventsAsync();

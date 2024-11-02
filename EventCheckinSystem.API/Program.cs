@@ -15,6 +15,8 @@ using EventCheckinSystem.Repo.Repositories.Implements;
 using Microsoft.AspNetCore.Identity;
 using AutoMapper;
 using System.IdentityModel.Tokens.Jwt;
+using EventCheckinSystem.Repo.DTOs;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -123,6 +125,7 @@ builder.Services.AddScoped<IGuestCheckinServices, GuestCheckinServices>();
 builder.Services.AddScoped<IGuestGroupServices, GuestGroupServices>();
 builder.Services.AddScoped<IGuestImageServices, GuestImageServices>();
 builder.Services.AddScoped<IGuestServices, GuestServices>();
+builder.Services.AddScoped<IValidator<GuestDTO>, GuestDTOValidator>();
 builder.Services.AddScoped<IOrganizationServices, OrganizationServices>();
 builder.Services.AddScoped<IWelcomeTemplateServices, WelcomeTemplateServices>();
 builder.Services.AddScoped<IUserEventServices, UserEventServices>();
