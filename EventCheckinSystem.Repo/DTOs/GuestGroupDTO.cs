@@ -1,4 +1,5 @@
 ﻿using EventCheckinSystem.Repo.Data;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,31 @@ using System.Threading.Tasks;
 
 namespace EventCheckinSystem.Repo.DTOs
 {
+    public class GuestGroupDTOValidator : AbstractValidator<GuestGroupDTO>
+{
+    public GuestGroupDTOValidator()
+    {
+        RuleFor(model => model.GuestGroupID)
+            .NotEmpty().WithMessage("GuestGroupID không được bỏ trống!");
+
+        RuleFor(model => model.OrganizationID)
+            .NotEmpty().WithMessage("OrganizationID không được bỏ trống!")
+            .GreaterThan(0).WithMessage("OrganizationID phải lớn hơn 0!");
+
+        RuleFor(model => model.Type)
+            .NotEmpty().WithMessage("Type không được bỏ trống!")
+            .Length(2, 100).WithMessage("Type phải có độ dài từ 2 đến 100 ký tự!");
+
+        RuleFor(model => model.EventID)
+            .NotEmpty().WithMessage("EventID không được bỏ trống!")
+            .GreaterThan(0).WithMessage("EventID phải lớn hơn 0!");
+
+        RuleFor(model => model.Name)
+            .NotEmpty().WithMessage("Name không được bỏ trống!")
+            .Length(2, 100).WithMessage("Name phải có độ dài từ 2 đến 100 ký tự!");
+    }
+}
+
     public class GuestGroupDTO
     {
         public int GuestGroupID { get; set; }

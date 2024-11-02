@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
+using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using EventCheckinSystem.Repo.Repositories.Implements;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
@@ -25,21 +27,26 @@ namespace EventCheckinSystem.Services.Services
             _timeService = timeService;
         }
 
-        public async Task<IEnumerable<GuestGroupDTO>> GetAllGuestGroupsAsync()
+        public async Task<IEnumerable<GuestGroupResponse>> GetAllGuestGroupsAsync()
         {
             var guestGroups = await _guestGroupRepo.GetAllGuestGroupsAsync();
 
-            return _mapper.Map<IEnumerable<GuestGroupDTO>>(guestGroups);
+            return _mapper.Map<IEnumerable<GuestGroupResponse>>(guestGroups);
         }
 
-        public async Task<GuestGroupDTO> GetGuestGroupByIdAsync(int id)
+        public async Task<GuestGroupResponse> GetGuestGroupByIdAsync(int id)
         {
             var guestGroup = await _guestGroupRepo.GetGuestGroupByIdAsync(id);
-
-            return guestGroup == null ? null : _mapper.Map<GuestGroupDTO>(guestGroup);
+            if (guestGroup == null)
+            {
+                throw new ArgumentException("Không tìm thấy Guest Group");
+            }
+            var response = _mapper.Map<GuestGroupResponse>(guestGroup);
+            return response;
         }
 
-        public async Task<GuestGroupDTO> CreateGuestGroupAsync(GuestGroupDTO guestGroupDto)
+
+        public async Task<GuestGroupResponse> CreateGuestGroupAsync(CreateGuestGroupDTO guestGroupDto)
         {
             try
             {
@@ -49,7 +56,7 @@ namespace EventCheckinSystem.Services.Services
                 newGuestGroup.CreatedTime = _timeService.SystemTimeNow;
                 newGuestGroup.LastUpdatedTime = _timeService.SystemTimeNow;
                 var createdGuestGroup = await _guestGroupRepo.CreateGuestGroupAsync(newGuestGroup);
-                return _mapper.Map<GuestGroupDTO>(createdGuestGroup);
+                return _mapper.Map<GuestGroupResponse>(createdGuestGroup);
             }
             catch (Exception ex)
             {
@@ -61,13 +68,13 @@ namespace EventCheckinSystem.Services.Services
         {
             try
             {
-                var existingGuestGroup = await _guestGroupRepo.GetGuestGroupByIdAsync(guestGroupDto.EventID);
+                var existingGuestGroup = await _guestGroupRepo.GetGuestGroupByIdAsync(guestGroupDto.GuestGroupID);
                 if (existingGuestGroup == null)
                 {
                     throw new Exception("Guest Group not found");
                 }
 
-                _mapper.Map(guestGroupDto, existingGuestGroup); // Map updated fields to existing entity
+                _mapper.Map(guestGroupDto, existingGuestGroup);
                 existingGuestGroup.LastUpdatedBy = _userContextService.GetCurrentUserId();
                 existingGuestGroup.LastUpdatedTime = _timeService.SystemTimeNow;
 
@@ -84,11 +91,11 @@ namespace EventCheckinSystem.Services.Services
             return await _guestGroupRepo.DeleteGuestGroupAsync(id);
         }
 
-        public async Task<GuestGroupDTO> GetGuestGroupByGuestIdAsync(int guestId)
+        public async Task<GuestGroupResponse> GetGuestGroupByGuestIdAsync(int guestId)
         {
             var guestGroup = await _guestGroupRepo.GetGuestGroupByGuestIdAsync(guestId);
 
-            return guestGroup == null ? null : _mapper.Map<GuestGroupDTO>(guestGroup);
+            return guestGroup == null ? null : _mapper.Map<GuestGroupResponse>(guestGroup);
         }
     }
 }

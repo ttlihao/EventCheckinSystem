@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EventCheckinSystem.Repo.DTOs.ResponseDTO
 {
-    public class LoginResponseDTO
+    public class LoginResponse
     {
         public string VerificationToken { get; set; }
         public string ResetToken { get; set; }

@@ -1,5 +1,7 @@
 ﻿using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
+using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -21,14 +23,14 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GuestGroupDTO>>> GetAllGuestGroups()
+        public async Task<ActionResult<IEnumerable<GuestGroupResponse>>> GetAllGuestGroups()
         {
             var groups = await _guestGroupService.GetAllGuestGroupsAsync();
             return Ok(groups);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<GuestGroupDTO>> GetGuestGroupById(int id)
+        public async Task<ActionResult<GuestGroupResponse>> GetGuestGroupById(int id)
         {
             try
             {
@@ -46,7 +48,7 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<GuestGroupDTO>> CreateGuestGroup([FromBody] GuestGroupDTO newGroup)
+        public async Task<ActionResult<GuestGroupDTO>> CreateGuestGroup([FromBody] CreateGuestGroupDTO newGroup)
         {
             var createdGroup = await _guestGroupService.CreateGuestGroupAsync(newGroup);
             return CreatedAtAction(nameof(GetGuestGroupById), new { id = createdGroup.GuestGroupID }, createdGroup);
@@ -89,7 +91,7 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet("byguest/{guestId}")]
-        public async Task<ActionResult<GuestGroupDTO>> GetGuestGroupByGuestId(int guestId)
+        public async Task<ActionResult<GuestGroupResponse>> GetGuestGroupByGuestId(int guestId)
         {
             try
             {

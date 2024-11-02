@@ -1,13 +1,8 @@
-﻿using EventCheckinSystem.Repo.Data;
+﻿
 using EventCheckinSystem.Repo.DTOs;
-using EventCheckinSystem.Repo.Repositories.Interfaces;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 using EventCheckinSystem.Services.Interfaces;
-using EventCheckinSystem.Services.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace EventCheckinSystem.API.Controllers
 {
@@ -37,7 +32,7 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Guest>> GetGuestById(int id)
+        public async Task<ActionResult<GuestDTO>> GetGuestById(int id)
         {
             try
             {
@@ -54,7 +49,7 @@ namespace EventCheckinSystem.API.Controllers
             }
         }
         [HttpGet("get-by-name/{name}")]
-        public async Task<ActionResult<Guest>> GetGuestByName(string name)
+        public async Task<ActionResult<GuestDTO>> GetGuestByName(string name)
         {
             try
             {
@@ -71,7 +66,7 @@ namespace EventCheckinSystem.API.Controllers
             }
         }
         [HttpGet("get-by-eventid/{id}")]
-        public async Task<ActionResult<Guest>> GetGuestByName(int id)
+        public async Task<ActionResult<GuestDTO>> GetGuestByName(int id)
         {
             try
             {
@@ -89,12 +84,12 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddGuest([FromBody] GuestDTO newGuest)
+        public async Task<ActionResult> AddGuest([FromBody] CreateGuestDTO newGuest)
         {
             try
             {
-                await _guestService.AddGuestAsync(newGuest);
-                return CreatedAtAction(nameof(GetGuestById), new { id = newGuest.GuestID }, newGuest);
+                var response = await _guestService.AddGuestAsync(newGuest);
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -149,24 +144,6 @@ namespace EventCheckinSystem.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
-            }
-        }
-
-        [HttpPost("import-excel")]
-        public async Task<IActionResult> ImportGuestsFromExcel(IFormFile file)
-        {
-            if (file == null || file.Length <= 0)
-                return BadRequest("File này không đúng, xin hãy chọn file hợp lệ.");
-            try
-            {
-                var importedCount = await _guestService.ImportGuestsFromExcelAsync(file);
-                if (importedCount == 0)
-                    return BadRequest("File này không chứa thông tin khách hợp lệ.");
-                return Ok($"{importedCount} thông tin khách mời đã được nhập thành công.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
     }

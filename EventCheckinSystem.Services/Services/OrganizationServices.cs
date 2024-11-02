@@ -36,7 +36,7 @@ namespace EventCheckinSystem.Services.Services
             return _mapper.Map<OrganizationDTO>(organizationEntity);
         }
 
-        public async Task<CreateOrganizationDTO> CreateOrganizationAsync(CreateOrganizationDTO newOrganizationDto)
+        public async Task<OrganizationDTO> CreateOrganizationAsync(CreateOrganizationDTO newOrganizationDto)
         {
             try
             {
@@ -46,7 +46,7 @@ namespace EventCheckinSystem.Services.Services
                 newOrganization.CreatedTime = _timeService.SystemTimeNow;
                 newOrganization.LastUpdatedTime = _timeService.SystemTimeNow;
                 var createdOrganization = await _organizationRepo.CreateOrganizationAsync(newOrganization);
-                return _mapper.Map<CreateOrganizationDTO>(createdOrganization);
+                return _mapper.Map<OrganizationDTO>(createdOrganization);
             }
             catch (Exception ex)
             {

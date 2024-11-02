@@ -6,17 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EventCheckinSystem.Repo.DTOs
+namespace EventCheckinSystem.Repo.DTOs.CreateDTO
 {
-    public class GuestDTOValidator : AbstractValidator<GuestDTO>
+    public class CreateGuestDTOValidator : AbstractValidator<CreateGuestDTO>
     {
-        public GuestDTOValidator()
+        public CreateGuestDTOValidator()
         {
-            RuleFor(model => model.GuestID)
-                .NotEmpty().WithMessage("GuestID không được bỏ trống!");
-
-            RuleFor(model => model.GuestGroupID)
-                .NotEmpty().WithMessage("ID nhóm khách không được bỏ trống!");
 
             RuleFor(model => model.Name)
                 .NotEmpty().WithMessage("Tên không được bỏ trống!")
@@ -40,9 +35,8 @@ namespace EventCheckinSystem.Repo.DTOs
         }
     }
 
-    public class GuestDTO
+    public class CreateGuestDTO
     {
-        public int GuestID { get; set; }
         public int GuestGroupID { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }

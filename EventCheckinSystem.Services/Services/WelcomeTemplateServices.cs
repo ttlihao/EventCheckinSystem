@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
 using System;
@@ -36,7 +37,7 @@ namespace EventCheckinSystem.Services.Services
             return template != null ? _mapper.Map<WelcomeTemplateDTO>(template) : null;
         }
 
-        public async Task<WelcomeTemplateDTO> CreateWelcomeTemplateAsync(WelcomeTemplateDTO welcomeTemplateDto)
+        public async Task<WelcomeTemplateDTO> CreateWelcomeTemplateAsync(CreateWelcomeTemplateDTO welcomeTemplateDto)
         {
             try
             {

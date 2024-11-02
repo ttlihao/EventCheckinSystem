@@ -4,6 +4,8 @@ using EventCheckinSystem.Services.Interfaces;
 using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using EventCheckinSystem.Repo.DTOs.ResponseDTO;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 
 namespace EventCheckinSystem.API.Controllers
 {
@@ -20,14 +22,14 @@ namespace EventCheckinSystem.API.Controllers
 
         [HttpGet]
         [Authorize(Roles ="admin")]
-        public async Task<ActionResult<IEnumerable<EventDTO>>> GetAllEvents()
+        public async Task<ActionResult<IEnumerable<EventResponse>>> GetAllEvents()
         {
             var events = await _eventServices.GetAllEventsAsync();
             return Ok(events);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<EventDTO>> GetEventById(int id)
+        public async Task<ActionResult<EventResponse>> GetEventById(int id)
         {
             var eventDto = await _eventServices.GetEventByIdAsync(id);
             if (eventDto == null)
@@ -38,7 +40,7 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<EventDTO>> CreateEvent([FromBody] CreateEventDTO eventDto)
+        public async Task<ActionResult<EventResponse>> CreateEvent([FromBody] CreateEventDTO eventDto)
         {
             var createdEvent = await _eventServices.CreateEventAsync(eventDto);
             return CreatedAtAction(nameof(GetEventById), new { id = createdEvent.EventID }, createdEvent);

@@ -53,7 +53,7 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<CreateOrganizationDTO>> CreateOrganization([FromBody] CreateOrganizationDTO newOrganization)
+        public async Task<ActionResult<OrganizationDTO>> CreateOrganization([FromBody] CreateOrganizationDTO newOrganization)
         {
             try
             {

@@ -14,9 +14,7 @@ using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Repo.Repositories.Implements;
 using Microsoft.AspNetCore.Identity;
 using AutoMapper;
-using EventCheckinSystem.Repo.DTOs;
-using FluentValidation;
-using FluentValidation.AspNetCore;
+using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,12 +38,6 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1",
         Title = "API"
 
-    });
-
-    c.MapType<IFormFile>(() => new OpenApiSchema
-    {
-        Type = "string",
-        Format = "binary"
     });
 
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
@@ -111,8 +103,6 @@ builder.Services.AddIdentityCore<User>(options =>
     options.Password.RequiredUniqueChars = 1;
 })
 .AddEntityFrameworkStores<EventCheckinManagementContext>();
-builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddValidatorsFromAssemblyContaining<GuestDTOValidator>();
 
 builder.Services.AddScoped<IEventRepo, EventRepo>();
 builder.Services.AddScoped<IGuestCheckinRepo, GuestCheckinRepo>();
@@ -161,6 +151,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
 
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -176,6 +167,32 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+    };
+})
+.AddCookie(options =>
+{
+    options.Cookie.Name = "jwt";
+    options.Events = new CookieAuthenticationEvents
+    {
+        OnValidatePrincipal = async context =>
+        {
+            var token = context.Request.Cookies["jwt"];
+            var handler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
+            var validations = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = true,
+                ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                ValidateAudience = true,
+                ValidAudience = builder.Configuration["Jwt:Audience"],
+                ValidateLifetime = true
+            };
+
+            var principal = handler.ValidateToken(token, validations, out var securityToken);
+            context.Principal = principal;
+        }
     };
 });
 

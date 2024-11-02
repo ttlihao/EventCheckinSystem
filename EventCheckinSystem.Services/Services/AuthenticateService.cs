@@ -107,7 +107,7 @@ namespace EventCheckinSystem.Services.Services
             return _mapper.Map<UserDTO>(newUser);
         }
 
-        public async Task<LoginResponseDTO> LoginAsync(string username, string password)
+        public async Task<LoginResponse> LoginAsync(string username, string password)
         {
             try
             {
@@ -138,7 +138,7 @@ namespace EventCheckinSystem.Services.Services
                 user.VerificationTokenExpires = _timeService.SystemTimeNow.AddHours(_exRefreshToken);
                 user.ResetTokenExpires = _timeService.SystemTimeNow.AddHours(_exAccessToken);
                 await _userManager.UpdateAsync(user);
-                return new LoginResponseDTO
+                return new LoginResponse
                 {
                     VerificationToken = accessToken,
                     ResetToken = refreshToken,
@@ -154,12 +154,12 @@ namespace EventCheckinSystem.Services.Services
             }
         }
 
-        public Task<LoginResponseDTO> RefreshTokenAsync(string token, string refreshToken)
+        public Task<LoginResponse> RefreshTokenAsync(string token, string refreshToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<LoginResponseDTO> RevokeRefreshTokenAsync(string refreshToken)
+        public Task<LoginResponse> RevokeRefreshTokenAsync(string refreshToken)
         {
             throw new NotImplementedException();
         }

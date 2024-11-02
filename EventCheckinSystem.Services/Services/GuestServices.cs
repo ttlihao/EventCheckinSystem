@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
 using ExcelDataReader;
@@ -48,7 +49,7 @@ namespace EventCheckinSystem.Services.Services
             return guest != null ? _mapper.Map<List<GuestDTO>>(guest) : null;
         }
 
-        public async Task<GuestDTO> AddGuestAsync(GuestDTO guestDto)
+        public async Task<GuestDTO> AddGuestAsync(CreateGuestDTO guestDto)
         {
             try
             {

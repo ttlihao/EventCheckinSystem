@@ -1,4 +1,5 @@
 ﻿using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -53,7 +54,7 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<WelcomeTemplateDTO>> CreateWelcomeTemplate([FromBody] WelcomeTemplateDTO newTemplate)
+        public async Task<ActionResult<WelcomeTemplateDTO>> CreateWelcomeTemplate([FromBody] CreateWelcomeTemplateDTO newTemplate)
         {
             try
             {

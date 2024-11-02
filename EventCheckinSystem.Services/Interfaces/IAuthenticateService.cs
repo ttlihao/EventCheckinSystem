@@ -13,9 +13,9 @@ namespace EventCheckinSystem.Services.Interfaces
     public interface IAuthenticateService
     {
         Task<UserDTO> RegisterAsync(UserDTO userDTO);
-        Task<LoginResponseDTO> LoginAsync(string email, string password);
-        Task<LoginResponseDTO> RefreshTokenAsync(string token, string refreshToken);
-        Task<LoginResponseDTO> RevokeRefreshTokenAsync(string refreshToken);
+        Task<LoginResponse> LoginAsync(string email, string password);
+        Task<LoginResponse> RefreshTokenAsync(string token, string refreshToken);
+        Task<LoginResponse> RevokeRefreshTokenAsync(string refreshToken);
         Task<User> GetUserByIdAsync(string userId);
         Task<string> GetUserEmailByIdAsync(string userId);
         Task<IEnumerable<User>> GetUsersByFullNameAsync(string fullName);

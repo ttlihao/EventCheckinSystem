@@ -1,5 +1,6 @@
 ﻿using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -54,7 +55,7 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<GuestImageDTO>> CreateGuestImage([FromBody] GuestImageDTO newGuestImage)
+        public async Task<ActionResult<GuestImageDTO>> CreateGuestImage([FromBody] CreateGuestImageDTO newGuestImage)
         {
             try
             {

@@ -2,8 +2,8 @@
 using Azure.Core;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 using EventCheckinSystem.Repo.DTOs.ResponseDTO;
-using EventCheckinSystem.Repo.DTOs.UpdateDTO;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -91,7 +91,7 @@ namespace EventCheckinSystem.Services.Services
             }
         }
 
-        public async Task<IEnumerable<RoleResponseDTO>> GetAllRolesAsync()
+        public async Task<IEnumerable<RoleResponse>> GetAllRolesAsync()
         {
             try
             {
@@ -99,7 +99,7 @@ namespace EventCheckinSystem.Services.Services
                 var roles = await _roleManager.Roles.ToListAsync();
 
                 // Map roles to GetRoleResponse objects
-                return _mapper.Map<IEnumerable<RoleResponseDTO>>(roles);
+                return _mapper.Map<IEnumerable<RoleResponse>>(roles);
             }
             catch (Exception ex)
             {
@@ -133,7 +133,7 @@ namespace EventCheckinSystem.Services.Services
             }
         }
 
-        public async Task<RoleResponseDTO> GetRoleByNameAsync(string roleName)
+        public async Task<RoleResponse> GetRoleByNameAsync(string roleName)
         {
             try
             {
@@ -142,7 +142,7 @@ namespace EventCheckinSystem.Services.Services
                 {
                     throw new ArgumentException("Vai trò không tồn tại.");
                 }
-                return _mapper.Map<RoleResponseDTO>(role);
+                return _mapper.Map<RoleResponse>(role);
 
             }
             catch (Exception ex)

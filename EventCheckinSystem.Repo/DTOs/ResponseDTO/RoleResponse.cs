@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EventCheckinSystem.Repo.DTOs.ResponseDTO
 {
-    public class RoleResponseDTO
+    public class RoleResponse
     {
             public string Id { get; set; }
             public string Name { get; set; }

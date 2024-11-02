@@ -1,14 +1,10 @@
 ﻿using AutoMapper;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
+using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EventCheckinSystem.Services.Services
 {
@@ -27,19 +23,19 @@ namespace EventCheckinSystem.Services.Services
             _timeService = timeService; 
         }
 
-        public async Task<IEnumerable<EventDTO>> GetAllEventsAsync()
+        public async Task<IEnumerable<EventResponse>> GetAllEventsAsync()
         {
             var events = await _eventRepo.GetAllEventsAsync();
-            return _mapper.Map<IEnumerable<EventDTO>>(events);
+            return _mapper.Map<IEnumerable<EventResponse>>(events);
         }
 
-        public async Task<EventDTO> GetEventByIdAsync(int id)
+        public async Task<EventResponse> GetEventByIdAsync(int id)
         {
             var eventEntity = await _eventRepo.GetEventByIdAsync(id);
-            return _mapper.Map<EventDTO>(eventEntity);
+            return _mapper.Map<EventResponse>(eventEntity);
         }
 
-        public async Task<EventDTO> CreateEventAsync(CreateEventDTO newEventDto)
+        public async Task<EventResponse> CreateEventAsync(CreateEventDTO newEventDto)
         {
             try
             {
@@ -49,7 +45,7 @@ namespace EventCheckinSystem.Services.Services
                 newEvent.CreatedTime = _timeService.SystemTimeNow;
                 newEvent.LastUpdatedTime = _timeService.SystemTimeNow;
                 var createdEvent = await _eventRepo.CreateEventAsync(newEvent);
-                return _mapper.Map<EventDTO>(createdEvent);
+                return _mapper.Map<EventResponse>(createdEvent);
             }
             catch (Exception ex)
             {

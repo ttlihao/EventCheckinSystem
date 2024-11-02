@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +38,7 @@ namespace EventCheckinSystem.Services.Services
             return _mapper.Map<GuestImageDTO>(guestImage);
         }
 
-        public async Task<GuestImageDTO> CreateGuestImageAsync(GuestImageDTO guestImageDto)
+        public async Task<GuestImageDTO> CreateGuestImageAsync(CreateGuestImageDTO guestImageDto)
         {
             try
             {

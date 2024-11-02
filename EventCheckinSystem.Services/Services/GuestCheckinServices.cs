@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 using EventCheckinSystem.Repo.Repositories.Implements;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
@@ -37,7 +38,7 @@ namespace EventCheckinSystem.Services.Services
             return guestCheckin == null ? null : _mapper.Map<GuestCheckinDTO>(guestCheckin);
         }
 
-        public async Task<GuestCheckinDTO> CreateCheckinAsync(GuestCheckinDTO guestCheckinDto)
+        public async Task<GuestCheckinDTO> CreateCheckinAsync(CreateGuestCheckinDTO guestCheckinDto)
         {
             try
             {

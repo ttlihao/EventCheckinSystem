@@ -1,14 +1,16 @@
 ﻿using FluentValidation;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace EventCheckinSystem.Repo.DTOs
+namespace EventCheckinSystem.Repo.DTOs.CreateDTO
 {
-    public class EventDTOValidator : AbstractValidator<EventDTO>
+    public class CreateEventDTOValidator : AbstractValidator<CreateEventDTO>
     {
-        public EventDTOValidator()
+        public CreateEventDTOValidator()
         {
-            RuleFor(model => model.EventID)
-                .NotEmpty().WithMessage("EventID không được bỏ trống!");
 
             RuleFor(model => model.Name)
                 .NotEmpty().WithMessage("Tên sự kiện không được bỏ trống!")
@@ -42,10 +44,8 @@ namespace EventCheckinSystem.Repo.DTOs
                 .Length(2, 50).WithMessage("Trạng thái phải có độ dài từ 2 đến 50 ký tự!");
         }
     }
-
-    public class EventDTO
+    public class CreateEventDTO
     {
-        public int EventID { get; set; }
         public string Name { get; set; }
         public int OrganizationID { get; set; }
         public DateTime StartDate { get; set; }

@@ -1,7 +1,7 @@
 ﻿using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 using EventCheckinSystem.Repo.DTOs.ResponseDTO;
-using EventCheckinSystem.Repo.DTOs.UpdateDTO;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -13,8 +13,8 @@ namespace EventCheckinSystem.Services.Interfaces
 {
     public interface IRoleService
     {
-            Task<IEnumerable<RoleResponseDTO>> GetAllRolesAsync();
-            Task<RoleResponseDTO> GetRoleByNameAsync(string roleName);
+            Task<IEnumerable<RoleResponse>> GetAllRolesAsync();
+            Task<RoleResponse> GetRoleByNameAsync(string roleName);
             Task<bool> CreateRoleAsync(string roleName);
             Task<bool> UpdateRoleAsync(UpdateRoleDTO role);
             Task<bool> DeleteRoleAsync(string roleId);
