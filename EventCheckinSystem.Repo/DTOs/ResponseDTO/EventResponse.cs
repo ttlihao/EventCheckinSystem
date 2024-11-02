@@ -12,7 +12,6 @@ namespace EventCheckinSystem.Repo.DTOs.ResponseDTO
     {
         public int EventID { get; set; }
         public string Name { get; set; }
-        [JsonIgnore]
         public int OrganizationID { get; set; }
         public string OrganizationName{ get; set; }
         public DateTime StartDate { get; set; }
