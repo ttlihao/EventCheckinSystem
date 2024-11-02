@@ -34,6 +34,7 @@ namespace EventCheckinSystem.API.Controllers
 
             return Ok(response);
         }
+
         [HttpPost("register")]
         public async Task<ActionResult<UserDTO>> CreateUser([FromBody] UserDTO userDTO)
         {
