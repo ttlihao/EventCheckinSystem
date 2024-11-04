@@ -1,5 +1,6 @@
 ﻿using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -192,5 +193,15 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
             return await _context.GuestGroups.AnyAsync(g => g.GuestGroupID == guestGroupId);
         }
 
+        public async Task<PagedResult<Guest>> GetPagedGuestsAsync(PageRequest pageRequest)
+        {
+            var query = _context.Set<Guest>()
+                                .Where(e => e.IsActive && !e.IsDelete)
+                                .Include(g => g.GuestGroup)
+                                .Include(g => g.GuestImage)
+                                .Include(g => g.GuestCheckin);
+
+            return await query.CreatePagingAsync(pageRequest.PageNumber, pageRequest.PageSize);
+        }
     }
 }

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using ExcelDataReader;
+using EventCheckinSystem.Repo.DTOs.Paging;
 
 namespace EventCheckinSystem.Services.Services
 {
@@ -198,6 +199,18 @@ namespace EventCheckinSystem.Services.Services
             return dataSet.Tables[0];
         }
 
+        public async Task<PagedResult<GuestDTO>> GetPagedGuestsAsync(PageRequest pageRequest)
+        {
+            var pagedGuests = await _guestRepo.GetPagedGuestsAsync(pageRequest);
+
+            return new PagedResult<GuestDTO>
+            {
+                Items = _mapper.Map<List<GuestDTO>>(pagedGuests.Items),
+                TotalCount = pagedGuests.TotalCount,
+                PageSize = pagedGuests.PageSize,
+                PageNumber = pagedGuests.PageNumber
+            };
+        }
     }
 }
 

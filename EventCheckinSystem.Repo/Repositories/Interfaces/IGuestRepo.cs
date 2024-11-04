@@ -1,5 +1,6 @@
 ﻿using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -17,5 +18,6 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
         Task<List<Guest>> GetGuestsByEventIdAsync(int eventId);
         Task AddGuestsAsync(List<Guest> guests);
         Task<bool> GuestGroupExistsAsync(int guestGroupId);
+        Task<PagedResult<Guest>> GetPagedGuestsAsync(PageRequest pageRequest);
     }
 }

@@ -1,6 +1,7 @@
 ﻿
 using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.DTOs.CreateDTO;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,11 +19,12 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<GuestDTO>>> GetAllGuests()
+        public async Task<ActionResult<PagedResult<GuestDTO>>> GetAllGuests([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             try
             {
-                var guests = await _guestService.GetAllGuestsAsync();
+                var pageRequest = new PageRequest { PageNumber = pageNumber, PageSize = pageSize };
+                var guests = await _guestService.GetPagedGuestsAsync(pageRequest);
                 return Ok(guests);
             }
             catch (Exception ex)
