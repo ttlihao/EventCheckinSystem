@@ -1,5 +1,6 @@
 ﻿using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.DTOs.CreateDTO;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -12,5 +13,6 @@ namespace EventCheckinSystem.Services.Interfaces
         Task<GuestImageDTO> CreateGuestImageAsync(CreateGuestImageDTO guestImageDto);
         Task<bool> UpdateGuestImageAsync(GuestImageDTO guestImageDto);
         Task<bool> DeleteGuestImageAsync(int id);
+        Task<PagedResult<GuestImageDTO>> GetPagedGuestImagesAsync(PageRequest pageRequest);
     }
 }

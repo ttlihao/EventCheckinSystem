@@ -102,8 +102,6 @@ namespace EventCheckinSystem.Services.Services
         public async Task<PagedResult<GuestGroupResponse>> GetPagedGuestGroupsAsync(PageRequest pageRequest)
         {
             var pagedGuestGroups = await _guestGroupRepo.GetPagedGuestGroupsAsync(pageRequest);
-
-            // Map GuestGroup entities to GuestGroupResponse DTOs
             return new PagedResult<GuestGroupResponse>
             {
                 Items = _mapper.Map<List<GuestGroupResponse>>(pagedGuestGroups.Items),

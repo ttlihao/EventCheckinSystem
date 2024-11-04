@@ -1,5 +1,6 @@
 ﻿using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -118,6 +119,15 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
                 throw new Exception($"Error deleting GuestImage with ID {id}: {ex.Message}");
             }
             return false;
+        }
+
+        public async Task<PagedResult<GuestImage>> GetPagedGuestImagesAsync(PageRequest pageRequest)
+        {
+            var query = _context.GuestImages
+                .Where(e => e.IsActive && !e.IsDelete)
+                .Include(g => g.Guest);
+
+            return await query.CreatePagingAsync(pageRequest.PageNumber, pageRequest.PageSize);
         }
     }
 }

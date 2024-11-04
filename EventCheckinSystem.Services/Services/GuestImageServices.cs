@@ -2,6 +2,7 @@
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.DTOs.CreateDTO;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -86,6 +87,18 @@ namespace EventCheckinSystem.Services.Services
             {
                 throw new Exception("An error occurred while deleting the guest image", ex);
             }
+        }
+
+        public async Task<PagedResult<GuestImageDTO>> GetPagedGuestImagesAsync(PageRequest pageRequest)
+        {
+            var pagedGuestImages = await _guestImageRepo.GetPagedGuestImagesAsync(pageRequest);
+            return new PagedResult<GuestImageDTO>
+            {
+                Items = _mapper.Map<List<GuestImageDTO>>(pagedGuestImages.Items),
+                TotalCount = pagedGuestImages.TotalCount,
+                PageSize = pagedGuestImages.PageSize,
+                PageNumber = pagedGuestImages.PageNumber
+            };
         }
     }
 }

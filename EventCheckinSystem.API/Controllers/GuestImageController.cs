@@ -1,6 +1,7 @@
 ﻿using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.DTOs.CreateDTO;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -23,11 +24,12 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GuestImageDTO>>> GetAllGuestImages()
+        public async Task<ActionResult<PagedResult<GuestImageDTO>>> GetPagedGuestImages([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             try
             {
-                var guestImages = await _guestImageService.GetAllGuestImagesAsync();
+                var pageRequest = new PageRequest { PageNumber = pageNumber, PageSize = pageSize };
+                var guestImages = await _guestImageService.GetPagedGuestImagesAsync(pageRequest);
                 return Ok(guestImages);
             }
             catch (Exception ex)
