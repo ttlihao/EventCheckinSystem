@@ -1,5 +1,6 @@
 ﻿using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
         Task<bool> UpdateCheckinAsync(GuestCheckin updatedCheckinDto);
         Task<bool> DeleteCheckinAsync(int id);
         Task<GuestCheckin> CheckinGuestByIdAsync(int guestId, string createdBy);
+        Task<PagedResult<GuestCheckin>> GetPagedCheckinsAsync(PageRequest pageRequest);
     }
 }
 

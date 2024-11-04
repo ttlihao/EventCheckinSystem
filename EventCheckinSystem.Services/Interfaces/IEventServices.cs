@@ -1,6 +1,7 @@
 ﻿using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.DTOs.CreateDTO;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using System;
 using System.Collections.Generic;
@@ -17,5 +18,6 @@ namespace EventCheckinSystem.Services.Interfaces
         Task<EventResponse> CreateEventAsync(CreateEventDTO newEvent);
         Task<bool> UpdateEventAsync(EventDTO updatedEvent);
         Task<bool> DeleteEventAsync(int id);
+        Task<PagedResult<EventResponse>> GetPagedEventsAsync(PageRequest pageRequest);
     }
 }

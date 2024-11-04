@@ -2,6 +2,7 @@
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.DTOs.CreateDTO;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using EventCheckinSystem.Repo.Repositories.Implements;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
@@ -93,5 +94,19 @@ namespace EventCheckinSystem.Services.Services
 
             return _mapper.Map<GuestCheckinDTO>(checkin);
         }
+
+        public async Task<PagedResult<GuestCheckinDTO>> GetPagedCheckinsAsync(PageRequest pageRequest)
+        {
+            var pagedCheckins = await _checkinRepo.GetPagedCheckinsAsync(pageRequest);
+
+            return new PagedResult<GuestCheckinDTO>
+            {
+                Items = _mapper.Map<List<GuestCheckinDTO>>(pagedCheckins.Items),
+                TotalCount = pagedCheckins.TotalCount,
+                PageSize = pagedCheckins.PageSize,
+                PageNumber = pagedCheckins.PageNumber
+            };
+        }
+
     }
 }

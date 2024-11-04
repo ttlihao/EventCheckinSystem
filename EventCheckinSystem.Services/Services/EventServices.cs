@@ -2,6 +2,7 @@
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.DTOs.CreateDTO;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
@@ -79,6 +80,19 @@ namespace EventCheckinSystem.Services.Services
         public async Task<bool> DeleteEventAsync(int id)
         {
             return await _eventRepo.DeleteEventAsync(id);
+        }
+
+        public async Task<PagedResult<EventResponse>> GetPagedEventsAsync(PageRequest pageRequest)
+        {
+            var pagedEvents = await _eventRepo.GetPagedEventsAsync(pageRequest);
+
+            return new PagedResult<EventResponse>
+            {
+                Items = _mapper.Map<List<EventResponse>>(pagedEvents.Items),
+                TotalCount = pagedEvents.TotalCount,
+                PageSize = pagedEvents.PageSize,
+                PageNumber = pagedEvents.PageNumber
+            };
         }
     }
 

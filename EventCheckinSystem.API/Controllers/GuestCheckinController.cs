@@ -1,5 +1,6 @@
 ﻿using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.DTOs.CreateDTO;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,10 +21,18 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GuestCheckinDTO>>> GetAllCheckins()
+        public async Task<ActionResult<PagedResult<GuestCheckinDTO>>> GetPagedCheckins([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var checkins = await _guestCheckinService.GetAllCheckinsAsync();
-            return Ok(checkins);
+            try
+            {
+                var pageRequest = new PageRequest { PageNumber = pageNumber, PageSize = pageSize };
+                var checkins = await _guestCheckinService.GetPagedCheckinsAsync(pageRequest);
+                return Ok(checkins);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpGet("{id}")]

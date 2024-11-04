@@ -6,6 +6,8 @@ using EventCheckinSystem.Repo.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using EventCheckinSystem.Repo.DTOs.CreateDTO;
+using EventCheckinSystem.Repo.DTOs.Paging;
+using EventCheckinSystem.Services.Services;
 
 namespace EventCheckinSystem.API.Controllers
 {
@@ -21,10 +23,18 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EventResponse>>> GetAllEvents()
+        public async Task<ActionResult<PagedResult<EventResponse>>> GetAllEvents([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var events = await _eventServices.GetAllEventsAsync();
-            return Ok(events);
+            try
+            {
+                var pageRequest = new PageRequest { PageNumber = pageNumber, PageSize = pageSize };
+                var events = await _eventServices.GetPagedEventsAsync(pageRequest);
+                return Ok(events);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpGet("{id}")]

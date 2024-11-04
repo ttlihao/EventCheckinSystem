@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -132,6 +133,15 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
             {
                 throw new Exception($"Error checking in guest with ID {guestId}: {ex.Message}");
             }
+        }
+
+        public async Task<PagedResult<GuestCheckin>> GetPagedCheckinsAsync(PageRequest pageRequest)
+        {
+            var query = _context.GuestCheckins
+                .Where(e => e.IsActive && !e.IsDelete)
+                .Include(gc => gc.Guest);
+
+            return await query.CreatePagingAsync(pageRequest.PageNumber, pageRequest.PageSize);
         }
     }
 }
