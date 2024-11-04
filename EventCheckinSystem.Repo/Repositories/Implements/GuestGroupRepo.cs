@@ -1,4 +1,5 @@
 ﻿using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -137,6 +138,17 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
             {
                 throw new Exception($"Error retrieving GuestGroup with guestID {guestId}: {ex.Message}");
             }
+        }
+
+        public async Task<PagedResult<GuestGroup>> GetPagedGuestGroupsAsync(PageRequest pageRequest)
+        {
+            var query = _context.GuestGroups
+                .Where(g => g.IsActive && !g.IsDelete)
+                .Include(g => g.Organization)
+                .Include(g => g.Event)
+                .Include(g => g.Guests);
+
+            return await query.CreatePagingAsync(pageRequest.PageNumber, pageRequest.PageSize);
         }
     }
 }

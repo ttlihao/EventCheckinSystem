@@ -2,6 +2,7 @@
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.DTOs.CreateDTO;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using EventCheckinSystem.Repo.Repositories.Implements;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
@@ -96,6 +97,20 @@ namespace EventCheckinSystem.Services.Services
             var guestGroup = await _guestGroupRepo.GetGuestGroupByGuestIdAsync(guestId);
 
             return guestGroup == null ? null : _mapper.Map<GuestGroupResponse>(guestGroup);
+        }
+
+        public async Task<PagedResult<GuestGroupResponse>> GetPagedGuestGroupsAsync(PageRequest pageRequest)
+        {
+            var pagedGuestGroups = await _guestGroupRepo.GetPagedGuestGroupsAsync(pageRequest);
+
+            // Map GuestGroup entities to GuestGroupResponse DTOs
+            return new PagedResult<GuestGroupResponse>
+            {
+                Items = _mapper.Map<List<GuestGroupResponse>>(pagedGuestGroups.Items),
+                TotalCount = pagedGuestGroups.TotalCount,
+                PageSize = pagedGuestGroups.PageSize,
+                PageNumber = pagedGuestGroups.PageNumber
+            };
         }
     }
 }

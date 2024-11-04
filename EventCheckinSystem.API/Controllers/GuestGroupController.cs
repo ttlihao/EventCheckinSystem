@@ -1,6 +1,7 @@
 ﻿using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.DTOs.CreateDTO;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
@@ -23,10 +24,18 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GuestGroupResponse>>> GetAllGuestGroups()
+        public async Task<ActionResult<PagedResult<GuestGroupResponse>>> GetPagedGuestGroups([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var groups = await _guestGroupService.GetAllGuestGroupsAsync();
-            return Ok(groups);
+            try
+            {
+                var pageRequest = new PageRequest { PageNumber = pageNumber, PageSize = pageSize };
+                var guestGroups = await _guestGroupService.GetPagedGuestGroupsAsync(pageRequest);
+                return Ok(guestGroups);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpGet("{id}")]
