@@ -92,13 +92,22 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
 
         public async Task<PagedResult<Event>> GetPagedEventsAsync(PageRequest pageRequest)
         {
-            var query = _context.Events
-                .Where(e => e.IsActive && !e.IsDelete)
-                .Include(e => e.Organization)
-                .Include(e => e.GuestGroups)
-                .Include(e => e.UserEvents);
+            try
+            {
+                var query = _context.Events
+                    .Where(e => e.IsActive && !e.IsDelete)
+                    .Include(e => e.Organization)
+                    .Include(e => e.GuestGroups)
+                    .Include(e => e.UserEvents)
+                    .OrderBy(e => e.EventID).AsNoTracking(); // Ensure ordering by the correct column
 
-            return await query.CreatePagingAsync(pageRequest.PageNumber, pageRequest.PageSize);
+                return await query.CreatePagingAsync(pageRequest.PageNumber, pageRequest.PageSize);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error fetching paged events", e); // Provide a more descriptive error
+            }
         }
+
     }
 }
