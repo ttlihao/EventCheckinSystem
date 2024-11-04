@@ -1,4 +1,5 @@
 ﻿using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -21,11 +22,12 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<OrganizationDTO>>> GetAllOrganizations()
+        public async Task<ActionResult<PagedResult<OrganizationDTO>>> GetPagedOrganizations([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             try
             {
-                var organizations = await _organizationService.GetAllOrganizationsAsync();
+                var pageRequest = new PageRequest { PageNumber = pageNumber, PageSize = pageSize };
+                var organizations = await _organizationService.GetPagedOrganizationsAsync(pageRequest);
                 return Ok(organizations);
             }
             catch (Exception ex)

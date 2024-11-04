@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
 using System;
@@ -84,6 +85,18 @@ namespace EventCheckinSystem.Services.Services
             {
                 throw new Exception("An error occurred while deleting the organization", ex);
             }
+        }
+
+        public async Task<PagedResult<OrganizationDTO>> GetPagedOrganizationsAsync(PageRequest pageRequest)
+        {
+            var pagedOrganizations = await _organizationRepo.GetPagedOrganizationsAsync(pageRequest);
+            return new PagedResult<OrganizationDTO>
+            {
+                Items = _mapper.Map<List<OrganizationDTO>>(pagedOrganizations.Items),
+                TotalCount = pagedOrganizations.TotalCount,
+                PageSize = pagedOrganizations.PageSize,
+                PageNumber = pagedOrganizations.PageNumber
+            };
         }
     }
 }

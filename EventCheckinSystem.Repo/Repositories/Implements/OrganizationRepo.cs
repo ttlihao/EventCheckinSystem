@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -82,6 +83,18 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
                     return true;
             }
                 return false;
+        }
+
+        public async Task<PagedResult<Organization>> GetPagedOrganizationsAsync(PageRequest pageRequest)
+        {
+            var query = _context.Organizations
+                .Where(e => e.IsActive && !e.IsDelete)
+                .Include(o => o.Events)
+                    .ThenInclude(e => e.GuestGroups)
+                .Include(o => o.Events)
+                    .ThenInclude(e => e.UserEvents);
+
+            return await query.CreatePagingAsync(pageRequest.PageNumber, pageRequest.PageSize);
         }
     }
 }

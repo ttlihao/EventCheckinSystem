@@ -14,5 +14,6 @@ namespace EventCheckinSystem.Services.Interfaces
         Task<bool> UpdateWelcomeTemplateAsync(WelcomeTemplateDTO welcomeTemplateDto);
         Task<bool> DeleteWelcomeTemplateAsync(int id);
         Task<IEnumerable<WelcomeTemplateDTO>> GetWelcomeTemplatesByGuestGroupAsync(int guestGroupId);
+        Task<(IEnumerable<WelcomeTemplateDTO> templates, int totalCount)> GetWelcomeTemplatesPagedAsync(int pageNumber, int pageSize);
     }
 }

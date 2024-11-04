@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
 using System;
@@ -84,6 +85,18 @@ namespace EventCheckinSystem.Services.Services
             {
                 throw new Exception("An error occurred while deleting the user event", ex);
             }
+        }
+
+        public async Task<PagedResult<UserEventDTO>> GetPagedUserEventsAsync(PageRequest pageRequest)
+        {
+            var pagedUserEvents = await _userEventRepo.GetPagedUserEventsAsync(pageRequest);
+            return new PagedResult<UserEventDTO>
+            {
+                Items = _mapper.Map<List<UserEventDTO>>(pagedUserEvents.Items),
+                TotalCount = pagedUserEvents.TotalCount,
+                PageSize = pagedUserEvents.PageSize,
+                PageNumber = pagedUserEvents.PageNumber
+            };
         }
     }
 }

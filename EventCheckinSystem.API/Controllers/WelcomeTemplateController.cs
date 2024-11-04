@@ -2,6 +2,7 @@
 using EventCheckinSystem.Repo.DTOs.CreateDTO;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
+using EventCheckinSystem.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -21,18 +22,17 @@ namespace EventCheckinSystem.API.Controllers
             _welcomeTemplateService = welcomeTemplateRepo;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<WelcomeTemplateDTO>>> GetAllWelcomeTemplates()
+        [HttpGet("paged")]
+        public async Task<IActionResult> GetPagedWelcomeTemplates(int pageNumber = 1, int pageSize = 10)
         {
-            try
+            var (templates, totalCount) = await _welcomeTemplateService.GetWelcomeTemplatesPagedAsync(pageNumber, pageSize);
+            return Ok(new
             {
-                var templates = await _welcomeTemplateService.GetAllWelcomeTemplatesAsync();
-                return Ok(templates);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+                TotalCount = totalCount,
+                PageSize = pageSize,
+                PageNumber = pageNumber,
+                Templates = templates
+            });
         }
 
         [HttpGet("{id}")]

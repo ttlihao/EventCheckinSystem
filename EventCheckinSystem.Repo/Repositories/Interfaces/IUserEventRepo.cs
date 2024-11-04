@@ -1,4 +1,5 @@
 ﻿using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.DTOs.Paging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,5 +12,6 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
         Task<UserEvent> AddUserEventAsync(UserEvent userEvent);
         Task<bool> UpdateUserEventAsync(UserEvent userEvent);
         Task<bool> DeleteUserEventAsync(int eventId);
+        Task<PagedResult<UserEvent>> GetPagedUserEventsAsync(PageRequest pageRequest);
     }
 }

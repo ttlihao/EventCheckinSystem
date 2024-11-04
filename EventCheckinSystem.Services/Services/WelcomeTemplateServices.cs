@@ -92,5 +92,12 @@ namespace EventCheckinSystem.Services.Services
             var templates = await _welcomeTemplateRepo.GetWelcomeTemplatesByGuestGroupAsync(guestGroupId);
             return _mapper.Map<IEnumerable<WelcomeTemplateDTO>>(templates);
         }
+
+        public async Task<(IEnumerable<WelcomeTemplateDTO> templates, int totalCount)> GetWelcomeTemplatesPagedAsync(int pageNumber, int pageSize)
+        {
+            var (templates, totalCount) = await _welcomeTemplateRepo.GetWelcomeTemplatesPagedAsync(pageNumber, pageSize);
+            var templateDtos = _mapper.Map<IEnumerable<WelcomeTemplateDTO>>(templates);
+            return (templateDtos, totalCount);
+        }
     }
 }

@@ -12,5 +12,6 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
         Task<bool> UpdateWelcomeTemplateAsync(WelcomeTemplate welcomeTemplateDto);
         Task<bool> DeleteWelcomeTemplateAsync(int id);
         Task<IEnumerable<WelcomeTemplate>> GetWelcomeTemplatesByGuestGroupAsync(int guestGroupId);
+        Task<(IEnumerable<WelcomeTemplate> templates, int totalCount)> GetWelcomeTemplatesPagedAsync(int pageNumber, int pageSize);
     }
 }

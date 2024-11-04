@@ -45,6 +45,7 @@ namespace EventCheckinSystem.Repo.Configure
 
 
             CreateMap<WelcomeTemplate, CreateWelcomeTemplateDTO>().ReverseMap();
+            CreateMap<WelcomeTemplate, WelcomeTemplateDTO>().ReverseMap();
 
             CreateMap<IdentityUser, UserDTO>().ReverseMap();
             CreateMap<User, UserDTO>().ReverseMap();

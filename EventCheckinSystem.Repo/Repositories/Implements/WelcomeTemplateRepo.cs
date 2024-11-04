@@ -108,5 +108,21 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
                                  .Where(w => w.GuestGroupID == guestGroupId && !w.IsDelete && w.IsActive)
                                  .ToListAsync();
         }
+
+        public async Task<(IEnumerable<WelcomeTemplate> templates, int totalCount)> GetWelcomeTemplatesPagedAsync(int pageNumber, int pageSize)
+        {
+            var totalCount = await _context.WelcomeTemplates
+                .CountAsync(x => x.IsActive && !x.IsDelete);
+
+            var templates = await _context.WelcomeTemplates
+                .Include(x => x.GuestGroup)
+                .Where(x => x.IsActive && !x.IsDelete)
+                .OrderBy(x => x.WelcomeTemplateID) 
+                .Skip((pageNumber - 1) * pageSize) 
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (templates, totalCount);
+        }
     }
 }
