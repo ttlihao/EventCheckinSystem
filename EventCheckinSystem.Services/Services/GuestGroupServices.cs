@@ -110,5 +110,17 @@ namespace EventCheckinSystem.Services.Services
                 PageNumber = pagedGuestGroups.PageNumber
             };
         }
+
+        public async Task<List<GuestGroupDTO>> GetGuestGroupsByUserIdAsync(string userId)
+        {
+            var guestGroups = await _guestGroupRepo.GetGuestGroupsByUserIdAsync(userId);
+            return _mapper.Map<List<GuestGroupDTO>>(guestGroups);
+        }
+
+        public async Task<List<GuestGroupDTO>> GetGuestGroupsByEventIdAsync(int eventId)
+        {
+            var guestGroups = await _guestGroupRepo.GetGuestGroupsByEventIdAsync(eventId);
+            return _mapper.Map<List<GuestGroupDTO>>(guestGroups);
+        }
     }
 }

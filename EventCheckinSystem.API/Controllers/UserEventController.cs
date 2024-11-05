@@ -95,5 +95,23 @@ namespace EventCheckinSystem.API.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpGet("user/{userId}/events")]
+        public async Task<ActionResult<List<EventDTO>>> GetEventsByUserId(string userId)
+        {
+            try
+            {
+                var events = await _userEventService.GetEventsByUserIdAsync(userId);
+                if (events == null || events.Count == 0)
+                {
+                    return NotFound($"No events found for user ID: {userId}");
+                }
+                return Ok(events);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }

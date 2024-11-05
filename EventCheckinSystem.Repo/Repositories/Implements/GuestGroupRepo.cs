@@ -147,8 +147,26 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
                 .Include(g => g.Organization)
                 .Include(g => g.Event)
                 .Include(g => g.Guests);
-
             return await query.CreatePagingAsync(pageRequest.PageNumber, pageRequest.PageSize);
+        }
+
+        public async Task<List<GuestGroup>> GetGuestGroupsByUserIdAsync(string userId)
+        {
+            var eventIds = await _context.UserEvents
+                .Where(ue => ue.UserID == userId)
+                .Select(ue => ue.EventID)
+                .ToListAsync();
+            var guestGroups = await _context.GuestGroups
+                .Where(gg => eventIds.Contains(gg.EventID))
+                .ToListAsync();
+            return guestGroups;
+        }
+
+        public async Task<List<GuestGroup>> GetGuestGroupsByEventIdAsync(int eventId)
+        {
+            return await _context.GuestGroups
+                .Where(gg => gg.EventID == eventId)
+                .ToListAsync();
         }
     }
 }

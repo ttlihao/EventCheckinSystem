@@ -17,5 +17,7 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
         Task<bool> UpdateEventAsync(Event updatedEvent);
         Task<bool> DeleteEventAsync(int id);
         Task<PagedResult<Event>> GetPagedEventsAsync(PageRequest pageRequest);
+        Task<List<Event>> GetEventsByEventIdsAsync(List<int> eventIds);
+
     }
 }

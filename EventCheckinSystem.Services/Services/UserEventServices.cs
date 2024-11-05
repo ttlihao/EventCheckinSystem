@@ -98,5 +98,13 @@ namespace EventCheckinSystem.Services.Services
                 PageNumber = pagedUserEvents.PageNumber
             };
         }
+
+        public async Task<List<EventDTO>> GetEventsByUserIdAsync(string userId)
+        {
+            var eventIds = await _userEventRepo.GetEventIdsByUserIdAsync(userId);
+            var events = await _eventRepo.GetEventsByEventIdsAsync(eventIds);       
+            return _mapper.Map<List<EventDTO>>(events);
+        }
+
     }
 }
