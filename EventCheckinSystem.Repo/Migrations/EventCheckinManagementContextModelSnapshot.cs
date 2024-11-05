@@ -93,7 +93,7 @@ namespace EventCheckinSystem.Repo.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Events");
+                    b.ToTable("Events", (string)null);
                 });
 
             modelBuilder.Entity("EventCheckinSystem.Repo.Data.Guest", b =>
@@ -156,7 +156,7 @@ namespace EventCheckinSystem.Repo.Migrations
 
                     b.HasIndex("GuestGroupID");
 
-                    b.ToTable("Guests");
+                    b.ToTable("Guests", (string)null);
                 });
 
             modelBuilder.Entity("EventCheckinSystem.Repo.Data.GuestCheckin", b =>
@@ -168,6 +168,9 @@ namespace EventCheckinSystem.Repo.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GuestCheckinID"));
 
                     b.Property<DateTime>("CheckinTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("CheckoutTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedBy")
@@ -212,7 +215,7 @@ namespace EventCheckinSystem.Repo.Migrations
                     b.HasIndex("GuestID")
                         .IsUnique();
 
-                    b.ToTable("GuestCheckins");
+                    b.ToTable("GuestCheckins", (string)null);
                 });
 
             modelBuilder.Entity("EventCheckinSystem.Repo.Data.GuestGroup", b =>
@@ -269,7 +272,7 @@ namespace EventCheckinSystem.Repo.Migrations
 
                     b.HasIndex("OrganizationID");
 
-                    b.ToTable("GuestGroups");
+                    b.ToTable("GuestGroups", (string)null);
                 });
 
             modelBuilder.Entity("EventCheckinSystem.Repo.Data.GuestImage", b =>
@@ -318,7 +321,7 @@ namespace EventCheckinSystem.Repo.Migrations
                     b.HasIndex("GuestID")
                         .IsUnique();
 
-                    b.ToTable("GuestImages");
+                    b.ToTable("GuestImages", (string)null);
                 });
 
             modelBuilder.Entity("EventCheckinSystem.Repo.Data.Organization", b =>
@@ -380,7 +383,7 @@ namespace EventCheckinSystem.Repo.Migrations
 
                     b.HasKey("OrganizationID");
 
-                    b.ToTable("Organizations");
+                    b.ToTable("Organizations", (string)null);
                 });
 
             modelBuilder.Entity("EventCheckinSystem.Repo.Data.UserEvent", b =>
@@ -405,7 +408,7 @@ namespace EventCheckinSystem.Repo.Migrations
                     b.HasIndex("UserID", "EventID")
                         .IsUnique();
 
-                    b.ToTable("UserEvents");
+                    b.ToTable("UserEvents", (string)null);
                 });
 
             modelBuilder.Entity("EventCheckinSystem.Repo.Data.WelcomeTemplate", b =>
@@ -458,7 +461,7 @@ namespace EventCheckinSystem.Repo.Migrations
                     b.HasIndex("GuestGroupID")
                         .IsUnique();
 
-                    b.ToTable("WelcomeTemplates");
+                    b.ToTable("WelcomeTemplates", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

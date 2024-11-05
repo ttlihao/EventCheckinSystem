@@ -1,4 +1,4 @@
-﻿using EventCheckinSystem.Repo.Data;
+using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Services.Interfaces;
 using EventCheckinSystem.Services.Services;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +15,9 @@ using EventCheckinSystem.Repo.Repositories.Implements;
 using Microsoft.AspNetCore.Identity;
 using AutoMapper;
 using System.IdentityModel.Tokens.Jwt;
+using EventCheckinSystem.Repo.DTOs;
+using FluentValidation;
+using Microsoft.AspNetCore.Authentication.Google;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -155,7 +158,7 @@ builder.Services.AddControllers()
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
 }).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
@@ -194,7 +197,12 @@ builder.Services.AddAuthentication(options =>
             context.Principal = principal;
         }
     };
-});
+})
+.AddGoogle(googleOptions => { 
+    googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"]; 
+    googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]; 
+}
+);
 
 //builder.Services.AddIdentityApiEndpoints<User>()
 //    .AddEntityFrameworkStores<EventCheckinManagementContext>();

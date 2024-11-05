@@ -14,7 +14,9 @@ namespace EventCheckinSystem.Services.Interfaces
     {
         Task<UserDTO> RegisterAsync(UserDTO userDTO);
         Task<LoginResponse> LoginAsync(string email, string password);
+        Task<LoginResponse> LoginByGoogleAsync(string email);
         Task<LoginResponse> RefreshTokenAsync(string token, string refreshToken);
+        Task<User> GetUserByEmailAsync(string email);
         Task<LoginResponse> RevokeRefreshTokenAsync(string refreshToken);
         Task<User> GetUserByIdAsync(string userId);
         Task<string> GetUserEmailByIdAsync(string userId);

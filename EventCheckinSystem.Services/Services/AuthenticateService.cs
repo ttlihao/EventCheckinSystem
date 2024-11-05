@@ -229,5 +229,65 @@ namespace EventCheckinSystem.Services.Services
                 throw;
             }
         }
+
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            try
+            {
+                var user = await _authenticateRepo.GetUserByEmailAsync(email);
+                if (user == null)
+                {
+                    throw new ArgumentException("Không tìm thấy người dùng");
+                }
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<LoginResponse> LoginByGoogleAsync(string email)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(email) ??
+                    throw new ArgumentException("Email not registered yet!");
+
+                var roles = await _userManager.GetRolesAsync(user);
+                var userRole = roles.FirstOrDefault();
+                if (userRole == null)
+                {
+                    throw new ArgumentException("Người dùng chưa được cấp quyền");
+                }
+
+                // Generate access token
+                var accessToken = GenerateToken(user.Id, userRole, false);
+                // Generate refresh token
+                var refreshToken = GenerateToken(user.Id, userRole, true);
+
+                // Save Database
+                user.VerificationToken = accessToken;
+                user.ResetToken = refreshToken;
+                user.VerificationTokenExpires = _timeService.SystemTimeNow.AddHours(_exRefreshToken);
+                user.VerificationTokenExpires = _timeService.SystemTimeNow.AddHours(_exRefreshToken);
+                user.ResetTokenExpires = _timeService.SystemTimeNow.AddHours(_exAccessToken);
+                await _userManager.UpdateAsync(user);
+                return new LoginResponse
+                {
+                    VerificationToken = accessToken,
+                    ResetToken = refreshToken,
+                    UserId = user.Id,
+                    Username = user.UserName,
+                    Email = user.Email,
+                    RoleName = userRole
+                };
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
     }
 }

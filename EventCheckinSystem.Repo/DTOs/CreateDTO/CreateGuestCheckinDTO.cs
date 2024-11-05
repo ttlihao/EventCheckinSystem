@@ -10,9 +10,6 @@ namespace EventCheckinSystem.Repo.DTOs.CreateDTO
             RuleFor(model => model.GuestID)
                 .NotEmpty().WithMessage("GuestID không được bỏ trống!");
 
-            RuleFor(model => model.CheckinTime)
-                .NotEmpty().WithMessage("CheckinTime không được bỏ trống!")
-                .Must(date => date <= DateTime.Now).WithMessage("CheckinTime không thể là thời gian tương lai!");
 
             RuleFor(model => model.Status)
                 .NotEmpty().WithMessage("Status không được bỏ trống!")
@@ -26,7 +23,6 @@ namespace EventCheckinSystem.Repo.DTOs.CreateDTO
     public class CreateGuestCheckinDTO
     {
         public int GuestID { get; set; }
-        public DateTime CheckinTime { get; set; }
         public string Status { get; set; }
         public string Notes { get; set; }
     }

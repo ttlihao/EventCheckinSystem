@@ -1,9 +1,10 @@
 ﻿using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
-using static System.Net.Mime.MediaTypeNames;
+using System.Security.Claims;
 
 namespace EventCheckinSystem.API.Controllers
 {
@@ -40,5 +41,59 @@ namespace EventCheckinSystem.API.Controllers
             var response = await _authenticateService.RegisterAsync(userDTO);
             return Ok(response);
         }
+
+        [HttpGet("login-google")]
+        public IActionResult GoogleLogin()
+        {
+            var properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleResponse") };
+
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+        }
+
+
+        [HttpGet("google-response")]
+        public async Task<IActionResult> GoogleResponse()
+        {
+            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+
+            if (result?.Succeeded == true)
+            {
+                var claimsIdentity = result.Principal.Identity as ClaimsIdentity;
+                var email = claimsIdentity.FindFirst(ClaimTypes.Email)?.Value;
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized();
+                }
+
+                // Check if the user exists in the database
+                var user = await _authenticateService.GetUserByEmailAsync(email);
+
+                if (user == null)
+                {
+                    return Unauthorized(new { Message = "User not found. Please contact support." });
+                }
+
+                // Generate a token or sign the user in
+                var response = await _authenticateService.LoginByGoogleAsync(email);
+                var token = response.VerificationToken;
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
+                };
+
+                Response.Cookies.Append("jwt", token, cookieOptions);
+
+                // Redirect the user to the desired page after login
+                return Ok(response);
+            }
+
+            return Unauthorized();
+        }
+
+
+
     }
 }
