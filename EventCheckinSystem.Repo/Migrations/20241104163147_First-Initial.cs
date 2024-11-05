@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EventCheckinSystem.Repo.Migrations
 {
     /// <inheritdoc />
-    public partial class DeleteCheckOutTime : Migration
+    public partial class FirstInitial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

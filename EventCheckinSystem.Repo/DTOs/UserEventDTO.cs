@@ -17,7 +17,7 @@ namespace EventCheckinSystem.Repo.DTOs
                 .NotEmpty().WithMessage("UserID không được bỏ trống!");
 
             RuleFor(model => model.EventID)
-                .NotEmpty().WithMessage("RoleID không được bỏ trống!");
+                .NotEmpty().WithMessage("Event ID không được bỏ trống!");
         }
     }
     public class UserEventDTO

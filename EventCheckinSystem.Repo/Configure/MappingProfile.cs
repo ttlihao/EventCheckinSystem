@@ -50,11 +50,10 @@ namespace EventCheckinSystem.Repo.Configure
             CreateMap<IdentityUser, UserDTO>().ReverseMap();
             CreateMap<User, UserDTO>().ReverseMap();
             CreateMap<IdentityRole, RoleResponse>().ReverseMap();
-            CreateMap<UserEvent, UserEventDTO>()
-                .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => src.User.FullName))
-                .ForMember(dest => dest.EventID, opt => opt.MapFrom(src => src.Event.Name)).ReverseMap();
+            CreateMap<UserEvent, UserEventDTO>().ForMember(dest => dest.UserID, opt => opt.MapFrom(src => src.UserID))
+                                                .ForMember(dest => dest.EventID, opt => opt.MapFrom(src => src.EventID)).ReverseMap();
 
-            
+
         }
     }
 

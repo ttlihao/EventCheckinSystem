@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventCheckinSystem.Repo.Migrations
 {
     [DbContext(typeof(EventCheckinManagementContext))]
-    [Migration("20241029193121_DeleteCheckOutTime")]
-    partial class DeleteCheckOutTime
+    [Migration("20241104163147_First-Initial")]
+    partial class FirstInitial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
