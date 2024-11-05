@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using EventCheckinSystem.Repo.DTOs.CreateDTO;
 
 namespace EventCheckinSystem.Services.Services
 {
@@ -22,10 +23,11 @@ namespace EventCheckinSystem.Services.Services
         private readonly int _exAccessToken;
         private readonly int _exRefreshToken;
         private readonly ITimeService _timeService;
+        private readonly IUserContextService _userContextService;
         private readonly IMapper _mapper;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AuthenticateService(RoleManager<IdentityRole> roleManager, IMapper mapper, IAuthenticateRepo authenticateRepo, IConfiguration configuration, UserManager<User> userManager, ITimeService timeService)
+        public AuthenticateService(RoleManager<IdentityRole> roleManager, IMapper mapper, IAuthenticateRepo authenticateRepo, IConfiguration configuration, UserManager<User> userManager, ITimeService timeService, IUserContextService userContextService)
         {
             _authenticateRepo = authenticateRepo;
             _configuration = configuration;
@@ -35,6 +37,7 @@ namespace EventCheckinSystem.Services.Services
             _timeService = timeService;
             _mapper = mapper;
             _roleManager = roleManager;
+            _userContextService = userContextService;
         }
 
         public async Task<IEnumerable<User>> GetUsersByFullNameAsync(string fullName)
@@ -47,19 +50,22 @@ namespace EventCheckinSystem.Services.Services
             return await _authenticateRepo.GetUserEmailByIdAsync(userId);
         }
 
-        public async Task UpdateAsync(User user)
-        {
-            await _authenticateRepo.UpdateAsync(user);
-        }
-
         public async Task<User?> GetUserByRefreshTokenAsync(string refreshToken)
         {
             return await _authenticateRepo.GetUserByRefreshTokenAsync(refreshToken);
         }
 
-        public async Task UpdateUserAsync(User user)
+        public async Task<IdentityResult> UpdateUserAsync(UpdateUserDTO user)
         {
-            await _authenticateRepo.UpdateUserAsync(user);
+            var existingUser = await _userManager.FindByIdAsync(user.Id);
+            if (existingUser == null)
+            {
+                throw new ArgumentException("Không tìm thấy người dùng");
+            }
+            existingUser = _mapper.Map(user, existingUser);
+            existingUser.LastUpdatedBy = _userContextService.GetCurrentUserId();
+            existingUser.LastUpdatedTime = _timeService.SystemTimeNow;
+            return await _userManager.UpdateAsync(existingUser);
         }
 
         public async Task<string?> GetUserNameByIdAsync(object id)
@@ -253,7 +259,7 @@ namespace EventCheckinSystem.Services.Services
             try
             {
                 var user = await _userManager.FindByEmailAsync(email) ??
-                    throw new ArgumentException("Email not registered yet!");
+                    throw new ArgumentException("Email chưa được đăng ký");
 
                 var roles = await _userManager.GetRolesAsync(user);
                 var userRole = roles.FirstOrDefault();
@@ -288,6 +294,59 @@ namespace EventCheckinSystem.Services.Services
             {
                 throw;
             }
+        }
+
+        public async Task<bool> DeactiveUserAsync(string id)
+        {
+            var existingUser = await _userManager.FindByIdAsync(id);
+            if (existingUser != null)
+            {
+                existingUser.IsActive = false;
+                existingUser.IsDelete = true;
+                existingUser.DeletedTime = _timeService.SystemTimeNow;
+                existingUser.LastUpdatedBy = _userContextService.GetCurrentUserId();
+                existingUser.LastUpdatedTime = _timeService.SystemTimeNow;
+                await _authenticateRepo.UpdateUserAsync(existingUser);
+                return true;
+            }
+            return false;
+        }
+        public async Task<bool> ActiveUserAsync(string id)
+        {
+            var existingUser = await _userManager.FindByIdAsync(id);
+            if (existingUser != null)
+            {
+                existingUser.IsActive = true;
+                existingUser.IsDelete = false;
+                await _authenticateRepo.UpdateUserAsync(existingUser);
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<IEnumerable<UserResponse>> GetUsers()
+        {
+            var userList = await _authenticateRepo.GetAllUser();
+            var userResponseList = _mapper.Map<IEnumerable<UserResponse>>(userList);
+            return userResponseList;
+        }
+
+        public async Task<IdentityResult> ChangeUserPasswordAsync(ChangePasswordDTO request)
+        {
+            if (!request.ConfirmedPassword.Equals(request.NewPassword))
+            {
+                throw new ArgumentNullException("Mật khẩu confirm không chính xác");
+            }
+            var existingUser = await _userManager.FindByNameAsync(request.Username);
+            if (existingUser == null)
+            {
+                throw new ArgumentNullException("Không tìm thấy người dùng");
+            }
+            if (!await _userManager.CheckPasswordAsync(existingUser, request.OldPassword))
+            {
+                throw new ArgumentNullException("Mật khẩu cũ không chính xác");
+            }
+            return await _userManager.ChangePasswordAsync(existingUser, request.OldPassword, request.NewPassword);
         }
     }
 }

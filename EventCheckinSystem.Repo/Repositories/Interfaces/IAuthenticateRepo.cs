@@ -14,9 +14,8 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
         Task<User> GetUsesByIdAsync(string userId);
         Task<User> GetUserByEmailAsync(string email);
         Task<string> GetUserEmailByIdAsync(string userId);
-        Task UpdateAsync(User user);
         Task<User?> GetUserByRefreshTokenAsync(string refreshToken);
-        Task UpdateUserAsync(User user);
+        Task<bool> UpdateUserAsync(User user);
         Task<string?> GetUserNameByIdAsync(object id);
         Task<Dictionary<string, string>> GetFullNamesByIdsAsync(IEnumerable<string> userIds);
 

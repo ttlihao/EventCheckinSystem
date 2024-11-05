@@ -29,6 +29,7 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
         public async Task<IEnumerable<User>> GetAllUser()
         {
             var users = await _dbContext.Users
+                .Where(u =>  u.IsDelete == false && u.IsActive == true)
                 .ToListAsync();
             return users;
         }
@@ -39,21 +40,17 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
             return user?.Email;
         }
 
-        public async Task UpdateAsync(User user)
-        {
-            _dbContext.Users.Update(user);
-            await _dbContext.SaveChangesAsync();
-        }
 
         public async Task<User?> GetUserByRefreshTokenAsync(string resetToken)
         {
             return await _dbContext.Users.FirstOrDefaultAsync(u => u.ResetToken == resetToken);
         }
 
-        public async Task UpdateUserAsync(User user)
+        public async Task<bool> UpdateUserAsync(User user)
         {
-            _dbContext.Users.Update(user);
-            await _dbContext.SaveChangesAsync();
+            _dbContext.Users.Update(user); 
+            var result = await _dbContext.SaveChangesAsync(); 
+            return result > 0;
         }
 
         public async Task<string?> GetUserNameByIdAsync(object id)
