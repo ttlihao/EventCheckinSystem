@@ -91,5 +91,13 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
                 .FirstOrDefaultAsync(u => u.Id.ToLower().Contains(searchTerm) && u.IsDelete == false && u.IsActive == true);
             return user;
         }
+
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            var searchTerm = email.Trim().ToLower();
+            var user = await _dbContext.Users
+                .FirstOrDefaultAsync(u => u.Email.ToLower().Equals(searchTerm) && u.IsDelete == false && u.IsActive == true);
+            return user;
+        }
     }
 }

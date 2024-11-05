@@ -48,6 +48,7 @@ namespace EventCheckinSystem.Services.Services
                 newCheckin.LastUpdatedBy = newCheckin.CreatedBy;
                 newCheckin.CreatedTime = _timeService.SystemTimeNow;
                 newCheckin.LastUpdatedTime = _timeService.SystemTimeNow;
+                newCheckin.CheckinTime = _timeService.SystemTimeNow.DateTime;
                 var createdCheckin = await _checkinRepo.CreateCheckinAsync(newCheckin);
                 return _mapper.Map<GuestCheckinDTO>(createdCheckin);
             }
