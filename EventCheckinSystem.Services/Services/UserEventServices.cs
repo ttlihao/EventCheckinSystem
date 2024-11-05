@@ -99,10 +99,11 @@ namespace EventCheckinSystem.Services.Services
             };
         }
 
-        public async Task<List<UserEventDTO>> GetUserEventsByUserIdAsync(string userId)
+        public async Task<List<EventDTO>> GetEventsByUserIdAsync(string userId)
         {
-            var userEvents = await _userEventRepo.GetUserEventsByUserIdAsync(userId);
-            return _mapper.Map<List<UserEventDTO>>(userEvents);
+            var eventIds = await _userEventRepo.GetEventIdsByUserIdAsync(userId);
+            var events = await _eventRepo.GetEventsByEventIdsAsync(eventIds);       
+            return _mapper.Map<List<EventDTO>>(events);
         }
 
     }

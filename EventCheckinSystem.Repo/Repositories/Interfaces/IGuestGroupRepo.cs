@@ -15,5 +15,7 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
         Task<bool> DeleteGuestGroupAsync(int id);
         Task<GuestGroup> GetGuestGroupByGuestIdAsync(int guestId);
         Task<PagedResult<GuestGroup>> GetPagedGuestGroupsAsync(PageRequest pageRequest);
+        Task<List<GuestGroup>> GetGuestGroupsByUserIdAsync(string userId);
+        Task<List<GuestGroup>> GetGuestGroupsByEventIdAsync(int eventId);
     }
 }

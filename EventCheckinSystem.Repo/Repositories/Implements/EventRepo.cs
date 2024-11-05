@@ -109,5 +109,12 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
             }
         }
 
+        public async Task<List<Event>> GetEventsByEventIdsAsync(List<int> eventIds)
+        {
+            return await _context.Events
+                .Where(e => eventIds.Contains(e.EventID))
+                .ToListAsync();
+        }
+
     }
 }

@@ -85,13 +85,12 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
             return await query.CreatePagingAsync(pageRequest.PageNumber, pageRequest.PageSize);
         }
 
-        public async Task<List<UserEvent>> GetUserEventsByUserIdAsync(string userId)
+        public async Task<List<int>> GetEventIdsByUserIdAsync(string userId)
         {
-            var userEvents = await _context.UserEvents
-                .Include(ue => ue.Event)
+            return await _context.UserEvents
                 .Where(ue => ue.UserID == userId)
+                .Select(ue => ue.EventID)
                 .ToListAsync();
-            return userEvents;
         }
 
     }

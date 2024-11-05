@@ -13,6 +13,6 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
         Task<bool> UpdateUserEventAsync(UserEvent userEvent);
         Task<bool> DeleteUserEventAsync(int eventId);
         Task<PagedResult<UserEvent>> GetPagedUserEventsAsync(PageRequest pageRequest);
-        Task<List<UserEvent>> GetUserEventsByUserIdAsync(string userId);
+        Task<List<int>> GetEventIdsByUserIdAsync(string userId);
     }
 }

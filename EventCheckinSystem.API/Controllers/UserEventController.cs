@@ -97,16 +97,16 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet("user/{userId}/events")]
-        public async Task<ActionResult<List<UserEventDTO>>> GetEventsByUserId(string userId)
+        public async Task<ActionResult<List<EventDTO>>> GetEventsByUserId(string userId)
         {
             try
             {
-                var userEvents = await _userEventService.GetUserEventsByUserIdAsync(userId);
-                if (userEvents == null || userEvents.Count == 0)
+                var events = await _userEventService.GetEventsByUserIdAsync(userId);
+                if (events == null || events.Count == 0)
                 {
                     return NotFound($"No events found for user ID: {userId}");
                 }
-                return Ok(userEvents);
+                return Ok(events);
             }
             catch (Exception ex)
             {

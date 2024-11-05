@@ -13,6 +13,6 @@ namespace EventCheckinSystem.Services.Interfaces
         Task<bool> UpdateUserEventAsync(UserEventDTO userEventDto);
         Task<bool> DeleteUserEventAsync(int eventId);
         Task<PagedResult<UserEventDTO>> GetPagedUserEventsAsync(PageRequest pageRequest);
-        Task<List<UserEventDTO>> GetUserEventsByUserIdAsync(string userId);
+        Task<List<EventDTO>> GetEventsByUserIdAsync(string userId);
     }
 }

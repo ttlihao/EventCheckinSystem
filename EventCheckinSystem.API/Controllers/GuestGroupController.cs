@@ -5,6 +5,7 @@ using EventCheckinSystem.Repo.DTOs.Paging;
 using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
+using EventCheckinSystem.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -116,5 +117,42 @@ namespace EventCheckinSystem.API.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpGet("user/{userId}/guest-groups")]
+        public async Task<ActionResult<List<GuestGroupDTO>>> GetGuestGroupsByUserId(string userId)
+        {
+            try
+            {
+                var guestGroups = await _guestGroupService.GetGuestGroupsByUserIdAsync(userId);
+                if (guestGroups == null || guestGroups.Count == 0)
+                {
+                    return NotFound($"No guest groups found for user ID: {userId}");
+                }
+                return Ok(guestGroups);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("event/{eventId}/guest-groups")]
+        public async Task<ActionResult<List<GuestGroupDTO>>> GetGuestGroupsByEventId(int eventId)
+        {
+            try
+            {
+                var guestGroups = await _guestGroupService.GetGuestGroupsByEventIdAsync(eventId);
+                if (guestGroups == null || guestGroups.Count == 0)
+                {
+                    return NotFound($"No guest groups found for event ID: {eventId}");
+                }
+                return Ok(guestGroups);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
     }
 }
