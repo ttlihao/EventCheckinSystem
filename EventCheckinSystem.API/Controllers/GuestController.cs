@@ -103,11 +103,11 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddGuest([FromBody] CreateGuestDTO newGuest)
+        public async Task<ActionResult> AddGuest([FromForm] CreateGuestDTO newGuest, IFormFile imageFile)
         {
             try
             {
-                var response = await _guestService.AddGuestAsync(newGuest);
+                var response = await _guestService.AddGuestAsync(newGuest, imageFile);
                 return Ok(response);
             }
             catch (Exception ex)
