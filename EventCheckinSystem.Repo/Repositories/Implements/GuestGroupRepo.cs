@@ -158,6 +158,9 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
                 .ToListAsync();
             var guestGroups = await _context.GuestGroups
                 .Where(gg => eventIds.Contains(gg.EventID))
+                .Include(g => g.Organization)
+                .Include(g => g.Event)
+                .Include(g => g.Guests)
                 .ToListAsync();
             return guestGroups;
         }
@@ -166,6 +169,9 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
         {
             return await _context.GuestGroups
                 .Where(gg => gg.EventID == eventId)
+                .Include(g => g.Organization)
+                .Include(g => g.Event)
+                .Include(g => g.Guests)
                 .ToListAsync();
         }
     }

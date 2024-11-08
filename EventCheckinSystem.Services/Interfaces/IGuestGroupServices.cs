@@ -16,7 +16,8 @@ namespace EventCheckinSystem.Services.Interfaces
         Task<bool> DeleteGuestGroupAsync(int id);
         Task<GuestGroupResponse> GetGuestGroupByGuestIdAsync(int guestId);
         Task<PagedResult<GuestGroupResponse>> GetPagedGuestGroupsAsync(PageRequest pageRequest);
-        Task<List<GuestGroupDTO>> GetGuestGroupsByUserIdAsync(string userId);
-        Task<List<GuestGroupDTO>> GetGuestGroupsByEventIdAsync(int eventId);
+        Task<List<GuestGroupResponse>> GetGuestGroupsByUserIdAsync(string userId);
+
+        Task<List<GuestGroupResponse>> GetGuestGroupsByEventIdAsync(int eventId);
     }
 }
