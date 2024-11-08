@@ -23,14 +23,16 @@ namespace EventCheckinSystem.Services.Services
         private readonly IUserContextService _userContextService;
         private readonly ITimeService _timeService;
         private readonly IValidator<GuestDTO> _guestValidator;
+        private readonly IGuestImageRepo _guestImageRepo;
 
-        public GuestServices(IGuestRepo guestRepo, IMapper mapper, IUserContextService userContextService, ITimeService timeService, IValidator<GuestDTO> guestValidator)
+        public GuestServices(IGuestRepo guestRepo, IMapper mapper, IUserContextService userContextService, ITimeService timeService, IValidator<GuestDTO> guestValidator, IGuestImageRepo guestImageRepo)
         {
             _guestRepo = guestRepo;
             _mapper = mapper;
             _userContextService = userContextService;
             _timeService = timeService;
             _guestValidator = guestValidator;
+            _guestImageRepo = guestImageRepo;
         }
 
         public async Task<List<GuestDTO>> GetAllGuestsAsync()
@@ -54,12 +56,32 @@ namespace EventCheckinSystem.Services.Services
         {
             try
             {
-                var newGuest = _mapper.Map<Guest>(guestDto);
-                newGuest.CreatedBy = _userContextService.GetCurrentUserId();
-                newGuest.LastUpdatedBy = newGuest.CreatedBy;
-                newGuest.CreatedTime = _timeService.SystemTimeNow;
-                newGuest.LastUpdatedTime = _timeService.SystemTimeNow;
+                var newGuest = new Guest
+                {
+                    GuestGroupID = guestDto.GuestGroupID,
+                    Name = guestDto.Name,
+                    Email = guestDto.Email,
+                    PhoneNumber = guestDto.PhoneNumber,
+                    Address = guestDto.Address,
+                    Birthday = guestDto.Birthday,
+                    CreatedBy = _userContextService.GetCurrentUserId(),
+                    LastUpdatedBy = _userContextService.GetCurrentUserId(),
+                    CreatedTime = _timeService.SystemTimeNow,
+                    LastUpdatedTime = _timeService.SystemTimeNow
+                };
+
                 var createdGuest = await _guestRepo.AddGuestAsync(newGuest);
+                var guestImage = new GuestImage
+                {
+                    GuestID = createdGuest.GuestID, 
+                    ImageURL = guestDto.ImageUrl,
+                    CreatedBy = _userContextService.GetCurrentUserId(),
+                    LastUpdatedBy = _userContextService.GetCurrentUserId(),
+                    CreatedTime = _timeService.SystemTimeNow,
+                    LastUpdatedTime = _timeService.SystemTimeNow
+                };
+                await _guestImageRepo.CreateGuestImageAsync(guestImage);
+
                 return _mapper.Map<GuestDTO>(createdGuest);
             }
             catch (Exception ex)
