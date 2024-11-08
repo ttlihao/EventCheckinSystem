@@ -30,19 +30,19 @@ namespace EventCheckinSystem.Services.Services
             _timeService = timeService;
         }
 
-        public async Task<List<UserEventDTO>> GetAllUserEventsAsync()
+        public async Task<List<UserEventResponse>> GetAllUserEventsAsync()
         {
             var userEvents = await _userEventRepo.GetAllUserEventsAsync();
-            return _mapper.Map<List<UserEventDTO>>(userEvents);
+            return _mapper.Map<List<UserEventResponse>>(userEvents);
         }
 
-        public async Task<UserEventDTO> GetUserEventByIdAsync(int eventId)
+        public async Task<UserEventResponse> GetUserEventByIdAsync(int eventId)
         {
             var userEvent = await _userEventRepo.GetUserEventByIdAsync(eventId);
-            return userEvent != null ? _mapper.Map<UserEventDTO>(userEvent) : null;
+            return userEvent != null ? _mapper.Map<UserEventResponse>(userEvent) : null;
         }
 
-        public async Task<UserEventDTO> AddUserEventAsync(UserEventDTO userEventDto)
+        public async Task<UserEventResponse> AddUserEventAsync(UserEventDTO userEventDto)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace EventCheckinSystem.Services.Services
                 newUserEvent.User = await _authenticateRepo.GetUsesByIdAsync(newUserEvent.UserID);
                 newUserEvent.Event = await _eventRepo.GetEventByIdAsync(newUserEvent.EventID);
                 var createdUserEvent = await _userEventRepo.AddUserEventAsync(newUserEvent);
-                return _mapper.Map<UserEventDTO>(createdUserEvent);
+                return _mapper.Map<UserEventResponse>(createdUserEvent);
             }
             catch (Exception ex)
             {
@@ -88,12 +88,12 @@ namespace EventCheckinSystem.Services.Services
             }
         }
 
-        public async Task<PagedResult<UserEventDTO>> GetPagedUserEventsAsync(PageRequest pageRequest)
+        public async Task<PagedResult<UserEventResponse>> GetPagedUserEventsAsync(PageRequest pageRequest)
         {
             var pagedUserEvents = await _userEventRepo.GetPagedUserEventsAsync(pageRequest);
-            return new PagedResult<UserEventDTO>
+            return new PagedResult<UserEventResponse>
             {
-                Items = _mapper.Map<List<UserEventDTO>>(pagedUserEvents.Items),
+                Items = _mapper.Map<List<UserEventResponse>>(pagedUserEvents.Items),
                 TotalCount = pagedUserEvents.TotalCount,
                 PageSize = pagedUserEvents.PageSize,
                 PageNumber = pagedUserEvents.PageNumber

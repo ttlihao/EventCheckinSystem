@@ -8,12 +8,12 @@ namespace EventCheckinSystem.Services.Interfaces
 {
     public interface IUserEventServices
     {
-        Task<List<UserEventDTO>> GetAllUserEventsAsync();
-        Task<UserEventDTO> GetUserEventByIdAsync(int eventId);
-        Task<UserEventDTO> AddUserEventAsync(UserEventDTO userEventDto);
+        Task<List<UserEventResponse>> GetAllUserEventsAsync();
+        Task<UserEventResponse> GetUserEventByIdAsync(int eventId);
+        Task<UserEventResponse> AddUserEventAsync(UserEventDTO userEventDto);
         Task<bool> UpdateUserEventAsync(UserEventDTO userEventDto);
         Task<bool> DeleteUserEventAsync(int eventId);
-        Task<PagedResult<UserEventDTO>> GetPagedUserEventsAsync(PageRequest pageRequest);
+        Task<PagedResult<UserEventResponse>> GetPagedUserEventsAsync(PageRequest pageRequest);
         Task<List<EventResponse>> GetEventsByUserIdAsync(string userId);
     }
 }
