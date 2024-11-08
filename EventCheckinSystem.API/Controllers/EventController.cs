@@ -37,6 +37,26 @@ namespace EventCheckinSystem.API.Controllers
             }
         }
 
+        [HttpGet("get-all-event-incoming")]
+        public async Task<ActionResult<PagedResult<EventResponse>>> GetAllEventsIncoming([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            try
+            {
+                var pageRequest = new PageRequest { PageNumber = pageNumber, PageSize = pageSize };
+                var events = await _eventServices.GetPagedIncomingEventsAsync(pageRequest);
+                if (events.TotalCount == 0)
+                {
+                    return NotFound("Không có sự kiện sắp diễn ra");
+                }
+                return Ok(events);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+
         [HttpGet("{id}")]
         public async Task<ActionResult<EventResponse>> GetEventById(int id)
         {
@@ -47,6 +67,27 @@ namespace EventCheckinSystem.API.Controllers
             }
             return Ok(eventDto);
         }
+        [HttpGet("get-total-event-by-month")]
+        public async Task<ActionResult<EventResponse>> GetTotalEventInMonth(int month, int year)
+        {
+            var totalEvent = await _eventServices.GetTotalEventByMonth(month, year);
+            if (totalEvent == null)
+            {
+                return NotFound();
+            }
+            return Ok(totalEvent);
+        }
+        [HttpGet("get-event-by-month")]
+        public async Task<ActionResult<EventResponse>> GetEventsInMonth(int month, int year)
+        {
+            var events = await _eventServices.GetEventByMonth(month, year);
+            if (events == null)
+            {
+                return NotFound();
+            }
+            return Ok(events);
+        }
+
 
         [HttpPost]
         public async Task<ActionResult<EventResponse>> CreateEvent([FromBody] CreateEventDTO eventDto)

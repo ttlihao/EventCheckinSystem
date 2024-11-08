@@ -15,9 +15,12 @@ namespace EventCheckinSystem.Services.Interfaces
     {
         Task<IEnumerable<EventResponse>> GetAllEventsAsync();
         Task<EventResponse> GetEventByIdAsync(int id);
+        Task<int> GetTotalEventByMonth(int month, int year);
         Task<EventResponse> CreateEventAsync(CreateEventDTO newEvent);
         Task<bool> UpdateEventAsync(EventDTO updatedEvent);
         Task<bool> DeleteEventAsync(int id);
         Task<PagedResult<EventResponse>> GetPagedEventsAsync(PageRequest pageRequest);
+        Task<PagedResult<EventResponse>> GetPagedIncomingEventsAsync(PageRequest pageRequest);
+        Task<PagedResult<EventResponse>> GetEventByMonth(int month, int year);
     }
 }
