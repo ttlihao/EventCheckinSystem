@@ -18,6 +18,7 @@ using System.IdentityModel.Tokens.Jwt;
 using EventCheckinSystem.Repo.DTOs;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -116,7 +117,8 @@ builder.Services.AddScoped<IOrganizationRepo, OrganizationRepo>();
 builder.Services.AddScoped<IWelcomeTemplateRepo, WelcomeTemplateRepo>();
 builder.Services.AddScoped<IUserEventRepo, UserEventRepo>();
 builder.Services.AddScoped<IAuthenticateRepo, AuthenticateRepo>();
-
+builder.Services.AddScoped<IAzureBlobService>(provider =>
+    new AzureBlobService(builder.Configuration.GetConnectionString("AzureBlobStorage")));
 
 builder.Services.AddScoped<IUserContextService, UserContextService>();
 builder.Services.AddSingleton<IEmailService, EmailService>();   
