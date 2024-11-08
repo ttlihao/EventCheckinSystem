@@ -71,7 +71,7 @@ namespace EventCheckinSystem.API.Controllers
         public async Task<ActionResult<EventResponse>> GetTotalEventInMonth(int month, int year)
         {
             var totalEvent = await _eventServices.GetTotalEventByMonth(month, year);
-            if (totalEvent == null)
+            if (totalEvent == 0)
             {
                 return NotFound();
             }
