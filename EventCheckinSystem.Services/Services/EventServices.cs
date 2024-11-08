@@ -130,7 +130,7 @@ namespace EventCheckinSystem.Services.Services
             return totalEvents;
         }
 
-        public async Task<PagedResult<EventResponse>> GetEventByMonth(int month, int year)
+        public async Task<PagedResult<EventResponse>> GetEventByMonth(int month, int year, PageRequest pageRequest)
         {
             if (year < 1 || year > DateTime.Now.Year)
             {
@@ -142,14 +142,18 @@ namespace EventCheckinSystem.Services.Services
                 throw new ArgumentOutOfRangeException(nameof(month), "Month must be between 1 and 12.");
             }
 
-            var eventList = await _eventRepo.GetAllEventsAsync();
+            var pagedEvents = await _eventRepo.GetPagedEventsAsync(pageRequest);
 
-            var events = eventList
-                .Where(e => e.StartDate.Year == year && e.StartDate.Month == month)
-                .Count();
-
-            return events;
+            var events = pagedEvents.Items.Where(c => c.StartDate > _timeService.SystemTimeNow);
+            return new PagedResult<EventResponse>
+            {
+                Items = _mapper.Map<List<EventResponse>>(events),
+                TotalCount = events.Count(),
+                PageSize = pagedEvents.PageSize,
+                PageNumber = pagedEvents.PageNumber
+            };
         }
+
 
 
     }

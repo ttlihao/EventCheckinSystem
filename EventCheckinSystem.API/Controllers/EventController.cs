@@ -12,6 +12,7 @@ using EventCheckinSystem.Services.Services;
 namespace EventCheckinSystem.API.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class EventController : ControllerBase
     {
@@ -78,9 +79,10 @@ namespace EventCheckinSystem.API.Controllers
             return Ok(totalEvent);
         }
         [HttpGet("get-event-by-month")]
-        public async Task<ActionResult<EventResponse>> GetEventsInMonth(int month, int year)
+        public async Task<ActionResult<EventResponse>> GetEventsInMonth([FromQuery]int month, int year, int pageIndex = 1, int pageSize = 10)
         {
-            var events = await _eventServices.GetEventByMonth(month, year);
+            var pageRequest = new PageRequest { PageNumber = pageIndex, PageSize = pageSize };
+            var events = await _eventServices.GetEventByMonth(month, year, pageRequest);
             if (events == null)
             {
                 return NotFound();

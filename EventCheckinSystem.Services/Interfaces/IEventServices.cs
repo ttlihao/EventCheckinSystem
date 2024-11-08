@@ -21,6 +21,6 @@ namespace EventCheckinSystem.Services.Interfaces
         Task<bool> DeleteEventAsync(int id);
         Task<PagedResult<EventResponse>> GetPagedEventsAsync(PageRequest pageRequest);
         Task<PagedResult<EventResponse>> GetPagedIncomingEventsAsync(PageRequest pageRequest);
-        Task<PagedResult<EventResponse>> GetEventByMonth(int month, int year);
+        Task<PagedResult<EventResponse>> GetEventByMonth(int month, int year,PageRequest pageRequest);
     }
 }
