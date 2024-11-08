@@ -13,9 +13,9 @@ using System.Threading.Tasks;
 namespace EventCheckinSystem.Services.Interfaces
 {
     public interface IAuthenticateService
-    {
+    {   
         Task<UserDTO> RegisterAsync(UserDTO userDTO);
-        Task<LoginResponse> LoginAsync(string email, string password);
+        Task<LoginResponse> LoginAsync(string username, string password);
         Task<LoginResponse> LoginByGoogleAsync(string email);
         Task<LoginResponse> RefreshTokenAsync(string token, string refreshToken);
         Task<LoginResponse> RevokeRefreshTokenAsync(string refreshToken);

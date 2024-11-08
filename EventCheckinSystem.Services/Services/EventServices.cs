@@ -6,6 +6,7 @@ using EventCheckinSystem.Repo.DTOs.Paging;
 using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace EventCheckinSystem.Services.Services
 {
@@ -94,6 +95,67 @@ namespace EventCheckinSystem.Services.Services
                 PageNumber = pagedEvents.PageNumber
             };
         }
+        public async Task<PagedResult<EventResponse>> GetPagedIncomingEventsAsync(PageRequest pageRequest)
+        {
+            var pagedEvents = await _eventRepo.GetPagedEventsAsync(pageRequest);
+
+            var incomingEvents = pagedEvents.Items.Where(c => c.StartDate > _timeService.SystemTimeNow);
+            return new PagedResult<EventResponse>
+            {
+                Items = _mapper.Map<List<EventResponse>>(incomingEvents),
+                TotalCount = incomingEvents.Count(),
+                PageSize = pagedEvents.PageSize,
+                PageNumber = pagedEvents.PageNumber
+            };
+        }
+
+        public async Task<int> GetTotalEventByMonth(int month, int year)
+        {
+            if (year < 1 || year > DateTime.Now.Year)
+            {
+                throw new ArgumentOutOfRangeException(nameof(year), "Year must be between 1 and the current year.");
+            }
+
+            if (month < 1 || month > 12)
+            {
+                throw new ArgumentOutOfRangeException(nameof(month), "Month must be between 1 and 12.");
+            }
+
+            var eventList = await _eventRepo.GetAllEventsAsync();
+
+            var totalEvents = eventList
+                .Where(e => e.StartDate.Year == year && e.StartDate.Month == month)
+                .Count();
+
+            return totalEvents;
+        }
+
+        public async Task<PagedResult<EventResponse>> GetEventByMonth(int month, int year, PageRequest pageRequest)
+        {
+            if (year < 1 || year > DateTime.Now.Year)
+            {
+                throw new ArgumentOutOfRangeException(nameof(year), "Year must be between 1 and the current year.");
+            }
+
+            if (month < 1 || month > 12)
+            {
+                throw new ArgumentOutOfRangeException(nameof(month), "Month must be between 1 and 12.");
+            }
+
+            var pagedEvents = await _eventRepo.GetPagedEventsAsync(pageRequest);
+
+            var events = pagedEvents.Items.Where(c => c.StartDate > _timeService.SystemTimeNow);
+            return new PagedResult<EventResponse>
+            {
+                Items = _mapper.Map<List<EventResponse>>(events),
+                TotalCount = events.Count(),
+                PageSize = pagedEvents.PageSize,
+                PageNumber = pagedEvents.PageNumber
+            };
+        }
+
+
+
     }
 
 }

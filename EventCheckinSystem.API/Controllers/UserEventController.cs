@@ -1,5 +1,6 @@
 ﻿using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.DTOs.Paging;
+using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -97,7 +98,7 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet("user/{userId}/events")]
-        public async Task<ActionResult<List<EventDTO>>> GetEventsByUserId(string userId)
+        public async Task<ActionResult<List<EventResponse>>> GetEventsByUserId(string userId)
         {
             try
             {

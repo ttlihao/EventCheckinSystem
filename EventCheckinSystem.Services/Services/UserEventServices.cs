@@ -2,6 +2,7 @@
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.DTOs.Paging;
+using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using EventCheckinSystem.Repo.Repositories.Interfaces;
 using EventCheckinSystem.Services.Interfaces;
 using System;
@@ -99,11 +100,11 @@ namespace EventCheckinSystem.Services.Services
             };
         }
 
-        public async Task<List<EventDTO>> GetEventsByUserIdAsync(string userId)
+        public async Task<List<EventResponse>> GetEventsByUserIdAsync(string userId)
         {
             var eventIds = await _userEventRepo.GetEventIdsByUserIdAsync(userId);
             var events = await _eventRepo.GetEventsByEventIdsAsync(eventIds);       
-            return _mapper.Map<List<EventDTO>>(events);
+            return _mapper.Map<List<EventResponse>>(events);
         }
 
     }

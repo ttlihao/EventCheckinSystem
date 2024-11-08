@@ -1,5 +1,6 @@
 ﻿using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.DTOs.Paging;
+using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -13,6 +14,6 @@ namespace EventCheckinSystem.Services.Interfaces
         Task<bool> UpdateUserEventAsync(UserEventDTO userEventDto);
         Task<bool> DeleteUserEventAsync(int eventId);
         Task<PagedResult<UserEventDTO>> GetPagedUserEventsAsync(PageRequest pageRequest);
-        Task<List<EventDTO>> GetEventsByUserIdAsync(string userId);
+        Task<List<EventResponse>> GetEventsByUserIdAsync(string userId);
     }
 }
