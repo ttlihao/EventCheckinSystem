@@ -46,7 +46,7 @@ namespace EventCheckinSystem.API.Controllers
             return Ok(checkin);
         }
 
-        [HttpPost]
+        [HttpPost("{id}")]
         public async Task<ActionResult<GuestCheckinDTO>> CreateCheckin([FromBody] int guestId)
         {
             var createdCheckin = await _guestCheckinService.CreateCheckinAsync(guestId);
@@ -65,11 +65,5 @@ namespace EventCheckinSystem.API.Controllers
             return Ok(await _guestCheckinService.DeleteCheckinAsync(id));
         }
 
-        [HttpPost("checkin")]
-        public async Task<ActionResult<GuestCheckinDTO>> CheckinGuest([FromQuery] int guestId)
-        {
-            var checkin = await _guestCheckinService.CheckinGuestByIdAsync(guestId);
-            return Ok(checkin);
-        }
     }
 }
