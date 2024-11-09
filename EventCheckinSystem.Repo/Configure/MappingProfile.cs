@@ -29,6 +29,7 @@ namespace EventCheckinSystem.Repo.Configure
                 .ReverseMap();
             CreateMap<Guest, GuestResponse>()
                 .ForMember(dest => dest.checkinStatus, opt => opt.MapFrom(src => src.GuestCheckin != null))
+                .ForMember(dest => dest.ImageURL, opt => opt.MapFrom(src => src.GuestImage.ImageURL))
                 .ReverseMap();
             CreateMap<Guest, CreateGuestDTO>().ReverseMap();
 
