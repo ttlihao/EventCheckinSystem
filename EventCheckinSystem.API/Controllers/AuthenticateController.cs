@@ -9,6 +9,7 @@ using System.Security.Claims;
 namespace EventCheckinSystem.API.Controllers
 {
     [ApiController]
+
     [Route("api/[controller]")]
     public class AuthenticateController : Controller
     {

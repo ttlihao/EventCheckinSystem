@@ -43,7 +43,7 @@ namespace EventCheckinSystem.Services.Services
 
          
             var sasToken = GenerateSasToken(blobClient);
-            return $"{blobClient.Uri}?{sasToken}";
+            return $"{sasToken}";
         }
 
         private string GenerateSasToken(BlobClient blobClient)
@@ -53,7 +53,7 @@ namespace EventCheckinSystem.Services.Services
             {
                 BlobContainerName = _containerName,
                 BlobName = blobClient.Name,
-                ExpiresOn = DateTimeOffset.UtcNow.AddHours(1)
+                ExpiresOn = DateTimeOffset.UtcNow.AddYears(1)
             };
             sasBuilder.SetPermissions(BlobSasPermissions.Read | BlobSasPermissions.Write);
             return blobClient.GenerateSasUri(sasBuilder).ToString();
