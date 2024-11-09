@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using EventCheckinSystem.Repo.Data;
 using EventCheckinSystem.Repo.DTOs;
 using EventCheckinSystem.Repo.DTOs.CreateDTO;
@@ -15,16 +15,18 @@ namespace EventCheckinSystem.Services.Services
     public class GuestCheckinServices : IGuestCheckinServices
     {
         private readonly IGuestCheckinRepo _checkinRepo;
+        private readonly IGuestRepo _guestRepo;
         private readonly IMapper _mapper;
         private readonly IUserContextService _userContextService;
         private readonly ITimeService _timeService;
 
-        public GuestCheckinServices(IGuestCheckinRepo checkinRepo, IMapper mapper, IUserContextService userContextService, ITimeService timeService)
+        public GuestCheckinServices(IGuestCheckinRepo checkinRepo, IMapper mapper, IUserContextService userContextService, ITimeService timeService, IGuestRepo guestRepo)
         {
             _checkinRepo = checkinRepo;
             _mapper = mapper;
             _userContextService = userContextService;
             _timeService = timeService;
+            _guestRepo = guestRepo;
         }
 
         public async Task<IEnumerable<GuestCheckinDTO>> GetAllCheckinsAsync()
@@ -39,17 +41,23 @@ namespace EventCheckinSystem.Services.Services
             return guestCheckin == null ? null : _mapper.Map<GuestCheckinDTO>(guestCheckin);
         }
 
-        public async Task<GuestCheckinDTO> CreateCheckinAsync(CreateGuestCheckinDTO guestCheckinDto)
+        public async Task<GuestCheckinDTO> CreateCheckinAsync(int guestId)
         {
             try
             {
-                var newCheckin = _mapper.Map<GuestCheckin>(guestCheckinDto);
-                newCheckin.CreatedBy = _userContextService.GetCurrentUserId();
-                newCheckin.LastUpdatedBy = newCheckin.CreatedBy;
-                newCheckin.CreatedTime = _timeService.SystemTimeNow;
-                newCheckin.LastUpdatedTime = _timeService.SystemTimeNow;
-                newCheckin.CheckinTime = _timeService.SystemTimeNow.DateTime;
-                newCheckin.Status = "Checked In";
+                var newCheckin = new GuestCheckin {
+                    GuestID = guestId,
+                    Notes = "",
+                    Status = "Checkin Success",
+                    Guest = await _guestRepo.GetGuestByIdAsync(guestId),
+                    CreatedBy = _userContextService.GetCurrentUserId(),
+                    LastUpdatedBy = _userContextService.GetCurrentUserId(),
+                    CreatedTime = _timeService.SystemTimeNow,
+                    LastUpdatedTime = _timeService.SystemTimeNow,
+                    CheckinTime = _timeService.SystemTimeNow.DateTime,
+                    IsActive = true,
+                    IsDelete = false,
+                };
                 var createdCheckin = await _checkinRepo.CreateCheckinAsync(newCheckin);
                 return _mapper.Map<GuestCheckinDTO>(createdCheckin);
             }

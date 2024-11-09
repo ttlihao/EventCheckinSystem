@@ -11,7 +11,7 @@ namespace EventCheckinSystem.Services.Interfaces
     {
         Task<IEnumerable<GuestCheckinDTO>> GetAllCheckinsAsync();
         Task<GuestCheckinDTO> GetCheckinByIdAsync(int id);
-        Task<GuestCheckinDTO> CreateCheckinAsync(CreateGuestCheckinDTO guestCheckinDto);
+        Task<GuestCheckinDTO> CreateCheckinAsync(int guestId);
         Task<bool> UpdateCheckinAsync(GuestCheckinDTO updatedCheckinDto);
         Task<bool> DeleteCheckinAsync(int id);
         Task<GuestCheckinDTO> CheckinGuestByIdAsync(int guestId);

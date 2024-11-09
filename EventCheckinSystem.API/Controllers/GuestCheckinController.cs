@@ -47,9 +47,9 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<GuestCheckinDTO>> CreateCheckin([FromBody] CreateGuestCheckinDTO checkinDto)
+        public async Task<ActionResult<GuestCheckinDTO>> CreateCheckin([FromBody] int guestId)
         {
-            var createdCheckin = await _guestCheckinService.CreateCheckinAsync(checkinDto);
+            var createdCheckin = await _guestCheckinService.CreateCheckinAsync(guestId);
             return CreatedAtAction(nameof(GetCheckinById), new { id = createdCheckin.GuestCheckinID }, createdCheckin);
         }
 
