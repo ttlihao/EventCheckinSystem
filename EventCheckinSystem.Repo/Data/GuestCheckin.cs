@@ -12,7 +12,7 @@ namespace EventCheckinSystem.Repo.Data
         public int GuestCheckinID { get; set; }
         public int GuestID { get; set; }
         public DateTime CheckinTime { get; set; }
-        public string Status { get; set; }
+        public string Status { get; set; } = "Not Checkin";
         public string Notes { get; set; }
         public Guest Guest { get; set; }
     }
