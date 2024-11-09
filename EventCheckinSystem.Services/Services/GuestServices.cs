@@ -102,7 +102,7 @@ namespace EventCheckinSystem.Services.Services
             }
         }
 
-        public async Task<bool> UpdateGuestAsync(GuestDTO guestDto)
+        public async Task<bool> UpdateGuestAsync(GuestDTO guestDto, IFormFile imageFile = null)
         {
             try
             {
@@ -111,7 +111,33 @@ namespace EventCheckinSystem.Services.Services
                 {
                     throw new Exception("Guest not found");
                 }
-                _mapper.Map(guestDto, existingGuest); // Map updated fields to existing entity
+                if (imageFile != null)
+                {
+                    guestDto.ImageURL = await _azureBlobService.UploadImageAsync(imageFile);
+                    var existingGuestImage = await _guestImageRepo.GetGuestImageByGuestIdAsync(guestDto.GuestID);
+                    if (existingGuestImage != null)
+                    {
+                        existingGuestImage.ImageURL = guestDto.ImageURL;
+                        existingGuestImage.LastUpdatedBy = _userContextService.GetCurrentUserId();
+                        existingGuestImage.LastUpdatedTime = DateTime.UtcNow;
+                        await _guestImageRepo.UpdateGuestImageAsync(existingGuestImage);
+                    }
+                    else
+                    {
+                        var newGuestImage = new GuestImage
+                        {
+                            GuestID = guestDto.GuestID,
+                            ImageURL = guestDto.ImageURL,
+                            CreatedBy = _userContextService.GetCurrentUserId(),
+                            LastUpdatedBy = _userContextService.GetCurrentUserId(),
+                            CreatedTime = DateTime.UtcNow,
+                            LastUpdatedTime = DateTime.UtcNow
+                        };
+                        await _guestImageRepo.CreateGuestImageAsync(newGuestImage);
+                    }
+                }
+
+                _mapper.Map(guestDto, existingGuest);
                 existingGuest.LastUpdatedBy = _userContextService.GetCurrentUserId();
                 existingGuest.LastUpdatedTime = _timeService.SystemTimeNow;
                 return await _guestRepo.UpdateGuestAsync(existingGuest);
@@ -121,6 +147,7 @@ namespace EventCheckinSystem.Services.Services
                 throw new Exception("An error occurred while updating the guest", ex);
             }
         }
+
 
         public async Task<bool> DeleteGuestAsync(int guestId)
         {

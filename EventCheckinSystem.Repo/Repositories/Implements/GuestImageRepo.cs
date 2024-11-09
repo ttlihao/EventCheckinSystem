@@ -129,5 +129,10 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
 
             return await query.CreatePagingAsync(pageRequest.PageNumber, pageRequest.PageSize);
         }
+
+        public async Task<GuestImage> GetGuestImageByGuestIdAsync(int guestId)
+        {
+            return await _context.GuestImages.FirstOrDefaultAsync(img => img.GuestID == guestId);
+        }
     }
 }

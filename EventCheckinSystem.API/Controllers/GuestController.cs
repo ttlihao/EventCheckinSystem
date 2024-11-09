@@ -117,12 +117,20 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateGuest([FromBody] GuestDTO updatedGuest)
+        public async Task<IActionResult> UpdateGuest([FromForm] GuestDTO updatedGuest, IFormFile imageFile = null)
         {
             try
             {
-                await _guestService.UpdateGuestAsync(updatedGuest);
-                return Ok();
+                var result = await _guestService.UpdateGuestAsync(updatedGuest, imageFile);
+
+                if (result)
+                {
+                    return Ok(new { Message = "Guest updated successfully" });
+                }
+                else
+                {
+                    return NotFound("Guest not found or update failed");
+                }
             }
             catch (NullReferenceException ex)
             {
@@ -133,6 +141,7 @@ namespace EventCheckinSystem.API.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGuest(int id)

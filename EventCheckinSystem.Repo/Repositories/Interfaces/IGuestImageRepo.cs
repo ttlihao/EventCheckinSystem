@@ -14,5 +14,6 @@ namespace EventCheckinSystem.Repo.Repositories.Interfaces
         Task<bool> UpdateGuestImageAsync(GuestImage guestImage);
         Task<bool> DeleteGuestImageAsync(int id);
         Task<PagedResult<GuestImage>> GetPagedGuestImagesAsync(PageRequest pageRequest);
+        Task<GuestImage> GetGuestImageByGuestIdAsync(int guestId);
     }
 }
