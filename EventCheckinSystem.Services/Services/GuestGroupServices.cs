@@ -111,16 +111,16 @@ namespace EventCheckinSystem.Services.Services
             };
         }
 
-        public async Task<List<GuestGroupDTO>> GetGuestGroupsByUserIdAsync(string userId)
+        public async Task<List<GuestGroupResponse>> GetGuestGroupsByUserIdAsync(string userId)
         {
             var guestGroups = await _guestGroupRepo.GetGuestGroupsByUserIdAsync(userId);
-            return _mapper.Map<List<GuestGroupDTO>>(guestGroups);
+            return _mapper.Map<List<GuestGroupResponse>>(guestGroups);
         }
 
-        public async Task<List<GuestGroupDTO>> GetGuestGroupsByEventIdAsync(int eventId)
+        public async Task<List<GuestGroupResponse>> GetGuestGroupsByEventIdAsync(int eventId)
         {
             var guestGroups = await _guestGroupRepo.GetGuestGroupsByEventIdAsync(eventId);
-            return _mapper.Map<List<GuestGroupDTO>>(guestGroups);
+            return _mapper.Map<List<GuestGroupResponse>>(guestGroups);
         }
     }
 }

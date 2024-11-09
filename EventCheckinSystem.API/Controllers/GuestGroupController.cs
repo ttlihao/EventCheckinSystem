@@ -119,7 +119,7 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet("user/{userId}/guest-groups")]
-        public async Task<ActionResult<List<GuestGroupDTO>>> GetGuestGroupsByUserId(string userId)
+        public async Task<ActionResult<List<GuestGroupResponse>>> GetGuestGroupsByUserId(string userId)
         {
             try
             {
@@ -137,7 +137,7 @@ namespace EventCheckinSystem.API.Controllers
         }
 
         [HttpGet("event/{eventId}/guest-groups")]
-        public async Task<ActionResult<List<GuestGroupDTO>>> GetGuestGroupsByEventId(int eventId)
+        public async Task<ActionResult<List<GuestGroupResponse>>> GetGuestGroupsByEventId(int eventId)
         {
             try
             {

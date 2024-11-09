@@ -113,6 +113,9 @@ namespace EventCheckinSystem.Repo.Repositories.Implements
         {
             return await _context.Events
                 .Where(e => eventIds.Contains(e.EventID))
+                .Include(e => e.Organization)
+                    .Include(e => e.GuestGroups)
+                    .Include(e => e.UserEvents)
                 .ToListAsync();
         }
 

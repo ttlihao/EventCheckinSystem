@@ -30,7 +30,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll",
         builder =>
         {
-            builder.WithOrigins("*")
+            builder.AllowAnyOrigin()
                    .AllowAnyHeader()
                    .AllowAnyMethod();
         });
@@ -221,9 +221,10 @@ if (app.Environment.IsDevelopment()|| app.Environment.IsProduction())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
+app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();

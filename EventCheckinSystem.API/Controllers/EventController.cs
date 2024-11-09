@@ -12,7 +12,6 @@ using EventCheckinSystem.Services.Services;
 namespace EventCheckinSystem.API.Controllers
 {
     [ApiController]
-    [Authorize]
     [Route("api/[controller]")]
     public class EventController : ControllerBase
     {
