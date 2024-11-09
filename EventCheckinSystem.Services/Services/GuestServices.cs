@@ -13,6 +13,7 @@ using System.Data;
 using System.Threading.Tasks;
 using ExcelDataReader;
 using EventCheckinSystem.Repo.DTOs.Paging;
+using EventCheckinSystem.Repo.DTOs.ResponseDTO;
 
 namespace EventCheckinSystem.Services.Services
 {
@@ -37,21 +38,21 @@ namespace EventCheckinSystem.Services.Services
             _azureBlobService = azureBlobService;
         }
 
-        public async Task<List<GuestDTO>> GetAllGuestsAsync()
+        public async Task<List<GuestResponse>> GetAllGuestsAsync()
         {
             var guests = await _guestRepo.GetAllGuestsAsync();
-            return _mapper.Map<List<GuestDTO>>(guests);
+            return _mapper.Map<List<GuestResponse>>(guests);
         }
 
-        public async Task<GuestDTO> GetGuestByIdAsync(int guestId)
+        public async Task<GuestResponse> GetGuestByIdAsync(int guestId)
         {
             var guest = await _guestRepo.GetGuestByIdAsync(guestId);
-            return guest != null ? _mapper.Map<GuestDTO>(guest) : null;
+            return guest != null ? _mapper.Map<GuestResponse>(guest) : null;
         }
-        public async Task<List<GuestDTO>> GetGuestByNameAsync(string guestName)
+        public async Task<List<GuestResponse>> GetGuestByNameAsync(string guestName)
         {
             var guest = await _guestRepo.GetGuestsByNameAsync(guestName);
-            return guest != null ? _mapper.Map<List<GuestDTO>>(guest) : null;
+            return guest != null ? _mapper.Map<List<GuestResponse>>(guest) : null;
         }
 
         public async Task<GuestDTO> AddGuestAsync(CreateGuestDTO guestDto, IFormFile imageFile)
@@ -134,15 +135,15 @@ namespace EventCheckinSystem.Services.Services
             }
         }
 
-        public async Task<List<GuestDTO>> GetGuestsByGroupIdAsync(int guestGroupId)
+        public async Task<List<GuestResponse>> GetGuestsByGroupIdAsync(int guestGroupId)
         {
             var guests = await _guestRepo.GetGuestsByGroupIdAsync(guestGroupId);
-            return _mapper.Map<List<GuestDTO>>(guests);
+            return _mapper.Map<List<GuestResponse>>(guests);
         }
-        public async Task<List<GuestDTO>> GetGuestsByEventIdAsync(int eventId)
+        public async Task<List<GuestResponse>> GetGuestsByEventIdAsync(int eventId)
         {
             var guests = await _guestRepo.GetGuestsByEventIdAsync(eventId);
-            return _mapper.Map<List<GuestDTO>>(guests);
+            return _mapper.Map<List<GuestResponse>>(guests);
         }
 
         public async Task<int> ImportGuestsFromExcelAsync(IFormFile file)
@@ -233,13 +234,13 @@ namespace EventCheckinSystem.Services.Services
             return dataSet.Tables[0];
         }
 
-        public async Task<PagedResult<GuestDTO>> GetPagedGuestsAsync(PageRequest pageRequest)
+        public async Task<PagedResult<GuestResponse>> GetPagedGuestsAsync(PageRequest pageRequest)
         {
             var pagedGuests = await _guestRepo.GetPagedGuestsAsync(pageRequest);
 
-            return new PagedResult<GuestDTO>
+            return new PagedResult<GuestResponse>
             {
-                Items = _mapper.Map<List<GuestDTO>>(pagedGuests.Items),
+                Items = _mapper.Map<List<GuestResponse>>(pagedGuests.Items),
                 TotalCount = pagedGuests.TotalCount,
                 PageSize = pagedGuests.PageSize,
                 PageNumber = pagedGuests.PageNumber
